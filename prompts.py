@@ -19,8 +19,8 @@ def aspect_prompt(topic, k=5, n=10):
     "aspect_list":
         [
             {{
-                "aspect_label": <should be a brief, 5-10 word string where the value is the label of the aspect (phrase-length)>,
-                "aspect_keywords": <list of {n} unique, comma-separated keywords (always a space after the comma) commonly used to describe the aspect_label (e.g., keyword_1, keyword_2, ..., keyword_{n})>
+                "aspect_label": <should be a brief, 5-10 word string where the value is an all-lowercase label of the aspect (phrase-length)>,
+                "aspect_keywords": <list of {n} unique, all-lowercase, and comma-separated keywords (always a space after the comma) commonly used to describe the aspect_label (e.g., keyword_1, keyword_2, ..., keyword_{n})>
             }}
         ]
 }}
