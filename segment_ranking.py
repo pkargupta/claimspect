@@ -1,5 +1,5 @@
-from utils.e5_model import e5_embed
-from utils.openai_embed import openai_embed
+from api.local.e5_model import e5_embed
+from api.openai.embed import openai_embed
 from scipy.spatial.distance import cosine
 import numpy as np
 
@@ -22,7 +22,6 @@ def positive_rank(target_aspect, segment_embs, embed_func):
     # S x 1
     return mean_pos
 
-
 def negative_rank(neg_aspects, segment_embs, embed_func, breadth_weight=0.5):
     # Query: We assume that the segment is relevant to the neg_aspects' parent aspect, so we do not need to include this within the query
     # penalize both breadth of neg_aspects discussed (mean of mean) AND depth of neg_aspects discussed (max of mean overall)
@@ -38,7 +37,7 @@ def negative_rank(neg_aspects, segment_embs, embed_func, breadth_weight=0.5):
         neg_aspect_sim = cosine_similarity(segment_embs, keyword_embs) # S x K
     
         # the more number of subaspects/keywords discussed, the worse -> 
-        mean_neg = target_similarity.mean(axis=1) # S x 1
+        mean_neg = neg_aspect_sim.mean(axis=1) # S x 1
         aspect_sims.append(mean_neg)
     
     aspect_sims = np.array(aspect_sims) # S x A
@@ -50,15 +49,17 @@ def negative_rank(neg_aspects, segment_embs, embed_func, breadth_weight=0.5):
     # S x 1
     return neg_rank
 
-
 def discriminative_rank(target_aspect, neg_aspects, segment_embs, embed_func, beta=1, gamma=2):
+    
     # Reward chunks that discuss the target aspect (S x 1)
+    print(f"Computing positive rank for {target_aspect.name}")
     pos_r = positive_rank(target_aspect, segment_embs, embed_func)
+    
     # Penalize chunks that discuss the distractor aspects (S x 1)
+    print(f"Computing negative rank for {target_aspect.name}")
     neg_r = negative_rank(neg_aspects, segment_embs, embed_func)
     
     return (pos_r * beta)/(neg_r * gamma)
-
 
 def aspect_segment_ranking(segments, target_aspect, neg_aspects, embed_func=e5_embed):
     """Step 3: Rank corpus segments based on relevance to keywords."""
@@ -68,7 +69,15 @@ def aspect_segment_ranking(segments, target_aspect, neg_aspects, embed_func=e5_e
     # we also want to penalize the segments which discuss a multitude of other aspects, given that they may distract during subaspect discovery + perspective
 
     segment_embs = embed_func([segments])[segments]
-    segment_ranks = discriminative_rank(target_aspect, neg_aspects, segment_embs, embed_func)
+    segment_scores = discriminative_rank(target_aspect, neg_aspects, segment_embs, embed_func)
+
+    segment_ranks = sorted(np.arange(len(segments)), key=lambda x: -segment_scores[x])
+
+    id2rank = {}
+    rank2id = {}
+    for rank, seg_id in enumerate(segment_ranks):
+        id2rank[seg_id] = rank
+        rank2id[rank] = seg_id
     
-    return segment_ranks
+    return rank2id, id2rank
     
