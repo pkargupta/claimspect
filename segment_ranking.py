@@ -1,5 +1,5 @@
-from utils.e5_model import e5_embed
-from utils.openai_embed import openai_embed
+from api.local.e5_model import e5_embed
+from api.openai.embed import openai_embed
 from scipy.spatial.distance import cosine
 import numpy as np
 
