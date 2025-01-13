@@ -1,8 +1,9 @@
 class Paper:
-    def __init__(self, paper_id, title, abstract):
+    def __init__(self, paper_id, title, abstract, segments=None):
         self.paper_id = paper_id
         self.title = title
         self.abstract = abstract
+        self.segments = segments
         
     def get_summary(self, max_length=250):
         """Returns a summary of the paper."""
@@ -44,6 +45,24 @@ class AspectNode:
         for sub_aspect in self.sub_aspects:
             papers.update(sub_aspect.get_all_papers())
         return papers
+
+    def get_all_keywords(self):
+        """Retrieves all keywords associated with this node and its sub-aspects."""
+        keywords = set(self.keywords)
+        for sub_aspect in self.sub_aspects:
+            keywords.update(sub_aspect.get_all_keywords())
+        return keywords
+
+    def get_all_segments(self, as_str=False):
+        """Retrieves all segments associated with this node and its papers."""
+        all_segments = []
+        for entry in self.related_papers.values():
+            if as_str:
+                all_segments.extend([seg.content for seg in entry["relevant_segments"]])
+            else:
+                all_segments.extend(entry["relevant_segments"])
+        
+        return all_segments
 
     def display(self, level=0):
         """Displays the aspect hierarchy starting from this node."""

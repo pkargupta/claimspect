@@ -114,8 +114,8 @@ class E5:
         return ret
 
 @memory.cache
-def e5_embed(text_list: list[str]):
-    e5 = E5()
+def e5_embed(args, text_list: list[str]):
+    e5 = args.embed_model
     res = e5(text_list)
     return res
 

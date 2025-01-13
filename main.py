@@ -1,5 +1,6 @@
 import argparse
 from vllm import LLM
+from api.local.e5_model import E5
 from vllm import SamplingParams
 from outlines.serve.vllm import JSONLogitsProcessor
 import json
@@ -11,10 +12,10 @@ def coarse_grained_aspect_discovery(args, claim, temperature=0.3, top_p=0.99):
     """Step 1: Generate coarse-grained aspects for the claim."""
     """Step 2: Generate specific keywords for each aspect."""
     
-    logits_processor = JSONLogitsProcessor(schema=aspect_list_schema, llm=args.model.llm_engine)
+    logits_processor = JSONLogitsProcessor(schema=aspect_list_schema, llm=args.chat_model.llm_engine)
     sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], temperature=temperature, top_p=top_p)
 
-    output = args.model.generate(aspect_prompt(claim), sampling_params=sampling_params)[0].outputs[0].text
+    output = args.chat_model.generate(aspect_prompt(claim), sampling_params=sampling_params)[0].outputs[0].text
 
     aspects = json.loads(output)['aspect_list']
     
@@ -59,21 +60,44 @@ def perspective_discovery(tree, claim):
     print(f"Perspectives discovered for claim '{claim}'.")
 
 def main(args):
+    # input corpus -> @Runchu is writing the dataset loader; we assume we have a corpus of Paper classes where the Paper class has an attribute called segments
+    # corpus: dict of Paper objects
+    # paper.segments: list of Segment objects where
+    
     claim = args.claim
     id2node = []
-
+    
     # Initialize tree
     root_node = AspectNode(idx=0, name=claim)
+    for paper in corpus:
+        # for the root_node, we naively assume that all segments in the corpus are relevant to the root
+        root_node.add_related_paper(paper, paper.segments)
+    
     tree = Tree(root_node)
     id2node.append(root_node)
 
     # Coarse-grained aspect discovery + keyword generation
     aspects = coarse_grained_aspect_discovery(args, claim)
-
+    
+    # Expand tree with first level
+    all_segments = root_node.get_all_segments(as_str=True)
     for aspect in aspects:
-        aspect_node = AspectNode(idx=len(id2node), name=aspect["aspect_label"], keywords=aspect["aspect_keywords"])
+        # Refine keywords
+        refined_aspect_keywords = extract_keyword(args, 
+                                                  claim=claim, 
+                                                  aspect_name=aspect["aspect_label"],
+                                                  aspect_keywords_from_llm=aspect["aspect_keywords"],
+                                                  corpus_segments=all_segments,
+                                                  retrieved_corpus_num=5,
+                                                  min_keyword_num=5,
+                                                  max_keyword_num=10,
+                                                  iteration_num=2)
+        
+        aspect_node = AspectNode(idx=len(id2node), name=aspect["aspect_label"], keywords=refined_aspect_keywords)
         tree.add_aspect(self, root_node, aspect_node)
         id2node.append(aspect_node)
+
+    
 
     # Keyword generation and corpus segment ranking
     # aspect_hierarchy = {}
@@ -96,8 +120,13 @@ if __name__ == "__main__":
     parser.add_argument("--claim", default="The United States' efforts to study and detect dangerous biological pathogens internationally risks misuse by allies and/or targeted biological attacks by adversaries.")
     parser.add_argument("--data_dir", default="datasets/")
     parser.add_argument("--topic", default="biosecurity")
+    parser.add_argument("--chat_model_name", default="vllm")
+    parser.add_argument("--embedding_model_name", default="e5")
     args = parser.parse_args()
 
-    args.model = LLM(model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True)
+    if args.embedding_model_name == "e5":
+        args.embed_model = E5()
+    if args.chat_model_name == "vllm":
+        args.chat_model = LLM(model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True)
 
     main(args)
