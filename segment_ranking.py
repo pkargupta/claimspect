@@ -1,5 +1,3 @@
-from api.local.e5_model import e5_embed
-from api.openai.embed import openai_embed
 from scipy.spatial.distance import cosine
 import numpy as np
 
@@ -49,7 +47,7 @@ def negative_rank(neg_aspects, segment_embs, embed_func, breadth_weight=0.5):
     # S x 1
     return neg_rank
 
-def discriminative_rank(target_aspect, neg_aspects, segment_embs, embed_func, beta=1, gamma=2):
+def discriminative_rank(target_aspect, neg_aspects, segment_embs, embed_func, beta, gamma):
     
     # Reward chunks that discuss the target aspect (S x 1)
     print(f"Computing positive rank for {target_aspect.name}")
@@ -61,15 +59,15 @@ def discriminative_rank(target_aspect, neg_aspects, segment_embs, embed_func, be
     
     return (pos_r * beta)/(neg_r * gamma)
 
-def aspect_segment_ranking(segments, target_aspect, neg_aspects, embed_func=e5_embed):
+def aspect_segment_ranking(args, segments, target_aspect, neg_aspects):
     """Step 3: Rank corpus segments based on relevance to keywords."""
     
     # we are by default, provided segments that are relevant to a given aspect
     # however, which are most likely to contain all relevant subaspects? we assume that the keywords cover many subaspects
     # we also want to penalize the segments which discuss a multitude of other aspects, given that they may distract during subaspect discovery + perspective
 
-    segment_embs = embed_func([segments])[segments]
-    segment_scores = discriminative_rank(target_aspect, neg_aspects, segment_embs, embed_func)
+    segment_embs = args.embed_func([segments])[segments]
+    segment_scores = discriminative_rank(target_aspect, neg_aspects, segment_embs, args.embed_func, args.beta, args.gamma)
 
     segment_ranks = sorted(np.arange(len(segments)), key=lambda x: -segment_scores[x])
 

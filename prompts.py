@@ -8,7 +8,7 @@ class gen_aspect_schema(BaseModel):
     aspect_keywords: Annotated[str, StringConstraints(strip_whitespace=True)]
     
 class aspect_list_schema(BaseModel):
-    aspect_list : conlist(gen_aspect_schema, min_length=2,max_length=5)
+    aspect_list : conlist(gen_aspect_schema, min_length=2, max_length=5)
 
 
 aspect_candidate_init_prompt = lambda topic, k=5, n=10: f"You are an analyst that identifies the different aspects (a minimum of 2 and a maximum of {k} aspects) that scientific research papers would consider when determining the answer to the following topic: \"{topic}\". For each aspect, provide {n} additional keywords that would typically be used to describe that aspect for the topic, {topic}.\n\n"

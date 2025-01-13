@@ -24,7 +24,7 @@ def get_embedding_function(args):
     """
     if args.embedding_model_name == "text-embedding-3-large":
         return openai_embed
-    elif args.embedding_model_name == "e5"
+    elif args.embedding_model_name == "e5":
         return e5_embed
     else:
         raise ValueError(f"Embedding model {args.embedding_model_name} not supported.")
@@ -49,12 +49,12 @@ def get_chat_function(args):
             logits_processor = JSONLogitsProcessor(schema=keyword_schema, llm=args.chat_model.llm_engine)
             sampling_params = SamplingParams(max_tokens=1000, logits_processors=[logits_processor], seed=42, temperature=0.7)
             outputs = args.model.generate(prompts, sampling_params=sampling_params)[0].outputs[0].text
-            keywords = json.loads(output)['output_keywords']
+            keywords = json.loads(outputs)['output_keywords']
             return [keywords]
             
         return vllm
     else:
-        raise ValueError(f"Chat model {chat_model_name} not supported.")
+        raise ValueError(f"Chat model {args.chat_model_name} not supported.")
 
 
 def stage1_retrieve_top_k_corpus_segments(args, 
@@ -68,7 +68,7 @@ def stage1_retrieve_top_k_corpus_segments(args,
     """
     
     # get the embedding of query and corpus segments
-    embedding_func = get_embedding_function(args)
+    embedding_func = args.embed_func
     retrieval_query = f"Claim: {claim} Aspect: {aspect_name} Aspect Keywords: {', '.join(current_keyword_group)}"
     retrieval_query_embedding_dict = embedding_func(args, [retrieval_query])
     corpus_segments_embeddings_dict = embedding_func(args, corpus_segments)

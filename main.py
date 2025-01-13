@@ -1,12 +1,20 @@
 import argparse
 from vllm import LLM
-from api.local.e5_model import E5
 from vllm import SamplingParams
 from outlines.serve.vllm import JSONLogitsProcessor
 import json
+from tqdm import tqdm
+from collections import deque
+
+from api.local.e5_model import E5
+from api.local.e5_model import e5_embed
+from api.openai.embed import openai_embed
 
 from hierarchy import Paper, AspectNode, Tree
+from keyword_generation.keyword_extractor import extract_keyword, stage1_retrieve_top_k_corpus_segments
 from prompts import aspect_list_schema, aspect_prompt
+from segment_ranking import aspect_segment_ranking
+from discovery import subaspect_discovery
 
 def coarse_grained_aspect_discovery(args, claim, temperature=0.3, top_p=0.99):
     """Step 1: Generate coarse-grained aspects for the claim."""
@@ -91,23 +99,58 @@ def main(args):
                                                   retrieved_corpus_num=5,
                                                   min_keyword_num=5,
                                                   max_keyword_num=10,
-                                                  iteration_num=2)
+                                                  iteration_num=1)
         
-        aspect_node = AspectNode(idx=len(id2node), name=aspect["aspect_label"], keywords=refined_aspect_keywords)
-        tree.add_aspect(self, root_node, aspect_node)
+        aspect_node = AspectNode(idx=len(id2node), name=aspect["aspect_label"], parent=root_node, keywords=refined_aspect_keywords)
+        tree.add_aspect(root_node, aspect_node)
         id2node.append(aspect_node)
 
-    
+    # Initialize a queue where for each aspect node, we:
+    queue = deque(root_node.subaspects)
 
-    # Keyword generation and corpus segment ranking
-    # aspect_hierarchy = {}
-    # for aspect in aspects:
-    #     keywords = keyword_generation(aspect)
-    #     ranked_segments = corpus_segment_ranking(aspect, keywords)
+    while queue:
+        current_node:AspectNode = queue.popleft()
+        print(f"Current Node: {current_node.name}")
+        
+        ## (1) retrieve relevant segments based on refined keywords
+        top_k_segments = stage1_retrieve_top_k_corpus_segments(args=args,
+                                              claim=claim,
+                                              aspect_name=current_node.name,
+                                              corpus_segments=all_segments,
+                                              retrieved_corpus_num=100,
+                                              current_keyword_group=current_node.keywords)
+        ## (2) rank the segments
+        rank2id, id2rank = aspect_segment_ranking(args=args,
+                               segments=top_k_segments, 
+                               target_aspect=current_node, 
+                               neg_aspects=current_node.get_siblings())
+        
+        ## (3) identify the relevant subaspects from the top-k ranked segments
+        subaspects = subaspect_discovery(args=args,
+                            segments=top_k_segments,
+                            rank2id=rank2id,
+                            parent_aspect=current_node,
+                            top_k=5, temperature=0.7, top_p=0.99)
+        
+        ## (4) perform depth expansion using these subaspects
+        for subaspect in tqdm(subaspects):
+            # Refine keywords
+            refined_aspect_keywords = extract_keyword(args, 
+                                                    claim=claim, 
+                                                    aspect_name=subaspect["subaspect_label"],
+                                                    aspect_keywords_from_llm=subaspect["subaspect_keywords"],
+                                                    corpus_segments=all_segments,
+                                                    retrieved_corpus_num=5,
+                                                    min_keyword_num=5,
+                                                    max_keyword_num=10,
+                                                    iteration_num=1)
+            
+            subaspect_node = AspectNode(idx=len(id2node), name=subaspect["subaspect_label"], parent=current_node, keywords=refined_aspect_keywords)
+            tree.add_aspect(current_node, subaspect_node)
+            id2node.append(subaspect_node)
+            if subaspect_node.depth < args.max_depth:
+                queue.append(subaspect_node)
 
-    #     # Sub-aspect discovery
-    #     sub_aspects = sub_aspect_discovery(aspect, ranked_segments)
-    #     aspect_hierarchy[aspect] = sub_aspects
 
     # # Hierarchical segment classification
     # tree = hierarchical_segment_classification(claim, aspect_hierarchy)
@@ -122,10 +165,17 @@ if __name__ == "__main__":
     parser.add_argument("--topic", default="biosecurity")
     parser.add_argument("--chat_model_name", default="vllm")
     parser.add_argument("--embedding_model_name", default="e5")
+    parser.add_argument("--beta", type=float, default=1)
+    parser.add_argument("--gamma", type=float, default=2)
+    parser.add_argument("--max_depth", type=int, default=3)
     args = parser.parse_args()
 
     if args.embedding_model_name == "e5":
         args.embed_model = E5()
+        args.embed_func = e5_embed
+    else:
+        args.embed_func = openai_embed
+
     if args.chat_model_name == "vllm":
         args.chat_model = LLM(model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True)
 

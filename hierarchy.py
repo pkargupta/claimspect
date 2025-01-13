@@ -13,10 +13,13 @@ class Paper:
         }
 
 class AspectNode:
-    def __init__(self, idx, name, keywords=None):
+    def __init__(self, idx, name, parent=None, keywords=None):
         self.id = idx
         self.name = name
         self.keywords = keywords
+        self.parent = parent
+        self.depth = 0 if self.parent is None else self.parent.depth + 1
+
         self.sub_aspects = []
         self.related_papers = {}  # Dictionary for faster lookup by paper_id
 
@@ -38,6 +41,12 @@ class AspectNode:
             self.related_papers[paper_id]["perspective_statement"] = perspective_statement
         else:
             raise ValueError(f"Paper with ID '{paper_id}' not found in related papers.")
+    
+    def get_parent(self):
+        return self.parent
+    
+    def get_siblings(self):
+        return [aspect_node for aspect_node in self.parent.sub_aspects if aspect_node.id != self.id]
 
     def get_all_papers(self):
         """Retrieves all papers associated with this node and its sub-aspects."""
