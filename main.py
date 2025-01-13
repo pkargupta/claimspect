@@ -30,25 +30,6 @@ def coarse_grained_aspect_discovery(args, claim, temperature=0.3, top_p=0.99):
     print(f"Generated coarse-grained aspects for claim '{claim}': {aspects}")
     return aspects
 
-def corpus_segment_ranking(aspect, keywords):
-    """Step 3: Rank corpus segments based on relevance to keywords."""
-    # Simulated ranked segments.
-    ranked_segments = [
-        f"Segment 1 discussing {aspect} with keywords {keywords}",
-        f"Segment 2 focusing on {aspect} with keywords {keywords}"
-    ]
-    print(f"Ranked segments for aspect '{aspect}': {ranked_segments}")
-    return ranked_segments
-
-def sub_aspect_discovery(aspect, ranked_segments):
-    """Step 4: Discover sub-aspects based on ranked segments."""
-    sub_aspects = [
-        f"Sub-aspect 1 for {aspect}",
-        f"Sub-aspect 2 for {aspect}"
-    ]
-    print(f"Discovered sub-aspects for aspect '{aspect}': {sub_aspects}")
-    return sub_aspects
-
 def hierarchical_segment_classification(claim, aspect_hierarchy):
     """Step 5: Classify segments into the aspect hierarchy."""
     tree = Tree(AspectNode(name=claim, description="Root of the aspect hierarchy"))
