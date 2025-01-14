@@ -4,17 +4,39 @@ from vllm import SamplingParams
 from outlines.serve.vllm import JSONLogitsProcessor
 import json
 from tqdm import tqdm
+import numpy as np
 from collections import deque
 
 from api.local.e5_model import E5
 from api.local.e5_model import e5_embed
 from api.openai.embed import openai_embed
 
-from hierarchy import Paper, AspectNode, Tree
+from hierarchy import Paper, AspectNode, Tree, Segment
 from keyword_generation.keyword_extractor import extract_keyword, stage1_retrieve_top_k_corpus_segments
 from prompts import aspect_list_schema, aspect_prompt
 from segment_ranking import aspect_segment_ranking
 from discovery import subaspect_discovery
+
+def load_data(args, chunk_size=3):
+    with open(f'{args.data_dir}/{args.topic}/{args.topic}_text.txt', 'r') as f:
+        corpus = []
+        paper_id = 0
+        global_id = 0
+
+        for line in f:
+            # chunk input paper content
+            sents = line.strip().lower().split('. ')
+            local_id = 0
+            paper_segments = []
+            for i in np.arange(0, len(sents), chunk_size):
+                paper_segments.append(Segment(global_id, local_id, paper_id, sents[i:i+chunk_size]))
+                local_id += 1
+                global_id += 1
+
+            corpus.append(Paper(paper_id=paper_id, segments=paper_segments))
+            paper_id += 1
+    
+    return corpus
 
 def coarse_grained_aspect_discovery(args, claim, temperature=0.3, top_p=0.99):
     """Step 1: Generate coarse-grained aspects for the claim."""
@@ -55,6 +77,7 @@ def main(args):
     
     claim = args.claim
     id2node = []
+    corpus = load_data(args)
     
     # Initialize tree
     root_node = AspectNode(idx=0, name=claim)
@@ -69,7 +92,7 @@ def main(args):
     aspects = coarse_grained_aspect_discovery(args, claim)
     
     # Expand tree with first level
-    all_segments = root_node.get_all_segments(as_str=True)
+    all_segments = root_node.get_all_segments()
     for aspect in aspects:
         # Refine keywords
         refined_aspect_keywords = extract_keyword(args, 
@@ -100,18 +123,20 @@ def main(args):
                                               corpus_segments=all_segments,
                                               retrieved_corpus_num=100,
                                               current_keyword_group=current_node.keywords)
+        top_k_seg_contents = [seg.content for seg in top_k_segments]
+
         ## (2) rank the segments
         rank2id, id2rank = aspect_segment_ranking(args=args,
-                               segments=top_k_segments, 
+                               segments=top_k_seg_contents, 
                                target_aspect=current_node, 
                                neg_aspects=current_node.get_siblings())
         
         ## (3) identify the relevant subaspects from the top-k ranked segments
         subaspects = subaspect_discovery(args=args,
-                            segments=top_k_segments,
+                            segments=top_k_seg_contents,
                             rank2id=rank2id,
                             parent_aspect=current_node,
-                            top_k=5, temperature=0.7, top_p=0.99)
+                            top_k=args.top_k, temperature=0.7, top_p=0.99)
         
         ## (4) perform depth expansion using these subaspects
         for subaspect in tqdm(subaspects):
@@ -129,6 +154,8 @@ def main(args):
             subaspect_node = AspectNode(idx=len(id2node), name=subaspect["subaspect_label"], parent=current_node, keywords=refined_aspect_keywords)
             tree.add_aspect(current_node, subaspect_node)
             id2node.append(subaspect_node)
+            subaspect_node.ranked_segments = top_k_segments
+            
             if subaspect_node.depth < args.max_depth:
                 queue.append(subaspect_node)
 
@@ -141,11 +168,12 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--claim", default="The United States' efforts to study and detect dangerous biological pathogens internationally risks misuse by allies and/or targeted biological attacks by adversaries.")
-    parser.add_argument("--data_dir", default="datasets/")
-    parser.add_argument("--topic", default="biosecurity")
+    parser.add_argument("--claim", default="The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.")
+    parser.add_argument("--data_dir", default="datasets")
+    parser.add_argument("--topic", default="vaccine")
     parser.add_argument("--chat_model_name", default="vllm")
     parser.add_argument("--embedding_model_name", default="e5")
+    parser.add_argument("--top_k", type=float, default=5)
     parser.add_argument("--beta", type=float, default=1)
     parser.add_argument("--gamma", type=float, default=2)
     parser.add_argument("--max_depth", type=int, default=3)
