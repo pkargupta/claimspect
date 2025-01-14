@@ -1,9 +1,11 @@
+from dataclasses import dataclass
+
 class Paper:
-    def __init__(self, paper_id, title, abstract, segments=None):
+    def __init__(self, paper_id, title=None, abstract=None, segments=None):
         self.paper_id = paper_id
         self.title = title
         self.abstract = abstract
-        self.segments = segments
+        self.segments: list[Segment] = segments
         
     def get_summary(self, max_length=250):
         """Returns a summary of the paper."""
@@ -11,6 +13,13 @@ class Paper:
             "Title": self.title,
             "Abstract": self.abstract[:max_length] + "..." if len(self.abstract) > max_length else self.abstract,
         }
+    
+@dataclass
+class Segment:
+    global_id: int
+    local_id: int
+    paper_id: int
+    content: str
 
 class AspectNode:
     def __init__(self, idx, name, parent=None, keywords=None):
@@ -21,6 +30,7 @@ class AspectNode:
         self.depth = 0 if self.parent is None else self.parent.depth + 1
 
         self.sub_aspects = []
+        self.ranked_segments = []
         self.related_papers = {}  # Dictionary for faster lookup by paper_id
 
     def add_sub_aspect(self, sub_aspect):
@@ -29,11 +39,18 @@ class AspectNode:
 
     def add_related_paper(self, paper, relevant_segments):
         """Links a paper and its associated relevant segments to this aspect node."""
-        self.related_papers[paper.paper_id] = {
-            "paper": paper,
-            "relevant_segments": relevant_segments,
-            "perspective_statement": None  # Initially None, to be updated later
-        }
+        if paper.paper_id in self.related_papers:
+            curr_segments = self.related_papers[paper.paper_id]["relevant_segments"]
+            for seg in relevant_segments:
+                if seg not in curr_segments:
+                    curr_segments.append(seg)
+            self.related_papers[paper.paper_id]["relevant_segments"] = curr_segments
+        else:
+            self.related_papers[paper.paper_id] = {
+                "paper": paper,
+                "relevant_segments": relevant_segments,
+                "perspective_statement": None  # Initially None, to be updated later
+            }
 
     def update_perspective_statement(self, paper_id, perspective_statement):
         """Updates the perspective statement for a specific paper."""
@@ -72,18 +89,33 @@ class AspectNode:
                 all_segments.extend(entry["relevant_segments"])
         
         return all_segments
+    
+    def display(self, level=0, indent_multiplier=2, visited=None):
+        """
+        Displays the aspect hierarchy starting from this node.
 
-    def display(self, level=0):
-        """Displays the aspect hierarchy starting from this node."""
-        indent = "  " * level
-        print(f"{indent}- {self.name}")
-        for sub_aspect in self.sub_aspects:
-            sub_aspect.display(level + 1)
-        if self.related_papers:
-            print(f"{indent}  Related Papers:")
-            for entry in self.related_papers.values():
-                perspective = entry['perspective_statement'] or "[Perspective not set]"
-                print(f"{indent}    - {entry['paper'].title}: {perspective}")
+        Args:
+        level (int): The current level of the node for indentation purposes.
+        indent_multiplier (int): The number of spaces used for indentation, multiplied by the level.
+        visited (set): A set of visited node IDs to handle cycles in the directed acyclic graph.
+        """
+        if visited is None:
+            visited = set()
+        if self.id in visited:
+            return
+        visited.add(self.id)
+
+        indent = " " * (level * indent_multiplier)
+        print(f"{indent}Aspect: {self.name}")
+        print(f"{indent}Depth: {self.depth}")
+        print(f"{indent}Keywords: {self.keywords}")
+        print(f"{indent}Top Segment: {self.ranked_segments[0].content}")
+        if self.sub_aspects:
+            print(f"{indent}{'-'*40}")
+            print(f"{indent}Subaspects:")
+            for subaspect in self.sub_aspects:
+                subaspect.display(level + 1, indent_multiplier, visited)
+        print(f"{indent}{'-'*40}")
 
 
 class Tree:

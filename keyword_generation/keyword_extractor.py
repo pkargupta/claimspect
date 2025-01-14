@@ -2,6 +2,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from api.openai.embed import openai_embed
 from api.openai.chat import chat
 from api.local.e5_model import e5_embed
+from hierarchy import Segment
 
 from vllm import SamplingParams
 from outlines.serve.vllm import JSONLogitsProcessor
@@ -60,7 +61,7 @@ def get_chat_function(args):
 def stage1_retrieve_top_k_corpus_segments(args, 
                                           claim: str, 
                                           aspect_name: str, 
-                                          corpus_segments: list[str], 
+                                          corpus_segments: list[Segment], 
                                           retrieved_corpus_num: int, 
                                           current_keyword_group: list[str],) -> list[str]:
     """
@@ -71,7 +72,8 @@ def stage1_retrieve_top_k_corpus_segments(args,
     embedding_func = args.embed_func
     retrieval_query = f"Claim: {claim} Aspect: {aspect_name} Aspect Keywords: {', '.join(current_keyword_group)}"
     retrieval_query_embedding_dict = embedding_func(args, [retrieval_query])
-    corpus_segments_embeddings_dict = embedding_func(args, corpus_segments)
+    seg_contents = [seg.content for seg in corpus_segments]
+    corpus_segments_embeddings_dict = embedding_func(args, seg_contents)
     
     # pick up the top-k corpus segments from cosine similarity
     corpus_segments_scores = {}
@@ -80,7 +82,7 @@ def stage1_retrieve_top_k_corpus_segments(args,
         similarity_score = cosine_similarity([retrieval_query_embedding], [embedding])[0][0]
         corpus_segments_scores[segment] = similarity_score
     
-    top_k_corpus_segments = sorted(corpus_segments_scores, key=corpus_segments_scores.get, reverse=True)[:retrieved_corpus_num]
+    top_k_corpus_segments = sorted(corpus_segments, key=lambda x: corpus_segments_scores[x.content], reverse=True)[:retrieved_corpus_num]
     return top_k_corpus_segments
 
 
@@ -102,10 +104,11 @@ def extract_keyword(args,
         
         """ Stage 1: Retrieve top-k the corpus segments relevant to a given aspect of the claim """
         top_k_corpus_segments = stage1_retrieve_top_k_corpus_segments(claim, aspect_name, corpus_segments, retrieved_corpus_num, args.embedding_model_name, current_keyword_group=current_keyword_group)
+        seg_contents = [seg.content for seg in top_k_corpus_segments]
 
         """ Stage 2: Extract keywords from the top-k corpus segments """
         chat_func = get_chat_function(args.chat_model_name)
-        prompt = f"We are discussing the claim {claim} with a focus on the aspect {aspect_name}. Please extract up to {2*max_keyword_num} keywords related to the aspect {aspect_name} from the following documents: {'\n\n'.join(top_k_corpus_segments)}. Ensure that the extracted keywords are diverse, specific, and highly relevant to the given aspect. Only output the keywords and seperate them with comma. "
+        prompt = f"We are discussing the claim {claim} with a focus on the aspect {aspect_name}. Please extract up to {2*max_keyword_num} keywords related to the aspect {aspect_name} from the following documents: {'\n\n'.join(seg_contents)}. Ensure that the extracted keywords are diverse, specific, and highly relevant to the given aspect. Only output the keywords and seperate them with comma. "
         chat_response = chat_func([prompt])
         if type(chat_response[0]) == str:
             keyword_candidates = [kw.strip() for kw in chat_response[0].split(",")]
