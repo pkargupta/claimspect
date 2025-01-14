@@ -6,7 +6,7 @@ CLAIM_GENERATION_PROMPT = """
 Scientific or political claims are often nuanced and multifaceted, rarely lending themselves to simple “yes” or “no” answers. To answer such questions effectively, claims must be broken into specific aspects for in-depth analysis, with evidence drawn from relevant scientific literature. We are currently studying such claims using this corpus: 
 {context}
 Task: Generate 20 nuanced and diverse claims based on this corpus. The claims should adhere to the following criteria:
-	1.	Diversity: The claims should be sufficiently varied, with no two claims being overly similar in focus or phrasing.
+	1.	Diversity: The claims should be sufficiently varied: (i) they should involve diverse sub-topics in the context; (ii) they should come from different perspectives (not always from the author's side).
 	2.	Complexity: The claims should be complex and controversial (and not necessarity true), requiring multi-aspect analysis rather than simplistic treatment. Avoid overly straightforward or simplistic claims.
 	3.	Research Feasibility: The claims should not be too specific and should pertain to topics with a likely body of existing literature to support evidence-based exploration.
     4.  Concision: The claims should be concise and focused in one short sentence.
