@@ -6,7 +6,8 @@ from hierarchy import Segment
 
 from vllm import SamplingParams
 from outlines.serve.vllm import JSONLogitsProcessor
-from pydantic import BaseModel, conlist
+from pydantic import BaseModel, StringConstraints, conlist
+from typing_extensions import Annotated
 import json
 
 """ 
@@ -31,7 +32,7 @@ def get_embedding_function(args):
         raise ValueError(f"Embedding model {args.embedding_model_name} not supported.")
 
 class keyword_schema(BaseModel):
-    output_keywords : conlist(str, min_length=2)
+    output_keywords : Annotated[str, StringConstraints(strip_whitespace=True)]
 
 def get_chat_function(args):
     """
@@ -48,8 +49,9 @@ def get_chat_function(args):
     elif args.chat_model_name == "vllm":
         def vllm(prompts: list[str]) -> list[str]:
             logits_processor = JSONLogitsProcessor(schema=keyword_schema, llm=args.chat_model.llm_engine)
-            sampling_params = SamplingParams(max_tokens=1000, logits_processors=[logits_processor], seed=42, temperature=0.7)
-            outputs = args.model.generate(prompts, sampling_params=sampling_params)[0].outputs[0].text
+            sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], seed=42, temperature=0.7)
+            outputs = args.chat_model.generate(prompts, sampling_params=sampling_params)[0].outputs[0].text
+            print(outputs)
             keywords = json.loads(outputs)['output_keywords']
             return [keywords]
             
@@ -71,9 +73,9 @@ def stage1_retrieve_top_k_corpus_segments(args,
     # get the embedding of query and corpus segments
     embedding_func = args.embed_func
     retrieval_query = f"Claim: {claim} Aspect: {aspect_name} Aspect Keywords: {', '.join(current_keyword_group)}"
-    retrieval_query_embedding_dict = embedding_func(args, [retrieval_query])
+    retrieval_query_embedding_dict = embedding_func(args.embed_model, [retrieval_query])
     seg_contents = [seg.content for seg in corpus_segments]
-    corpus_segments_embeddings_dict = embedding_func(args, seg_contents)
+    corpus_segments_embeddings_dict = embedding_func(args.embed_model, seg_contents)
     
     # pick up the top-k corpus segments from cosine similarity
     corpus_segments_scores = {}
@@ -103,15 +105,24 @@ def extract_keyword(args,
     for i in range(iteration_num):
         
         """ Stage 1: Retrieve top-k the corpus segments relevant to a given aspect of the claim """
-        top_k_corpus_segments = stage1_retrieve_top_k_corpus_segments(claim, aspect_name, corpus_segments, retrieved_corpus_num, args.embedding_model_name, current_keyword_group=current_keyword_group)
+        top_k_corpus_segments = stage1_retrieve_top_k_corpus_segments(args, claim, aspect_name, corpus_segments, retrieved_corpus_num, current_keyword_group)
         seg_contents = [seg.content for seg in top_k_corpus_segments]
 
         """ Stage 2: Extract keywords from the top-k corpus segments """
-        chat_func = get_chat_function(args.chat_model_name)
-        prompt = f"We are discussing the claim {claim} with a focus on the aspect {aspect_name}. Please extract up to {2*max_keyword_num} keywords related to the aspect {aspect_name} from the following documents: {'\n\n'.join(seg_contents)}. Ensure that the extracted keywords are diverse, specific, and highly relevant to the given aspect. Only output the keywords and seperate them with comma. "
+        chat_func = get_chat_function(args)
+        contents = '\n\n'.join(seg_contents)
+        prompt = f"""We are discussing the claim {claim} with a focus on the aspect {aspect_name}. Please extract up to {max_keyword_num} keywords related to the aspect {aspect_name} from the following documents: {contents}. Ensure that the extracted keywords are diverse, specific, and highly relevant to the given aspect. Only output the keywords and seperate them with comma.
+
+Your output should be in the following JSON format:
+---
+{{
+    "output_keywords": <list of strings, where each string is a unique, lowercase keyword relevant to the aspect and prominent within the input documents>
+}}
+---
+"""
         chat_response = chat_func([prompt])
         if type(chat_response[0]) == str:
-            keyword_candidates = [kw.strip() for kw in chat_response[0].split(",")]
+            keyword_candidates = [kw.strip().lower() for kw in chat_response[0].split(",")]
         else:
             keyword_candidates = [kw.strip().lower() for kw in chat_response[0]]
         
@@ -119,7 +130,7 @@ def extract_keyword(args,
         prompt = f"Based on the claim '{claim}' and the target aspect '{aspect_name}', identify {min_keyword_num} to {max_keyword_num} relevant keywords from the provided list: {keyword_candidates}. Merge terms with similar meanings, exclude relatively irrelevant ones, and output only the final keywords separated by commas."    
         chat_response = chat_func([prompt])
         if type(chat_response[0]) == str:
-            current_keyword_group = [kw.strip() for kw in chat_response[0].split(",")]
+            current_keyword_group = [kw.strip().lower() for kw in chat_response[0].split(",")]
         else:
             current_keyword_group = [kw.strip().lower() for kw in chat_response[0]]
     

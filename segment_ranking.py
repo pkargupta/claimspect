@@ -66,8 +66,8 @@ def aspect_segment_ranking(args, segments, target_aspect, neg_aspects):
     # however, which are most likely to contain all relevant subaspects? we assume that the keywords cover many subaspects
     # we also want to penalize the segments which discuss a multitude of other aspects, given that they may distract during subaspect discovery + perspective
 
-    segment_embs = args.embed_func([segments])[segments]
-    segment_scores = discriminative_rank(target_aspect, neg_aspects, segment_embs, args.embed_func, args.beta, args.gamma)
+    segment_embs = args.embed_func(args.embed_model, [segments])[segments]
+    segment_scores = discriminative_rank(target_aspect, neg_aspects, segment_embs, lambda x: args.embed_func(args.embed_model, x), args.beta, args.gamma)
 
     segment_ranks = sorted(np.arange(len(segments)), key=lambda x: -segment_scores[x])
 

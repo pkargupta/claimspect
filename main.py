@@ -6,6 +6,7 @@ import json
 from tqdm import tqdm
 import numpy as np
 from collections import deque
+from contextlib import redirect_stdout
 
 from api.local.e5_model import E5
 from api.local.e5_model import e5_embed
@@ -18,7 +19,7 @@ from segment_ranking import aspect_segment_ranking
 from discovery import subaspect_discovery
 
 def load_data(args, chunk_size=3):
-    with open(f'{args.data_dir}/{args.topic}/{args.topic}_text.txt', 'r') as f:
+    with open(f'{args.data_dir}/{args.topic}/{args.topic}_text.txt', 'r', encoding='utf-8', errors='ignore') as f:
         corpus = []
         paper_id = 0
         global_id = 0
@@ -29,7 +30,7 @@ def load_data(args, chunk_size=3):
             local_id = 0
             paper_segments = []
             for i in np.arange(0, len(sents), chunk_size):
-                paper_segments.append(Segment(global_id, local_id, paper_id, sents[i:i+chunk_size]))
+                paper_segments.append(Segment(global_id, local_id, paper_id, ". ".join(sents[i:i+chunk_size])))
                 local_id += 1
                 global_id += 1
 
@@ -74,12 +75,14 @@ def main(args):
     # input corpus -> @Runchu is writing the dataset loader; we assume we have a corpus of Paper classes where the Paper class has an attribute called segments
     # corpus: dict of Paper objects
     # paper.segments: list of Segment objects where
-    
+
+    print("######## LOADING DATA ########")
     claim = args.claim
     id2node = []
     corpus = load_data(args)
     
     # Initialize tree
+    print("######## INITIALIZE TREE ########")
     root_node = AspectNode(idx=0, name=claim)
     for paper in corpus:
         # for the root_node, we naively assume that all segments in the corpus are relevant to the root
@@ -92,10 +95,12 @@ def main(args):
     aspects = coarse_grained_aspect_discovery(args, claim)
     
     # Expand tree with first level
+    print("######## EXPAND AND ENRICH TREE WITH ASPECTS ########")
+    
     all_segments = root_node.get_all_segments()
     for aspect in aspects:
         # Refine keywords
-        refined_aspect_keywords = extract_keyword(args, 
+        refined_aspect_keywords = extract_keyword(args=args, 
                                                   claim=claim, 
                                                   aspect_name=aspect["aspect_label"],
                                                   aspect_keywords_from_llm=aspect["aspect_keywords"],
@@ -110,11 +115,12 @@ def main(args):
         id2node.append(aspect_node)
 
     # Initialize a queue where for each aspect node, we:
-    queue = deque(root_node.subaspects)
+    print("######## SUBASPECT EXPANSION BEGINS ########")
+    queue = deque(root_node.sub_aspects)
 
     while queue:
         current_node:AspectNode = queue.popleft()
-        print(f"Current Node: {current_node.name}")
+        print(f"Current Node: {current_node.name}; {len(queue)} nodes left in the queue!")
         
         ## (1) retrieve relevant segments based on refined keywords
         top_k_segments = stage1_retrieve_top_k_corpus_segments(args=args,
@@ -124,6 +130,7 @@ def main(args):
                                               retrieved_corpus_num=100,
                                               current_keyword_group=current_node.keywords)
         top_k_seg_contents = [seg.content for seg in top_k_segments]
+        print(top_k_seg_contents)
 
         ## (2) rank the segments
         rank2id, id2rank = aspect_segment_ranking(args=args,
@@ -141,7 +148,7 @@ def main(args):
         ## (4) perform depth expansion using these subaspects
         for subaspect in tqdm(subaspects):
             # Refine keywords
-            refined_aspect_keywords = extract_keyword(args, 
+            refined_aspect_keywords = extract_keyword(args=args, 
                                                     claim=claim, 
                                                     aspect_name=subaspect["subaspect_label"],
                                                     aspect_keywords_from_llm=subaspect["subaspect_keywords"],
@@ -158,6 +165,10 @@ def main(args):
             
             if subaspect_node.depth < args.max_depth:
                 queue.append(subaspect_node)
+
+    with open(f'{args.data_dir}/{args.topic}/aspect_hierarchy.txt', 'w') as f:
+        with redirect_stdout(f):
+            root_node.display(indent_multiplier=2, visited=None)
 
 
     # # Hierarchical segment classification
@@ -183,6 +194,7 @@ if __name__ == "__main__":
         args.embed_model = E5()
         args.embed_func = e5_embed
     else:
+        args.embed_model = args.embedding_model_name
         args.embed_func = openai_embed
 
     if args.chat_model_name == "vllm":
