@@ -1,20 +1,7 @@
 from arxiv2text import arxiv_to_text
-from docling.document_converter import DocumentConverter
 from unidecode import unidecode
 import string
-import json
 import re
-
-
-import argparse
-import os
-import csv
-import string
-import numpy as np
-import re
-from tqdm import tqdm
-import json
-from nltk import word_tokenize
 
 def extract_text(pdf_url):
     raw_extracted_text = arxiv_to_text(pdf_url).strip()
