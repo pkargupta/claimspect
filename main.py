@@ -111,6 +111,7 @@ def main(args):
                                                   iteration_num=1)
         
         aspect_node = AspectNode(idx=len(id2node), name=aspect["aspect_label"], parent=root_node, keywords=refined_aspect_keywords)
+        print(f'{aspect_node.name} keywords: {str(aspect_node.keywords)}')
         tree.add_aspect(root_node, aspect_node)
         id2node.append(aspect_node)
 
@@ -130,7 +131,6 @@ def main(args):
                                               retrieved_corpus_num=100,
                                               current_keyword_group=current_node.keywords)
         top_k_seg_contents = [seg.content for seg in top_k_segments]
-        print(top_k_seg_contents)
 
         ## (2) rank the segments
         rank2id, id2rank = aspect_segment_ranking(args=args,
@@ -160,6 +160,7 @@ def main(args):
             
             subaspect_node = AspectNode(idx=len(id2node), name=subaspect["subaspect_label"], parent=current_node, keywords=refined_aspect_keywords)
             tree.add_aspect(current_node, subaspect_node)
+            print(f'{subaspect_node.name} keywords: {str(subaspect_node.keywords)}')
             id2node.append(subaspect_node)
             subaspect_node.ranked_segments = top_k_segments
             
@@ -180,7 +181,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--claim", default="The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.")
-    parser.add_argument("--data_dir", default="datasets")
+    parser.add_argument("--data_dir", default="data")
     parser.add_argument("--topic", default="vaccine")
     parser.add_argument("--chat_model_name", default="vllm")
     parser.add_argument("--embedding_model_name", default="e5")

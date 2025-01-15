@@ -1,9 +1,6 @@
-from scipy.spatial.distance import cosine
+from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-
-# calcualte the cosine similarity between two embeddings (np.array)
-def cosine_similarity(embed1, embed2):
-    return 1 - cosine(embed1, embed2)
+from tqdm import tqdm
 
 def positive_rank(target_aspect, segment_embs, embed_func):
     # Query: We assume that the segment is relevant to the target_aspect's parent aspect, so we do not need to include this within the query
@@ -13,6 +10,7 @@ def positive_rank(target_aspect, segment_embs, embed_func):
         keyword_embs.append(embed_func([query])[query])
 
     keyword_embs = np.array(keyword_embs)
+    print(segment_embs.shape, keyword_embs.shape)
     target_similarity = cosine_similarity(segment_embs, keyword_embs) # S x K
 
     # the more number of subaspects/keywords discussed, the better
@@ -25,7 +23,7 @@ def negative_rank(neg_aspects, segment_embs, embed_func, breadth_weight=0.5):
     # penalize both breadth of neg_aspects discussed (mean of mean) AND depth of neg_aspects discussed (max of mean overall)
 
     aspect_sims = []
-    for aspect in neg_aspects:
+    for aspect in tqdm(neg_aspects):
         keyword_embs = []
         for keyword in aspect.keywords:
             query = f"{keyword} with respect to {aspect.name}"
@@ -38,10 +36,11 @@ def negative_rank(neg_aspects, segment_embs, embed_func, breadth_weight=0.5):
         mean_neg = neg_aspect_sim.mean(axis=1) # S x 1
         aspect_sims.append(mean_neg)
     
-    aspect_sims = np.array(aspect_sims) # S x A
+    aspect_sims = np.array(aspect_sims) # A x S
+    print(aspect_sims.shape)
     
-    breadth_rank = aspect_sims.mean(axis=1)
-    depth_rank = aspect_sims.max(axis=1)
+    breadth_rank = aspect_sims.mean(axis=0).reshape((len(segment_embs), -1))
+    depth_rank = aspect_sims.max(axis=0).reshape((len(segment_embs), -1))
     
     neg_rank = (breadth_weight * breadth_rank) + ((1-breadth_weight) * depth_rank)
     # S x 1
@@ -57,6 +56,7 @@ def discriminative_rank(target_aspect, neg_aspects, segment_embs, embed_func, be
     print(f"Computing negative rank for {target_aspect.name}")
     neg_r = negative_rank(neg_aspects, segment_embs, embed_func)
     
+    print(pos_r.shape, neg_r.shape)
     return (pos_r * beta)/(neg_r * gamma)
 
 def aspect_segment_ranking(args, segments, target_aspect, neg_aspects):
@@ -66,7 +66,8 @@ def aspect_segment_ranking(args, segments, target_aspect, neg_aspects):
     # however, which are most likely to contain all relevant subaspects? we assume that the keywords cover many subaspects
     # we also want to penalize the segments which discuss a multitude of other aspects, given that they may distract during subaspect discovery + perspective
 
-    segment_embs = args.embed_func(args.embed_model, [segments])[segments]
+    segment_embs = list(args.embed_func(args.embed_model, segments).values())
+    segment_embs = np.array(segment_embs)
     segment_scores = discriminative_rank(target_aspect, neg_aspects, segment_embs, lambda x: args.embed_func(args.embed_model, x), args.beta, args.gamma)
 
     segment_ranks = sorted(np.arange(len(segments)), key=lambda x: -segment_scores[x])
