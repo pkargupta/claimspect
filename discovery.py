@@ -16,7 +16,7 @@ def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temper
 
     subaspects = json.loads(output)['subaspect_list']
     
-    print(f"Generated subaspects for parent aspect '{parent_aspect.name}': {subaspects}")
+    print(f"Generated subaspects for parent aspect '{parent_aspect.name}': {str([aspect['subaspect_label'] for aspect in subaspects])}")
     
     return subaspects
 

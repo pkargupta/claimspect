@@ -51,7 +51,6 @@ def get_chat_function(args):
             logits_processor = JSONLogitsProcessor(schema=keyword_schema, llm=args.chat_model.llm_engine)
             sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], seed=42, temperature=0.7)
             outputs = args.chat_model.generate(prompts, sampling_params=sampling_params)[0].outputs[0].text
-            print(outputs)
             keywords = json.loads(outputs)['output_keywords']
             return [keywords]
             
@@ -111,7 +110,7 @@ def extract_keyword(args,
         """ Stage 2: Extract keywords from the top-k corpus segments """
         chat_func = get_chat_function(args)
         contents = '\n\n'.join(seg_contents)
-        prompt = f"""We are discussing the claim {claim} with a focus on the aspect {aspect_name}. Please extract up to {max_keyword_num} keywords related to the aspect {aspect_name} from the following documents: {contents}. Ensure that the extracted keywords are diverse, specific, and highly relevant to the given aspect. Only output the keywords and seperate them with comma.
+        prompt = f"""We are discussing the claim {claim} with a focus on the aspect {aspect_name}. Please extract up to {2*max_keyword_num} keywords related to the aspect {aspect_name} from the following documents: {contents}. Ensure that the extracted keywords are diverse, specific, and highly relevant to the given aspect. Only output the keywords and seperate them with comma.
 
 Your output should be in the following JSON format:
 ---
@@ -122,15 +121,23 @@ Your output should be in the following JSON format:
 """
         chat_response = chat_func([prompt])
         if type(chat_response[0]) == str:
-            keyword_candidates = [kw.strip().lower() for kw in chat_response[0].split(",")]
+            keyword_candidates = [kw.strip().lower() for kw in chat_response[0].split(", ")]
         else:
             keyword_candidates = [kw.strip().lower() for kw in chat_response[0]]
         
         """ Stage 3: Fusion and Filtering """
-        prompt = f"Based on the claim '{claim}' and the target aspect '{aspect_name}', identify {min_keyword_num} to {max_keyword_num} relevant keywords from the provided list: {keyword_candidates}. Merge terms with similar meanings, exclude relatively irrelevant ones, and output only the final keywords separated by commas."    
+        prompt = f"""Based on the claim '{claim}' and the target aspect '{aspect_name}', identify {min_keyword_num} to {max_keyword_num} relevant keywords from the provided list: {keyword_candidates}. Merge terms with similar meanings, exclude relatively irrelevant ones, and output only the final keywords separated by commas.
+
+Your output should be in the following JSON format:
+---
+{{
+    "output_keywords": <FILTERED list of strings, where each string is a unique, lowercase keyword relevant to the target aspect>
+}}
+---
+"""    
         chat_response = chat_func([prompt])
         if type(chat_response[0]) == str:
-            current_keyword_group = [kw.strip().lower() for kw in chat_response[0].split(",")]
+            current_keyword_group = [kw.strip().lower() for kw in chat_response[0].split(", ")]
         else:
             current_keyword_group = [kw.strip().lower() for kw in chat_response[0]]
     

@@ -107,10 +107,11 @@ def main(args):
                                                   corpus_segments=all_segments,
                                                   retrieved_corpus_num=5,
                                                   min_keyword_num=5,
-                                                  max_keyword_num=10,
+                                                  max_keyword_num=15,
                                                   iteration_num=1)
         
         aspect_node = AspectNode(idx=len(id2node), name=aspect["aspect_label"], parent=root_node, keywords=refined_aspect_keywords)
+        print(f'{aspect_node.name} keywords: {str(aspect_node.keywords)}')
         tree.add_aspect(root_node, aspect_node)
         id2node.append(aspect_node)
 
@@ -130,10 +131,9 @@ def main(args):
                                               retrieved_corpus_num=100,
                                               current_keyword_group=current_node.keywords)
         top_k_seg_contents = [seg.content for seg in top_k_segments]
-        print(top_k_seg_contents)
 
         ## (2) rank the segments
-        rank2id, id2rank = aspect_segment_ranking(args=args,
+        rank2id, id2score = aspect_segment_ranking(args=args,
                                segments=top_k_seg_contents, 
                                target_aspect=current_node, 
                                neg_aspects=current_node.get_siblings())
@@ -155,13 +155,14 @@ def main(args):
                                                     corpus_segments=all_segments,
                                                     retrieved_corpus_num=5,
                                                     min_keyword_num=5,
-                                                    max_keyword_num=10,
+                                                    max_keyword_num=15,
                                                     iteration_num=1)
             
             subaspect_node = AspectNode(idx=len(id2node), name=subaspect["subaspect_label"], parent=current_node, keywords=refined_aspect_keywords)
             tree.add_aspect(current_node, subaspect_node)
+            print(f'{subaspect_node.name} keywords: {str(subaspect_node.keywords)}')
             id2node.append(subaspect_node)
-            subaspect_node.ranked_segments = top_k_segments
+            subaspect_node.ranked_segments = {i:(top_k_segments[rank2id[i]], id2score[rank2id[i]]) for i in np.arange(len(top_k_segments))}
             
             if subaspect_node.depth < args.max_depth:
                 queue.append(subaspect_node)
@@ -180,14 +181,14 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--claim", default="The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.")
-    parser.add_argument("--data_dir", default="datasets")
+    parser.add_argument("--data_dir", default="data")
     parser.add_argument("--topic", default="vaccine")
     parser.add_argument("--chat_model_name", default="vllm")
     parser.add_argument("--embedding_model_name", default="e5")
     parser.add_argument("--top_k", type=float, default=5)
     parser.add_argument("--beta", type=float, default=1)
     parser.add_argument("--gamma", type=float, default=2)
-    parser.add_argument("--max_depth", type=int, default=3)
+    parser.add_argument("--max_depth", type=int, default=2)
     args = parser.parse_args()
 
     if args.embedding_model_name == "e5":

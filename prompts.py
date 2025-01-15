@@ -35,7 +35,7 @@ def aspect_prompt(topic, k=5, n=10):
 
 class gen_subaspect_schema(BaseModel):
     subaspect_label: Annotated[str, StringConstraints(strip_whitespace=True)]
-    subaspect_keywords: Annotated[str, StringConstraints(strip_whitespace=True)]
+    subaspect_keywords: conlist(str, min_length=2, max_length=20)
     
 class subaspect_list_schema(BaseModel):
     subaspect_list : conlist(gen_subaspect_schema, min_length=2, max_length=5)

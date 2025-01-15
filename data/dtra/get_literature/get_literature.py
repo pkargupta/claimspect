@@ -80,7 +80,6 @@ def main():
 
     with open('data/dtra/get_literature/claim2paper_meta_info.json', 'w') as f:
         json.dump(claim2paper, f, indent=4)
-        
 
 if __name__ in '__main__':
     main()

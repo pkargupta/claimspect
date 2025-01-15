@@ -108,7 +108,9 @@ class AspectNode:
         print(f"{indent}Aspect: {self.name}")
         print(f"{indent}Depth: {self.depth}")
         print(f"{indent}Keywords: {self.keywords}")
-        print(f"{indent}Top Segment: {self.ranked_segments[0].content}")
+        print(f"{indent}Top #1 Segment ({self.ranked_segments[0][1]}): {self.ranked_segments[0][0].content}")
+        print(f"{indent}Top #2 Segment ({self.ranked_segments[1][1]}): {self.ranked_segments[1][0].content}")
+        print(f"{indent}Top #3 Segment ({self.ranked_segments[2][1]}): {self.ranked_segments[2][0].content}")
         if self.sub_aspects:
             print(f"{indent}{'-'*40}")
             print(f"{indent}Subaspects:")
