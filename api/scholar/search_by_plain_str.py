@@ -4,11 +4,6 @@ import requests
 from typing import Optional
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
-@retry(
-    stop=stop_after_attempt(5),  # Retry up to 5 times
-    wait=wait_fixed(2),  # Wait 2 seconds between retries
-    retry=retry_if_exception_type(requests.exceptions.RequestException)  # Retry on request exceptions
-)
 def url_request(
     base_url: str,
     offset=None,
@@ -40,11 +35,17 @@ def url_request(
     return requests.get(base_url).json()
 
 # get API key
+@retry(
+    stop=stop_after_attempt(16),  # Retry up to 5 times
+    wait=wait_fixed(2),  # Wait 2 seconds between retries
+    retry=retry_if_exception_type(Exception)  # Retry on request exceptions
+)
 def search_literature_by_plain_text(
     query: str,
     fields: str = "title,abstract,authors,year,venue,publicationVenue,citationCount,openAccessPdf",
     year: str = "2000-",
     batch_size: int = 100,
+    max_num: str=1000,
 ):
     """
     Searches for literature by plain text query.
@@ -69,6 +70,9 @@ def search_literature_by_plain_text(
 
     for i in range(0, total_paper_num, batch_size):
         response = url_request(base_url, offset=i, limit=batch_size)
+        if i + batch_size > max_num:
+            print(f"Retrieved a maxium {max_num} papers...")
+            break
         retrieved += len(response["data"])
         print(f"Retrieved {retrieved} papers...")
         for paper in response["data"]:

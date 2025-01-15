@@ -14,7 +14,7 @@ def pdf2str(pdf_file_path: str) -> str:
     return result.replace("\n", " ").replace("\t", " ").replace("  ", " ")
 
 def get_pdf_path_list(
-    target_dir = "datasets/dtra/factsheet_pdf"
+    target_dir = "data/dtra/factsheet_pdf"
     ) -> list:
     """
     Get a list of PDF file paths.

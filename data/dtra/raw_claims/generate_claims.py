@@ -31,7 +31,7 @@ Please organize the following list of claims into a python list (without the ind
 {claim_list}"""
 
 def get_txt_paths(
-    target_dir: str = "datasets/dtra/factsheet_txt"
+    target_dir: str = "data/dtra/factsheet_txt"
 ):
     return [os.path.join(target_dir, f) for f in os.listdir(target_dir) if f.endswith('.txt')]
 
