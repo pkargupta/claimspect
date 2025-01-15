@@ -64,7 +64,8 @@ def stage1_retrieve_top_k_corpus_segments(args,
                                           aspect_name: str, 
                                           corpus_segments: list[Segment], 
                                           retrieved_corpus_num: int, 
-                                          current_keyword_group: list[str],) -> list[str]:
+                                          current_keyword_group: list[str],
+                                          corpus_embs=None,) -> list[str]:
     """
     Retrieve top-k the corpus segments relevant to a given aspect of the claim.
     """
@@ -73,8 +74,12 @@ def stage1_retrieve_top_k_corpus_segments(args,
     embedding_func = args.embed_func
     retrieval_query = f"Claim: {claim} Aspect: {aspect_name} Aspect Keywords: {', '.join(current_keyword_group)}"
     retrieval_query_embedding_dict = embedding_func(args.embed_model, [retrieval_query])
-    seg_contents = [seg.content for seg in corpus_segments]
-    corpus_segments_embeddings_dict = embedding_func(args.embed_model, seg_contents)
+    if corpus_embs is None:
+        seg_contents = [seg.content for seg in corpus_segments]
+        corpus_segments_embeddings_dict = embedding_func(args.embed_model, seg_contents)
+    else:
+        corpus_segments_embeddings_dict = corpus_embs
+        
     
     # pick up the top-k corpus segments from cosine similarity
     corpus_segments_scores = {}
@@ -95,7 +100,8 @@ def extract_keyword(args,
                     retrieved_corpus_num: int,
                     min_keyword_num: int,
                     max_keyword_num: int,
-                    iteration_num: int=1) -> list[str]:
+                    iteration_num: int=1,
+                    corpus_embs=None) -> list[str]:
     """
     Generate keywords for the given aspect in the claim.
     """
@@ -104,7 +110,7 @@ def extract_keyword(args,
     for i in range(iteration_num):
         
         """ Stage 1: Retrieve top-k the corpus segments relevant to a given aspect of the claim """
-        top_k_corpus_segments = stage1_retrieve_top_k_corpus_segments(args, claim, aspect_name, corpus_segments, retrieved_corpus_num, current_keyword_group)
+        top_k_corpus_segments = stage1_retrieve_top_k_corpus_segments(args, claim, aspect_name, corpus_segments, retrieved_corpus_num, current_keyword_group, corpus_embs)
         seg_contents = [seg.content for seg in top_k_corpus_segments]
 
         """ Stage 2: Extract keywords from the top-k corpus segments """

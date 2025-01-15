@@ -40,7 +40,7 @@ class gen_subaspect_schema(BaseModel):
 class subaspect_list_schema(BaseModel):
     subaspect_list : conlist(gen_subaspect_schema, min_length=2, max_length=5)
 
-subaspect_instruction = lambda aspect, topic, k, n: f"You are an analyst that identifies different subaspects of parent aspect, {aspect}, to consider when evaluating whether or not {topic}. You will identify a minimum of 2 and a maximum of {k} subaspects that the provided set of scientific research paper excerpts are considering when determining the answer to the following topic: {aspect} for \"{topic}\". For each subaspect, provide {n} additional keywords that would typically be used to describe that subaspect, using the research excerpts we provide you as reference.\n\n"
+subaspect_instruction = lambda aspect, topic, k, n: f"You are an analyst that identifies different subaspects of parent aspect, {aspect}, to consider when evaluating the claim: {topic}. You will identify a minimum of 2 and a maximum of {k} subaspects under aspect {aspect} that the provided set of scientific research paper excerpts are considering when determining the answer to the following topic: {aspect} for \"{topic}\". For each subaspect, provide {n} additional keywords that would typically be used to describe that subaspect, using the research excerpts we provide you as reference.\n\n"
 
 def subaspect_prompt(aspect, topic, segments, k=5, n=10): 
     prompt = subaspect_instruction(aspect, topic, k, n)

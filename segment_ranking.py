@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 def positive_rank(target_aspect, segment_embs, embed_func):
     # Query: We assume that the segment is relevant to the target_aspect's parent aspect, so we do not need to include this within the query
-    keywords = [f"{keyword} with respect to {target_aspect.name}" for keyword in target_aspect.keywords]
+    keywords = [f"{keyword} with respect to {str(target_aspect.get_ancestors(as_str=True))}" for keyword in target_aspect.keywords]
     keyword_embs = np.fromiter(embed_func(keywords).values(), dtype=np.dtype((float, 1024)))
     target_similarity = cosine_similarity(segment_embs, keyword_embs) # S x K
 
