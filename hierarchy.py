@@ -90,13 +90,12 @@ class AspectNode:
         
         return all_segments
     
-    def display(self, level=0, indent_multiplier=2, visited=None):
+    def display(self, indent_multiplier=2, visited=None):
         """
         Displays the aspect hierarchy starting from this node.
 
         Args:
-        level (int): The current level of the node for indentation purposes.
-        indent_multiplier (int): The number of spaces used for indentation, multiplied by the level.
+        indent_multiplier (int): The number of spaces used for indentation, multiplied by the depth.
         visited (set): A set of visited node IDs to handle cycles in the directed acyclic graph.
         """
         if visited is None:
@@ -105,7 +104,7 @@ class AspectNode:
             return
         visited.add(self.id)
 
-        indent = " " * (level * indent_multiplier)
+        indent = " " * (self.depth * indent_multiplier)
         print(f"{indent}Aspect: {self.name}")
         print(f"{indent}Depth: {self.depth}")
         print(f"{indent}Keywords: {self.keywords}")
@@ -114,7 +113,7 @@ class AspectNode:
             print(f"{indent}{'-'*40}")
             print(f"{indent}Subaspects:")
             for subaspect in self.sub_aspects:
-                subaspect.display(level + 1, indent_multiplier, visited)
+                subaspect.display(self.depth + 1, indent_multiplier, visited)
         print(f"{indent}{'-'*40}")
 
 

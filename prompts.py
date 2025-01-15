@@ -5,7 +5,7 @@ from typing_extensions import Annotated
 
 class gen_aspect_schema(BaseModel):
     aspect_label: Annotated[str, StringConstraints(strip_whitespace=True)]
-    aspect_keywords: Annotated[str, StringConstraints(strip_whitespace=True)]
+    aspect_keywords: conlist(str, min_length=2, max_length=20)
     
 class aspect_list_schema(BaseModel):
     aspect_list : conlist(gen_aspect_schema, min_length=2, max_length=5)
@@ -22,7 +22,7 @@ def aspect_prompt(topic, k=5, n=10):
         [
             {{
                 "aspect_label": <should be a brief, 5-10 word string where the value is an all-lowercase label of the aspect (phrase-length)>,
-                "aspect_keywords": <list of {n} unique, all-lowercase, and comma-separated keywords (always a space after the comma) commonly used to describe the aspect_label (e.g., keyword_1, keyword_2, ..., keyword_{n})>
+                "aspect_keywords": <list of {n} unique, all-lowercase, and comma-separated string keywords (always a space after the comma) commonly used to describe the aspect_label (e.g., ["keyword_1", "keyword_2", ..., "keyword_{n}"])>
             }}
         ]
 }}
@@ -55,7 +55,7 @@ def subaspect_prompt(aspect, topic, segments, k=5, n=10):
         [
             {{
                 "subaspect_label": <should be a brief, 5-10 word string where the value is an all-lowercase label of the subaspect (phrase-length) that falls under parent aspect {aspect}>,
-                "subaspect_keywords": <list of {n} unique, all-lowercase, and comma-separated keywords (always a space after the comma) used to describe the subaspect_label (e.g., keyword_1, keyword_2, ..., keyword_{n}) based on the input excerpts>
+                "subaspect_keywords": <list of {n} unique, all-lowercase, and comma-separated string keywords (always a space after the comma) used to describe the subaspect_label (e.g., ["keyword_1", "keyword_2", ..., "keyword_{n}"]) based on the input excerpts>
             }}
         ]
 }}
