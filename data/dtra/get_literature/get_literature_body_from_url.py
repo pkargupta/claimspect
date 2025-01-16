@@ -29,28 +29,46 @@ class Claim2idConverter:
     def __call__(self, claim: str):
         return self.claim2id[claim]
 
+def save_results_for_claim(claim_id, results):
+    """Save results for a given claim_id."""
+    claim_dir = f"{SAVE_PATH}/{claim_id}"
+    os.makedirs(claim_dir, exist_ok=True)
+    for instance in results:
+        paper_id = instance['paperId']
+        body = instance['body']
+        file_path = f"{claim_dir}/{paper_id}.txt"
+        if os.path.exists(file_path):
+            continue
+        with open(file_path, 'w') as f:
+            f.write(body)
+
 def main():
-    
     claim2id = Claim2idConverter()
     meta_info = load_meta_info()
-    results = {}
-    
+
     # iterate over 140 different claims with tqdm
-    for claim, meta_info_list in tqdm(list(meta_info.items()), desc="retrieving for claim ..."):
+    for claim, meta_info_list in tqdm(list(meta_info.items()), desc="Processing claims"):
         claim_id = claim2id(claim)
-        results[claim_id] = []
-        
+        claim_dir = f"{SAVE_PATH}/{claim_id}"
+
+        # Skip processing if claim directory already exists and is non-empty
+        if os.path.exists(claim_dir) and os.listdir(claim_dir):
+            print(f"Skipping claim_id {claim_id}, already processed.")
+            continue
+
+        results = []
+
         # shuffle the meta_info_list
         random.shuffle(meta_info_list)
-        
-        # iterative over meta_info_list with tqdm
-        for meta_info in tqdm(meta_info_list, desc="retrieving for meta info ..."):
+
+        # iterate over meta_info_list with tqdm
+        for meta_info in tqdm(meta_info_list, desc=f"Processing meta info for claim_id {claim_id}"):
             paper_id = meta_info['paperId']
             open_access_pdf = meta_info['openAccessPdf']
             if not open_access_pdf:
                 continue
             pdf_url = open_access_pdf['url']
-            
+
             # put the paper into the results
             try:
                 paper_content = parse_paper(pdf_url)
@@ -58,26 +76,17 @@ def main():
                     "paperId": paper_id,
                     "body": paper_content
                 }
-                results[claim_id].append(instance)
-                if len(results[claim_id]) >= MAX_PAPER_NUM:
+                results.append(instance)
+
+                # Save incrementally
+                save_results_for_claim(claim_id, [instance])
+
+                if len(results) >= MAX_PAPER_NUM:
                     break
-            
+
             # skip this case if the url is not working
             except Exception as e:
                 continue
-    
-    # save the results
-    for claim_id in results:
-        os.makedirs(f"{SAVE_PATH}/{claim_id}", exist_ok=True)
-        for instance in results[claim_id]:
-            paper_id = instance['paperId']
-            body = instance['body']
-            with open(f"{SAVE_PATH}/{claim_id}/{paper_id}.txt", 'w') as f:
-                f.write(body)
-        
-    
-
-    
 
 if __name__ == '__main__':
     main()
