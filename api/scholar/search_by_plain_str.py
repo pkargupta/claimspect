@@ -2,8 +2,13 @@ import os
 import time
 import requests
 from typing import Optional
+from joblib import Memory
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
+cachedir = "./cache"
+memory = Memory(cachedir, verbose=0)
+
+@memory.cache
 def url_request(
     base_url: str,
     offset=None,
