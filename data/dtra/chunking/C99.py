@@ -47,7 +47,7 @@ class C99:
         self.std_coeff = std_coeff
         self.tokenizer = tokenizer
 
-    def segment(self, document):
+    def segment(self, document, enable_tqdm=False):
         if len(document) < 3:
             return [1] + [0 for _ in range(len(document) - 1)]
         
@@ -79,7 +79,7 @@ class C99:
         # Proceed with the rest of the method as before
         # Compute rank matrix & sum matrix
         self.rank = np.zeros((n, n))
-        for i in tqdm(range(n), desc="Calculating Rank Matrix"):
+        for i in tqdm(range(n), desc="Calculating Rank Matrix", disable=not enable_tqdm):
             for j in range(i, n):
                 r1 = max(0, i - self.window + 1)
                 r2 = min(n - 1, i + self.window - 1)
@@ -95,7 +95,7 @@ class C99:
 
         # Calculate prefix sum matrix for fast range sum queries
         prefix_sm = np.zeros((n, n))
-        for i in tqdm(range(n), desc="Calculating Prefix Sum Matrix"):
+        for i in tqdm(range(n), desc="Calculating Prefix Sum Matrix", disable=not enable_tqdm):
             for j in range(n):
                 prefix_sm[i][j] = self.rank[i][j]
                 if i - 1 >= 0: prefix_sm[i][j] += prefix_sm[i - 1][j]
@@ -103,7 +103,7 @@ class C99:
                 if i - 1 >= 0 and j - 1 >= 0: prefix_sm[i][j] -= prefix_sm[i - 1][j - 1]
         
         self.sm = np.zeros((n, n))
-        for i in tqdm(range(n), desc="Calculating Sum Matrix"):
+        for i in tqdm(range(n), desc="Calculating Sum Matrix", disable=not enable_tqdm):
             for j in range(i, n):
                 if i == 0:
                     self.sm[i][j] = prefix_sm[j][j]
@@ -116,7 +116,7 @@ class C99:
         D = 1.0 * self.sm[0][n - 1] / (n * n)
         darr, region_arr, idx = [D], [Region(0, n - 1, self.sm)], []
         sum_region, sum_area = float(self.sm[0][n - 1]), float(n * n)
-        for i in tqdm(range(n - 1), desc="Determining Boundaries"):
+        for i in tqdm(range(n - 1), desc="Determining Boundaries", disable=not enable_tqdm):
             mx, pos = -1e9, -1
             for j, region in enumerate(region_arr):
                 if region.l == region.r:
@@ -194,7 +194,7 @@ class TopicSegmentor:
         self.embedder = SentenceTransformer('allenai-specter')
         self.model = C99(window=3, std_coeff=0.6)
 
-    def segment(self, context):
+    def segment(self, context, enable_tqdm=False):
         pos = []
         sentences = []
         for c_id, sent in enumerate(context):
@@ -207,13 +207,13 @@ class TopicSegmentor:
 
         embeddings = []
         with torch.no_grad():
-            for i in tqdm(range(len(sentences)), desc="Encoding Sentences"):
+            for i in tqdm(range(len(sentences)), desc="Encoding Sentences", disable=not enable_tqdm):
                 embedding = self.embedder.encode(sentences[i])
                 embeddings.append(embedding)
 
         sent_label = []
-        for i in tqdm(range(len(embeddings)), desc="Segmenting Topics"):
-            boundary = self.model.segment(embeddings[i])
+        for i in tqdm(range(len(embeddings)), desc="Segmenting Topics", disable=not enable_tqdm):
+            boundary = self.model.segment(embeddings[i], enable_tqdm)
             temp_labels = []
             l = 0
             for j in range(len(boundary)):
@@ -237,9 +237,7 @@ class TopicSegmentor:
 
 def main():
     
-    corpus_path = "data/dtra/get_literature/literature_body/0/9ae24e5b13d964e70dac68fa97a0849e6d289caa.txt"
-    with open(corpus_path, "r") as f:
-        corpus = f.read()
+    corpus = "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog."
     
     segmentor = TopicSegmentor()
     segments = segmentor.segment([corpus])
