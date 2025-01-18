@@ -1,5 +1,5 @@
 from sklearn.metrics.pairwise import cosine_similarity
-from api.openai.embed import openai_embed
+from api.openai.embed import embed as openai_embed
 from api.openai.chat import chat
 from api.local.e5_model import e5_embed
 from hierarchy import Segment
@@ -42,10 +42,12 @@ def get_chat_function(args):
         def chat_gpt_4o(prompts: list[str]) -> list[str]:
             return chat(prompts, model_name='gpt-4o', seed=42, temperature=0.7)
         return chat_gpt_4o
+
     elif args.chat_model_name == "gpt-4o-mini":
         def chat_gpt_4o_mini(prompts: list[str]) -> list[str]:
             return chat(prompts, model_name='gpt-4o-mini', seed=42, temperature=0.7)
         return chat_gpt_4o_mini
+    
     elif args.chat_model_name == "vllm":
         def vllm(prompts: list[str]) -> list[str]:
             logits_processor = JSONLogitsProcessor(schema=keyword_schema, llm=args.chat_model.llm_engine)

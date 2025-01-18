@@ -118,13 +118,16 @@ def embed(
     if clear_cache:
         os.remove(request_file)
         os.remove(save_file)
-    return results
+    
+    results_dict = {input_str: result for input_str, result in zip(inputs, results)}
+    return results_dict
 
 # Entry Point
 if __name__ == '__main__':
     try:
         responses = embed(['Who is your daddy?', 'What is the meaning of life?'])
-        for response in responses:
+        for input_str, response in responses.items():
+            print(f"Input: {input_str}")
             print(response[:10])
     except Exception as e:
         logging.error(f"An error occurred: {e}")

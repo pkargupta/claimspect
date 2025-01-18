@@ -1,6 +1,6 @@
 import random
 import json
-from api.openai.embed import embed
+from api.openai.embed import embed as openai_embed
 # import cosine similarity function
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -32,12 +32,12 @@ for claim, segments in zip(sampled_claims, segment_sets):
     
     claim_str = claim["body"]
     segments_str_list = [segment["segment"] for segment in segments]
-    claim_embedding = embed([claim_str], embed_model_name)[0]
-    segment_embeddings = embed(segments_str_list, embed_model_name)
+    claim_embedding = openai_embed([claim_str], embed_model_name)[claim_str]
+    segment_embeddings = openai_embed(segments_str_list, embed_model_name)
     # the results are dicts {str: vector}
     
     top_20_segments = []
-    for segment_str, segment_embedding in zip(segments_str_list, segment_embeddings):
+    for segment_str, segment_embedding in segment_embeddings.items():
 
         # use cosine similarity to calculate the similarity with list of float
         similarity = cosine_similarity([claim_embedding], [segment_embedding])[0][0]

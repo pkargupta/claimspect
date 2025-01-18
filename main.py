@@ -10,7 +10,7 @@ from contextlib import redirect_stdout
 
 from api.local.e5_model import E5
 from api.local.e5_model import e5_embed
-from api.openai.embed import openai_embed
+from api.openai.embed import embed as openai_embed
 
 from hierarchy import Paper, AspectNode, Tree, Segment
 from keyword_generation.keyword_extractor import extract_keyword, stage1_retrieve_top_k_corpus_segments
