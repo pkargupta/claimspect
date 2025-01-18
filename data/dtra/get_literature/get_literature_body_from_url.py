@@ -3,6 +3,7 @@ import time
 import json
 import random
 from tqdm import tqdm
+from multiprocessing import Pool, cpu_count
 from preprocessing.pdf2txt import parse_paper
 
 SAVE_PATH = "data/dtra/get_literature/literature_body"
@@ -29,55 +30,74 @@ class Claim2idConverter:
     def __call__(self, claim: str):
         return self.claim2id[claim]
 
-def main():
+def save_results_for_claim(claim_id, paper_id, body):
+    claim_dir = os.path.join(SAVE_PATH, str(claim_id))
+    os.makedirs(claim_dir, exist_ok=True)
+    file_path = os.path.join(claim_dir, f"{paper_id}.txt")
+    if not os.path.exists(file_path):
+        with open(file_path, 'w') as f:
+            f.write(body)
+
+def process_pdf(args):
     
+    paper_id, pdf_url, claim_id = args
+    claim_dir = os.path.join(SAVE_PATH, str(claim_id))
+    os.makedirs(claim_dir, exist_ok=True)
+
+    file_path = os.path.join(claim_dir, f"{paper_id}.txt")
+
+    if os.path.exists(file_path):
+        return None
+    
+    try:
+        paper_content = parse_paper(pdf_url)
+        with open(file_path, 'w') as f:
+            f.write(paper_content)
+        return paper_id
+    except Exception as e:
+
+        return None
+
+def main():
     claim2id = Claim2idConverter()
     meta_info = load_meta_info()
-    results = {}
-    
-    # iterate over 140 different claims with tqdm
-    for claim, meta_info_list in tqdm(list(meta_info.items()), desc="retrieving for claim ..."):
+
+    all_claims = list(meta_info.items())
+
+    for claim, meta_info_list in tqdm(all_claims, desc="Processing claims"):
         claim_id = claim2id(claim)
-        results[claim_id] = []
-        
-        # shuffle the meta_info_list
+        claim_dir = os.path.join(SAVE_PATH, str(claim_id))
+
+        if os.path.exists(claim_dir) and os.listdir(claim_dir):
+            print(f"Skipping claim_id {claim_id}, already processed.")
+            continue
+
         random.shuffle(meta_info_list)
-        
-        # iterative over meta_info_list with tqdm
-        for meta_info in tqdm(meta_info_list, desc="retrieving for meta info ..."):
-            paper_id = meta_info['paperId']
-            open_access_pdf = meta_info['openAccessPdf']
+
+        paper_args_list = []
+        for info in meta_info_list:
+            paper_id = info['paperId']
+            open_access_pdf = info['openAccessPdf']
             if not open_access_pdf:
                 continue
             pdf_url = open_access_pdf['url']
-            
-            # put the paper into the results
-            try:
-                paper_content = parse_paper(pdf_url)
-                instance = {
-                    "paperId": paper_id,
-                    "body": paper_content
-                }
-                results[claim_id].append(instance)
-                if len(results[claim_id]) >= MAX_PAPER_NUM:
-                    break
-            
-            # skip this case if the url is not working
-            except Exception as e:
-                continue
-    
-    # save the results
-    for claim_id in results:
-        os.makedirs(f"{SAVE_PATH}/{claim_id}", exist_ok=True)
-        for instance in results[claim_id]:
-            paper_id = instance['paperId']
-            body = instance['body']
-            with open(f"{SAVE_PATH}/{claim_id}/{paper_id}.txt", 'w') as f:
-                f.write(body)
-        
-    
+            paper_args_list.append((paper_id, pdf_url, claim_id))
 
-    
+        if not paper_args_list:
+            continue
+
+        results = []
+        with Pool(processes=cpu_count()) as pool:
+            for paper_id in tqdm(pool.imap_unordered(process_pdf, paper_args_list),
+                                 total=len(paper_args_list),
+                                 desc=f"Processing meta info for claim_id {claim_id}"):
+                if paper_id is not None:
+                    results.append(paper_id)
+                if len(results) >= MAX_PAPER_NUM:
+                    pool.terminate()
+                    break
+
+        print(f"Claim ID {claim_id} processed: {len(results)} papers saved.")
 
 if __name__ == '__main__':
     main()

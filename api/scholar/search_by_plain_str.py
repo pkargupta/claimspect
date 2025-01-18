@@ -2,8 +2,13 @@ import os
 import time
 import requests
 from typing import Optional
+from joblib import Memory
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
+cachedir = "./cache"
+memory = Memory(cachedir, verbose=0)
+
+@memory.cache
 def url_request(
     base_url: str,
     offset=None,
@@ -36,7 +41,7 @@ def url_request(
 
 # get API key
 @retry(
-    stop=stop_after_attempt(16),  # Retry up to 5 times
+    stop=stop_after_attempt(5),  # Retry up to 5 times
     wait=wait_fixed(2),  # Wait 2 seconds between retries
     retry=retry_if_exception_type(Exception)  # Retry on request exceptions
 )

@@ -3,6 +3,7 @@ import time
 import json
 import logging
 import asyncio
+from joblib import Memory
 from typing import Literal, List, Dict
 from api.openai.chat_parallel import process_api_requests_from_file
 
@@ -63,7 +64,10 @@ def read_responses(save_file: str) -> List[str]:
         for response in responses
     ]
 
+memory = Memory(CACHE_DIR, verbose=0)
+
 # Main Chat Function
+@memory.cache
 def chat(
     inputs: List[str],
     half_usage=False,
