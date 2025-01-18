@@ -17,6 +17,7 @@ from keyword_generation.keyword_extractor import extract_keyword, stage1_retriev
 from prompts import aspect_list_schema, aspect_prompt
 from segment_ranking import aspect_segment_ranking
 from discovery import subaspect_discovery
+from unidecode import unidecode
 
 def load_data(args, chunk_size=3):
     with open(f'{args.data_dir}/{args.topic}/{args.topic}_text.txt', 'r', encoding='utf-8', errors='ignore') as f:
@@ -30,7 +31,8 @@ def load_data(args, chunk_size=3):
             local_id = 0
             paper_segments = []
             for i in np.arange(0, len(sents), chunk_size):
-                paper_segments.append(Segment(global_id, local_id, paper_id, ". ".join(sents[i:i+chunk_size])))
+                seg_content = unidecode(". ".join(sents[i:i+chunk_size]))
+                paper_segments.append(Segment(global_id, local_id, paper_id, seg_content))
                 local_id += 1
                 global_id += 1
 
@@ -98,6 +100,9 @@ def main(args):
     print("######## EXPAND AND ENRICH TREE WITH ASPECTS ########")
     
     all_segments = root_node.get_all_segments()
+    seg_contents = [seg.content for seg in all_segments]
+    corpus_embs = args.embed_func(args.embed_model, seg_contents)
+    
     for aspect in aspects:
         # Refine keywords
         refined_aspect_keywords = extract_keyword(args=args, 
@@ -108,7 +113,8 @@ def main(args):
                                                   retrieved_corpus_num=5,
                                                   min_keyword_num=5,
                                                   max_keyword_num=15,
-                                                  iteration_num=1)
+                                                  iteration_num=1,
+                                                  corpus_embs=corpus_embs)
         
         aspect_node = AspectNode(idx=len(id2node), name=aspect["aspect_label"], parent=root_node, keywords=refined_aspect_keywords)
         print(f'{aspect_node.name} keywords: {str(aspect_node.keywords)}')
@@ -129,7 +135,7 @@ def main(args):
                                               aspect_name=current_node.name,
                                               corpus_segments=all_segments,
                                               retrieved_corpus_num=100,
-                                              current_keyword_group=current_node.keywords)
+                                              current_keyword_group=current_node.keywords,corpus_embs=corpus_embs)
         top_k_seg_contents = [seg.content for seg in top_k_segments]
 
         ## (2) rank the segments
@@ -137,6 +143,8 @@ def main(args):
                                segments=top_k_seg_contents, 
                                target_aspect=current_node, 
                                neg_aspects=current_node.get_siblings())
+
+        current_node.ranked_segments = {i:(top_k_segments[rank2id[i]], id2score[rank2id[i]]) for i in np.arange(len(top_k_segments))}
         
         ## (3) identify the relevant subaspects from the top-k ranked segments
         subaspects = subaspect_discovery(args=args,
@@ -156,20 +164,21 @@ def main(args):
                                                     retrieved_corpus_num=5,
                                                     min_keyword_num=5,
                                                     max_keyword_num=15,
-                                                    iteration_num=1)
+                                                    iteration_num=1,
+                                                    corpus_embs=corpus_embs)
             
             subaspect_node = AspectNode(idx=len(id2node), name=subaspect["subaspect_label"], parent=current_node, keywords=refined_aspect_keywords)
             tree.add_aspect(current_node, subaspect_node)
             print(f'{subaspect_node.name} keywords: {str(subaspect_node.keywords)}')
             id2node.append(subaspect_node)
-            subaspect_node.ranked_segments = {i:(top_k_segments[rank2id[i]], id2score[rank2id[i]]) for i in np.arange(len(top_k_segments))}
             
-            if subaspect_node.depth < args.max_depth:
+            if subaspect_node.depth <= args.max_depth:
                 queue.append(subaspect_node)
 
+    print("######## OUTPUT ASPECT HIERARCHY ########")
     with open(f'{args.data_dir}/{args.topic}/aspect_hierarchy.txt', 'w') as f:
         with redirect_stdout(f):
-            root_node.display(indent_multiplier=2, visited=None)
+            root_node.display(indent_multiplier=5, visited=None)
 
 
     # # Hierarchical segment classification

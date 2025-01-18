@@ -30,7 +30,7 @@ class AspectNode:
         self.depth = 0 if self.parent is None else self.parent.depth + 1
 
         self.sub_aspects = []
-        self.ranked_segments = []
+        self.ranked_segments = {}
         self.related_papers = {}  # Dictionary for faster lookup by paper_id
 
     def add_sub_aspect(self, sub_aspect):
@@ -61,6 +61,22 @@ class AspectNode:
     
     def get_parent(self):
         return self.parent
+
+    def get_ancestors(self, as_str=False):
+        if self.parent is None:
+            return []
+        
+        ancestors = self.parent.get_ancestors()
+        if len(ancestors) > 0:
+            if as_str:
+                return [self.parent.name] + ancestors
+            else:
+                return [self.parent] + ancestors
+        else:
+            if as_str:
+                return [self.parent.name]
+            else:
+                return [self.parent]
     
     def get_siblings(self):
         return [aspect_node for aspect_node in self.parent.sub_aspects if aspect_node.id != self.id]
@@ -108,14 +124,15 @@ class AspectNode:
         print(f"{indent}Aspect: {self.name}")
         print(f"{indent}Depth: {self.depth}")
         print(f"{indent}Keywords: {self.keywords}")
-        print(f"{indent}Top #1 Segment ({self.ranked_segments[0][1]}): {self.ranked_segments[0][0].content}")
-        print(f"{indent}Top #2 Segment ({self.ranked_segments[1][1]}): {self.ranked_segments[1][0].content}")
-        print(f"{indent}Top #3 Segment ({self.ranked_segments[2][1]}): {self.ranked_segments[2][0].content}")
+        if len(self.ranked_segments) > 0:
+            print(f"{indent}Top #1 Segment ({self.ranked_segments[0][1]}): {self.ranked_segments[0][0].content}")
+            print(f"{indent}Top #2 Segment ({self.ranked_segments[1][1]}): {self.ranked_segments[1][0].content}")
+            print(f"{indent}Top #3 Segment ({self.ranked_segments[2][1]}): {self.ranked_segments[2][0].content}")
         if self.sub_aspects:
             print(f"{indent}{'-'*40}")
             print(f"{indent}Subaspects:")
             for subaspect in self.sub_aspects:
-                subaspect.display(self.depth + 1, indent_multiplier, visited)
+                subaspect.display(indent_multiplier, visited)
         print(f"{indent}{'-'*40}")
 
 
