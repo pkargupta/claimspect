@@ -1,0 +1,9 @@
+0	being_a_good_vaccine
+1	efficacy
+2	safety
+3	cost_and_accessibility
+4	manufacturing_and_distribution
+5	safety_for_children
+6	safety_for_the_elderly
+7	storation_and_transportation
+8	production
