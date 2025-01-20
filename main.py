@@ -66,13 +66,6 @@ def hierarchical_segment_classification(claim, aspect_hierarchy):
     tree.display_tree()
     return tree
 
-def perspective_discovery(tree, claim):
-    """Step 6: Identify perspectives/stances in the corpus."""
-    for aspect in tree.root.sub_aspects:
-        for sub_aspect in aspect.sub_aspects:
-            print(f"Identified perspective for sub-aspect '{sub_aspect.name}' under aspect '{aspect.name}'")
-    print(f"Perspectives discovered for claim '{claim}'.")
-
 def main(args):
     # input corpus -> @Runchu is writing the dataset loader; we assume we have a corpus of Paper classes where the Paper class has an attribute called segments
     # corpus: dict of Paper objects
