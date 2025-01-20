@@ -3,6 +3,8 @@ from vllm import SamplingParams
 from outlines.serve.vllm import JSONLogitsProcessor
 import json
 import numpy as np
+from collections import deque
+
 from prompts import subaspect_list_schema, subaspect_prompt
 
 def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temperature=0.7, top_p=0.99):
@@ -12,7 +14,7 @@ def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temper
     logits_processor = JSONLogitsProcessor(schema=subaspect_list_schema, llm=args.chat_model.llm_engine)
     sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], temperature=temperature, top_p=top_p)
 
-    output = args.chat_model.generate(subaspect_prompt(parent_aspect.name, args.claim, subset), sampling_params=sampling_params)[0].outputs[0].text
+    output = args.chat_model.generate(subaspect_prompt(parent_aspect.name, parent_aspect.description, args.claim, subset), sampling_params=sampling_params)[0].outputs[0].text
 
     subaspects = json.loads(output)['subaspect_list']
     
@@ -21,5 +23,12 @@ def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temper
     return subaspects
 
 
-def perspective_discovery():
+def perspective_discovery(root_node):
+    queue = deque(root_node.sub_aspects)
+
+    while queue:
+        current_node:AspectNode = queue.popleft()
+        # get the current mapped segments
+        node_segments = current_node.ranked_segments
+        # given the segments as input, identify the 
     return
