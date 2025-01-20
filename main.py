@@ -16,7 +16,7 @@ from hierarchy import Paper, AspectNode, Tree, Segment
 from keyword_generation.keyword_extractor import extract_keyword, extract_keywords, stage1_retrieve_top_k_corpus_segments
 from prompts import aspect_list_schema, aspect_prompt
 from segment_ranking import aspect_segment_ranking
-from discovery import subaspect_discovery
+from discovery import subaspect_discovery, perspective_discovery
 from unidecode import unidecode
 
 def load_data(args, chunk_size=3):
@@ -164,10 +164,13 @@ def main(args):
                 
                 queue.append(subaspect_node)
 
+    print("######## DISCOVERING PERSPECTIVES ########")
+    perspective_discovery(args, id2node)
+    
     print("######## OUTPUT ASPECT HIERARCHY ########")
     with open(f'{args.data_dir}/{args.topic}/aspect_hierarchy.txt', 'w') as f:
         with redirect_stdout(f):
-            hierarchy_dict = root_node.display(indent_multiplier=5, visited=None)
+            hierarchy_dict = root_node.display(indent_multiplier=5, visited=None, corpus_len=len(corpus))
 
     with open(f'{args.data_dir}/{args.topic}/hierarchy.json', 'w', encoding='utf-8') as f:
         json.dump(hierarchy_dict, f, ensure_ascii=False, indent=4)

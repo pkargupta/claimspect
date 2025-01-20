@@ -33,6 +33,7 @@ class AspectNode:
         self.sub_aspects = []
         self.ranked_segments = {}
         self.related_papers = {}  # Dictionary for faster lookup by paper_id
+        self.perspectives = None
 
     def add_sub_aspect(self, sub_aspect):
         """Adds a sub-aspect to the current node."""
@@ -106,8 +107,22 @@ class AspectNode:
                 all_segments.extend(entry["relevant_segments"])
         
         return all_segments
+
+    def compute_stats(self):
+        s_papers = set()
+        for seg_id in self.perspectives["supports_claim"]["perspective_segments"]:
+            s_papers.add(self.ranked_segments[seg_id].paper_id)
+        n_papers = set()
+        for seg_id in self.perspectives["neutral_to_claim"]["perspective_segments"]:
+            n_papers.add(self.ranked_segments[seg_id].paper_id)
+
+        o_papers = set()
+        for seg_id in self.perspectives["opposes_claim"]["perspective_segments"]:
+            o_papers.add(self.ranked_segments[seg_id].paper_id)
+
+        return s_papers, n_papers, o_papers 
     
-    def display(self, indent_multiplier=2, visited=None):
+    def display(self, indent_multiplier=2, visited=None, corpus_len=0):
         """
         Displays the aspect hierarchy starting from this node.
 
@@ -137,12 +152,25 @@ class AspectNode:
             print(f"{indent}Top #1 Segment ({self.ranked_segments[0][1]}): {self.ranked_segments[0][0].content}")
             print(f"{indent}Top #2 Segment ({self.ranked_segments[1][1]}): {self.ranked_segments[1][0].content}")
             print(f"{indent}Top #3 Segment ({self.ranked_segments[2][1]}): {self.ranked_segments[2][0].content}")
+
+        if self.perspectives:
+            s_papers, n_papers, o_papers = self.compute_stats()
+            
+            output_dict['perspectives'] = self.perspectives
+            output_dict['perspectives']['support_ratio'] = f"{len(s_papers)}/{corpus_len}"
+            output_dict['perspectives']['neutral_ratio'] = f"{len(n_papers)}/{corpus_len}"
+            output_dict['perspectives']['oppose_ratio'] = f"{len(o_papers)}/{corpus_len}"
+            
+            print(f"{indent}Support ({len(s_papers)}/{corpus_len}): {self.perspectives['supports_claim']}")
+            print(f"{indent}Neutral ({len(n_papers)}/{corpus_len}): {self.perspectives['neutral_to_claim']}")
+            print(f"{indent}Oppose ({len(o_papers)}/{corpus_len}): {self.perspectives['opposes_claim']}")
+            
         if self.sub_aspects:
             print(f"{indent}{'-'*40}")
             print(f"{indent}Subaspects:")
             output_dict['children'] = []
             for subaspect in self.sub_aspects:
-                sub_dict = subaspect.display(indent_multiplier, visited)
+                sub_dict = subaspect.display(indent_multiplier, visited, corpus_len)
                 if sub_dict is not None:
                     output_dict['children'].append(sub_dict)
                 

@@ -73,6 +73,7 @@ Provide your output in the following JSON format:
 
     return prompt
 
+############ KEYWORD EXTRACTION & FILTERING ############
 
 def keyword_extraction_prompt(claim, aspect_name, aspect_description, max_keyword_num, seg_contents):
     contents = ""
@@ -108,3 +109,58 @@ Your output should be in the following JSON format:
 }}
 ---
 """
+
+############ PERSPECTIVE DISCOVERY ############
+class perspective_cluster(BaseModel):
+    perspective_description: Annotated[str, StringConstraints(strip_whitespace=True)]
+    perspective_segments: conlist(int)
+    
+class perspective_schema(BaseModel):
+    supports_claim: perspective_cluster
+    neutral_to_claim: perspective_cluster
+    opposes_claim: perspective_cluster
+    irrelevant_to_claim: perspective_cluster
+
+def perspective_prompt(claim, aspect_name, aspect_description, segments):
+
+    formatted_segments = ""
+    for idx, seg in enumerate(segments):
+        formatted_segments += f"Segment #{idx}: {seg.content}"
+    
+    return f"""You are a stance detector, which determines the stance that segments from scientific papers have towards an aspect of a specific claim. Your stance options are the following:
+
+- supports_claim: The segment either implicitly or explicitly indicates that the claim is true specific to the given aspect.
+- neutral_to_claim: The segment is relevant to the claim and aspect, but does not indicate whether the claim is true specific to the given aspect.
+- opposes_claim: The segment either implicitly or explicitly indicates that the claim is false specific to the given aspect.
+- irrelevant_to_claim: The segment does not contain relevant information on the claim and the given aspect.
+
+Here is information on your input claim and aspect.
+Claim: {claim}
+Aspect to consider: {aspect_name}: {aspect_description}
+
+Here are your segments:
+{formatted_segments}
+
+Your output should be in the following JSON format:
+---
+{{
+    "supports_claim": {{
+        "perspective_description": <output a brief, sentence-long string where the value is a summary of what the supportive stance is towards the specific aspect of the claim>,
+        "perspective_segments": <output a list of the integer ids of all of segments which support the aspect of the claim>
+    }},
+    "neutral_to_claim": {{
+        "perspective_description": <output a brief, sentence-long string where the value is a summary of what the neutral stance is towards the specific aspect of the claim>,
+        "perspective_segments": <output a list of the integer ids of all of segments relevant to the claim but are neutral to aspect of the claim>
+    }},
+    "opposes_claim": {{
+        "perspective_description": <output a brief, sentence-long string where the value is a summary of what the opposing stance is towards the specific aspect of the claim>,
+        "perspective_segments": <output a list of the integer ids of all of segments which oppose the aspect of the claim>
+    }},
+    "irrelevant_to_claim": {{
+        "perspective_description": <output a brief, sentence-long string where the value is a summary of what the segments irrelevant to the claim are discussing,
+        "perspective_segments": <output a list of the integer ids of all of segments irrelevant to the claim>
+    }}
+}}
+---
+"""
+    
