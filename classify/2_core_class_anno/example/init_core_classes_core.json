@@ -1,0 +1,239 @@
+{
+ "0": {
+  "response": "cost and accessibility, storation and transportation",
+  "core classes": [
+   "3",
+   "7"
+  ],
+  "with ancestors": [
+   "0",
+   "4",
+   "7",
+   "3"
+  ]
+ },
+ "1": {
+  "response": "efficacy, safety, cost and accessibility, safety for the elderly",
+  "core classes": [
+   "1",
+   "2",
+   "3",
+   "6"
+  ],
+  "with ancestors": [
+   "2",
+   "0",
+   "6",
+   "1",
+   "3"
+  ]
+ },
+ "2": {
+  "response": "efficacy, safety for children, safety for the elderly",
+  "core classes": [
+   "1",
+   "5",
+   "6"
+  ],
+  "with ancestors": [
+   "2",
+   "0",
+   "6",
+   "5",
+   "1"
+  ]
+ },
+ "3": {
+  "response": "efficacy, safety",
+  "core classes": [
+   "1",
+   "2"
+  ],
+  "with ancestors": [
+   "0",
+   "1",
+   "2"
+  ]
+ },
+ "4": {
+  "response": "efficacy, safety",
+  "core classes": [
+   "1",
+   "2"
+  ],
+  "with ancestors": [
+   "0",
+   "1",
+   "2"
+  ]
+ },
+ "5": {
+  "response": "efficacy, safety, storation and transportation, manufacturing and distribution",
+  "core classes": [
+   "1",
+   "2",
+   "7",
+   "4"
+  ],
+  "with ancestors": [
+   "2",
+   "0",
+   "4",
+   "1",
+   "7"
+  ]
+ },
+ "6": {
+  "response": "efficacy, safety, cost and accessibility",
+  "core classes": [
+   "1",
+   "2",
+   "3"
+  ],
+  "with ancestors": [
+   "0",
+   "1",
+   "3",
+   "2"
+  ]
+ },
+ "7": {
+  "response": "efficacy, safety, cost and accessibility",
+  "core classes": [
+   "1",
+   "2",
+   "3"
+  ],
+  "with ancestors": [
+   "0",
+   "1",
+   "3",
+   "2"
+  ]
+ },
+ "8": {
+  "response": "efficacy",
+  "core classes": [
+   "1"
+  ],
+  "with ancestors": [
+   "0",
+   "1"
+  ]
+ },
+ "9": {
+  "response": "safety for the elderly, efficacy",
+  "core classes": [
+   "6",
+   "1"
+  ],
+  "with ancestors": [
+   "6",
+   "0",
+   "1",
+   "2"
+  ]
+ },
+ "10": {
+  "response": "safety for the elderly, efficacy",
+  "core classes": [
+   "6",
+   "1"
+  ],
+  "with ancestors": [
+   "6",
+   "0",
+   "1",
+   "2"
+  ]
+ },
+ "11": {
+  "response": "safety, efficacy",
+  "core classes": [
+   "2",
+   "1"
+  ],
+  "with ancestors": [
+   "0",
+   "1",
+   "2"
+  ]
+ },
+ "12": {
+  "response": "safety, efficacy",
+  "core classes": [
+   "2",
+   "1"
+  ],
+  "with ancestors": [
+   "0",
+   "1",
+   "2"
+  ]
+ },
+ "13": {
+  "response": "efficacy",
+  "core classes": [
+   "1"
+  ],
+  "with ancestors": [
+   "0",
+   "1"
+  ]
+ },
+ "14": {
+  "response": "efficacy",
+  "core classes": [
+   "1"
+  ],
+  "with ancestors": [
+   "0",
+   "1"
+  ]
+ },
+ "15": {
+  "response": "efficacy, safety, storation and transportation, manufacturing and distribution",
+  "core classes": [
+   "1",
+   "2",
+   "7",
+   "4"
+  ],
+  "with ancestors": [
+   "2",
+   "0",
+   "4",
+   "1",
+   "7"
+  ]
+ },
+ "16": {
+  "response": "efficacy, safety, cost and accessibility",
+  "core classes": [
+   "1",
+   "2",
+   "3"
+  ],
+  "with ancestors": [
+   "0",
+   "1",
+   "3",
+   "2"
+  ]
+ },
+ "17": {
+  "response": "safety, efficacy, storation and transportation",
+  "core classes": [
+   "2",
+   "1",
+   "7"
+  ],
+  "with ancestors": [
+   "2",
+   "0",
+   "4",
+   "1",
+   "7"
+  ]
+ }
+}
