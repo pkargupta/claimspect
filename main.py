@@ -11,8 +11,10 @@ from contextlib import redirect_stdout
 from api.local.e5_model import E5
 from api.local.e5_model import e5_embed
 from api.openai.embed import embed as openai_embed
+from api.openai.chat import chat
 
 from hierarchy import Paper, AspectNode, Tree, Segment
+from filter.keyword_ensemble_embedding_llm_judge import KeywordEnsembleEmbeddingLLMFilter
 from keyword_generation.keyword_extractor import extract_keyword, stage1_retrieve_top_k_corpus_segments
 from prompts import aspect_list_schema, aspect_prompt
 from segment_ranking import aspect_segment_ranking
@@ -45,13 +47,21 @@ def coarse_grained_aspect_discovery(args, claim, temperature=0.3, top_p=0.99):
     """Step 1: Generate coarse-grained aspects for the claim."""
     """Step 2: Generate specific keywords for each aspect."""
     
-    logits_processor = JSONLogitsProcessor(schema=aspect_list_schema, llm=args.chat_model.llm_engine)
-    sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], temperature=temperature, top_p=top_p)
-
-    output = args.chat_model.generate(aspect_prompt(claim), sampling_params=sampling_params)[0].outputs[0].text
-
-    aspects = json.loads(output)['aspect_list']
+    if args.chat_model_name == "vllm":
+        # OPTION 1: generation code for vllm
+        logits_processor = JSONLogitsProcessor(schema=aspect_list_schema, llm=args.chat_model.llm_engine)
+        sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], temperature=temperature, top_p=top_p)
+        output = args.chat_model.generate(aspect_prompt(claim), sampling_params=sampling_params)[0].outputs[0].text
+        aspects = json.loads(output)['aspect_list']
     
+    if args.chat_model_name == "gpt-4o" or "gpt-4o-mini":
+        # OPTION 2: generation code for openai model
+        response = args.chat_model([aspect_prompt(claim)])[0]
+        # extract the part in ```json``` from the response
+        if "```json" in response:
+            response = response.split("```json")[1].split("```")[0].strip()
+        aspects = json.loads(response)['aspect_list']
+
     print(f"Generated coarse-grained aspects for claim '{claim}': {aspects}")
     return aspects
 
@@ -72,17 +82,52 @@ def perspective_discovery(tree, claim):
         for sub_aspect in aspect.sub_aspects:
             print(f"Identified perspective for sub-aspect '{sub_aspect.name}' under aspect '{aspect.name}'")
     print(f"Perspectives discovered for claim '{claim}'.")
+    
+def filter_segments(args, tree):
+    
+    # extract segments
+    segments = tree.root.get_all_segments()
+    segment_str_list = [seg.content for seg in segments]
+    major_aspects = [aspect.name for aspect in tree.root.sub_aspects]
+    
+    # init filter
+    filter_obj = KeywordEnsembleEmbeddingLLMFilter(aspect_list=major_aspects, 
+                                                   embedding_model_name=args.embedding_model_name,
+                                                   chat_model_name=args.chat_model_name)
+    
+    # filter segments
+    new_segment_str_list = filter_obj.filter(args.claim, segment_str_list, major_aspects)
+    
+    # change the results 
+    filtered_papers_dict = {}
+    for paper_id, paper in tree.root.related_papers.items():
+        original_segments = paper["relevant_segments"]
+        filtered_segments = []
+        for segment in original_segments:
+            if segment.content in new_segment_str_list:
+                filtered_segments.append(segment)
+        
+        # if no filtered segments, remove the paper
+        if len(filtered_segments) == 0:
+            continue
+        
+        # else, reduce the relevant segments to the filtered ones
+        paper["relevant_segments"] = filtered_segments
+        
+        # update the paper in the dict
+        filtered_papers_dict[paper_id] = paper
+    
+    tree.root.related_papers = filtered_papers_dict
 
 def main(args):
     # input corpus -> @Runchu is writing the dataset loader; we assume we have a corpus of Paper classes where the Paper class has an attribute called segments
     # corpus: dict of Paper objects
     # paper.segments: list of Segment objects where
-
     print("######## LOADING DATA ########")
     claim = args.claim
     id2node = []
-    corpus = load_data(args)
-    
+    corpus = load_data(args)  # papers
+
     # Initialize tree
     print("######## INITIALIZE TREE ########")
     root_node = AspectNode(idx=0, name=claim)
@@ -98,10 +143,9 @@ def main(args):
     
     # Expand tree with first level
     print("######## EXPAND AND ENRICH TREE WITH ASPECTS ########")
-    
     all_segments = root_node.get_all_segments()
     seg_contents = [seg.content for seg in all_segments]
-    corpus_embs = args.embed_func(args.embed_model, seg_contents)
+    corpus_embs = args.embed_func(seg_contents, embed_model=args.embed_model)
     
     for aspect in aspects:
         # Refine keywords
@@ -174,14 +218,18 @@ def main(args):
             
             if subaspect_node.depth <= args.max_depth:
                 queue.append(subaspect_node)
-
+    
     print("######## OUTPUT ASPECT HIERARCHY ########")
     with open(f'{args.data_dir}/{args.topic}/aspect_hierarchy.txt', 'w') as f:
         with redirect_stdout(f):
             root_node.display(indent_multiplier=5, visited=None)
 
-
-    # # Hierarchical segment classification
+    """ Filtering: filter out segments that are not relevant to the claim """
+    filter_segments(tree)  # 7000 -> 192
+    
+    """ Hierarchical segment classification """
+    hierarchical_classification = hierarchical_segment_classification(claim, tree)
+    
     # tree = hierarchical_segment_classification(claim, aspect_hierarchy)
 
     # # Perspective discovery
@@ -209,5 +257,10 @@ if __name__ == "__main__":
 
     if args.chat_model_name == "vllm":
         args.chat_model = LLM(model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True)
-
+    
+    elif args.chat_model_name == "gpt-4o" or "gpt-4o-mini":
+        def openai_model_specific_chat(prompts: list[str]) -> list[str]:
+            return chat(prompts, model_name=args.chat_model_name, seed=42, temperature=0.3, top_p=0.99)
+        args.chat_model = openai_model_specific_chat
+    
     main(args)

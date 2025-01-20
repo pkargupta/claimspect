@@ -34,8 +34,8 @@ def validate_inputs(inputs: list[str], model_name: str, tier_list: str):
 def create_request_file(inputs: List[str], model_name: str, params: Dict) -> str:
     """Generate the request JSONL file."""
     os.makedirs(CACHE_DIR, exist_ok=True)
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    request_file = f'{CACHE_DIR}/request_{timestamp}.jsonl'
+    timestamp = int(time.time() * 1000)
+    request_file = f'{CACHE_DIR}/embed_request_{timestamp}.jsonl'
 
     content = [
         {
@@ -95,8 +95,8 @@ def embed(
 
     # File paths
     request_file = create_request_file(inputs, model_name, params)
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    save_file = f'{CACHE_DIR}/response_{timestamp}.jsonl'
+    timestamp = int(time.time() * 1000)
+    save_file = f'{CACHE_DIR}/embed_response_{timestamp}.jsonl'
 
     # Process API requests
     asyncio.run(

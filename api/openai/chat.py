@@ -7,6 +7,10 @@ from joblib import Memory
 from typing import Literal, List, Dict
 from api.openai.chat_parallel import process_api_requests_from_file
 
+# Retry function
+MAX_RETRIES = 4
+
+
 # Constants
 CACHE_DIR = '.cache'
 RATE_LIMIT = {
@@ -32,8 +36,8 @@ def validate_inputs(inputs: list[str], model_name: str, tier_list: str):
 def create_request_file(inputs: List[str], model_name: str, params: Dict) -> str:
     """Generate the request JSONL file."""
     os.makedirs(CACHE_DIR, exist_ok=True)
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    request_file = f'{CACHE_DIR}/request_{timestamp}.jsonl'
+    timestamp = int(time.time() * 1000)
+    request_file = f'{CACHE_DIR}/chat_request_{timestamp}.jsonl'
 
     content = [
         {
@@ -81,26 +85,41 @@ def chat(
 
     # File paths
     request_file = create_request_file(inputs, model_name, params)
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    save_file = f'{CACHE_DIR}/response_{timestamp}.jsonl'
+    timestamp = int(time.time() * 1000)
+    save_file = f'{CACHE_DIR}/chat_response_{timestamp}.jsonl'
 
-    # Process API requests
-    asyncio.run(
-        process_api_requests_from_file(
-            requests_filepath=request_file,
-            save_filepath=save_file,
-            request_url="https://api.openai.com/v1/chat/completions",
-            api_key=os.environ['OPENAI_API_KEY'],
-            max_requests_per_minute=RATE_LIMIT[tier_list][model_name]['PRM'] // 2 if half_usage else RATE_LIMIT[tier_list][model_name]['PRM'],
-            max_tokens_per_minute=RATE_LIMIT[tier_list][model_name]['TPM'] // 2 if half_usage else RATE_LIMIT[tier_list][model_name]['TPM'],
-            token_encoding_name='o200k_base',
-            max_attempts=5,
-            logging_level=logging.INFO
-        )
-    )
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            # Process API requests
+            asyncio.run(
+                process_api_requests_from_file(
+                    requests_filepath=request_file,
+                    save_filepath=save_file,
+                    request_url="https://api.openai.com/v1/chat/completions",
+                    api_key=os.environ['OPENAI_API_KEY'],
+                    max_requests_per_minute=RATE_LIMIT[tier_list][model_name]['PRM'] // 2 if half_usage else RATE_LIMIT[tier_list][model_name]['PRM'],
+                    max_tokens_per_minute=RATE_LIMIT[tier_list][model_name]['TPM'] // 2 if half_usage else RATE_LIMIT[tier_list][model_name]['TPM'],
+                    token_encoding_name='o200k_base',
+                    max_attempts=5,
+                    logging_level=logging.INFO
+                )
+            )
 
-    # Extract and return responses
-    results = read_responses(save_file)
+            # Extract and return responses
+            results = read_responses(save_file)
+
+            # If successful, break out of retry loop
+            break
+
+        except Exception as e:
+            logging.error(f"Attempt {attempt} failed with error: {e}")
+
+            if attempt == MAX_RETRIES:
+                logging.critical("Maximum retry attempts reached. Exiting.")
+                raise
+            else:
+                logging.info(f"Retrying... ({attempt}/{MAX_RETRIES})")
+    
     if clear_cache:
         os.remove(request_file)
         os.remove(save_file)

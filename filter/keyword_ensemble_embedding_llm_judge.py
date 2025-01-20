@@ -7,15 +7,16 @@ from api.openai.chat import chat
 from api.openai.embed import embed as openai_embed
 from sklearn.metrics.pairwise import cosine_similarity
 
-class KeywordEnsembleEmbeddingFilter(AbstractFilter):
+class KeywordEnsembleEmbeddingLLMFilter(AbstractFilter):
     
     def __init__(self, 
                  aspect_list: list[str],
                  minimal_occurrences: int = 3,  # Minimal number of occurrences of a keyword for a segment to be kept
                  char_length_threshold: int = 500,
                  embedding_model_name: str = 'e5',
+                 chat_model_name: str = 'gpt-4o',
                  weight_keywords: float = 0.5,
-                 boundary_density: float = 0.5,
+                 boundary_density: float = 0.2,
                  density_interval: int = 9,
                  threshold_upper_bound: int = 200):
 
@@ -31,6 +32,7 @@ class KeywordEnsembleEmbeddingFilter(AbstractFilter):
         self.char_length_threshold = char_length_threshold
         # Initialize the embedding model based on the given name
         self.embedding_model = self.get_embedding_model(embedding_model_name)
+        self.chat_model_name = chat_model_name
         # Initialize the embedding function based on the given name
         self.embedding_func = self.get_embedding_func(embedding_model_name)
     
@@ -78,7 +80,11 @@ The aspects are: {aspects}
 
 Please help me determine whether this segment is related to the claim so that I can analyze this claim based on it from at least one of these aspects. Your output should be 'Yes' or 'No'. """
         prompts = [prompt_template.format(segment=segment, claim=claim, aspects=', '.join(aspects)) for segment in segments]
-        responses = chat(prompts,temperature=0.01, model_name='gpt-4o')
+        if self.chat_model_name == 'gpt-4o' or self.chat_model_name == 'gpt-4o-mini':
+            responses = chat(prompts,temperature=0.01, model_name=self.chat_model_name)
+        else:
+            raise ValueError(f'Invalid chat model name: {self.chat_model_name} not implemented yet.')
+
         bool_list = ['yes' in response.lower() for response in responses]
         return bool_list
     
@@ -193,7 +199,7 @@ if __name__ == "__main__":
     # filter_obj = KeywordEnsembleEmbeddingFilter(boundary_density=0.3, aspect_list = major_aspects)
     # filter_obj = KeywordEnsembleEmbeddingFilter(boundary_density=0.2, aspect_list = major_aspects)
     # filter_obj = KeywordEnsembleEmbeddingFilter(boundary_density=0.1, aspect_list = major_aspects)
-    filter_obj = KeywordEnsembleEmbeddingFilter(boundary_density=0.05, aspect_list = major_aspects)
+    filter_obj = KeywordEnsembleEmbeddingLLMFilter(boundary_density=0.05, aspect_list = major_aspects)
     
     # Filter the segments based on the claim
     filtered_segments = filter_obj.filter(claim, segments, keyword_list)

@@ -75,7 +75,7 @@ def stage1_retrieve_top_k_corpus_segments(args,
     # get the embedding of query and corpus segments
     embedding_func = args.embed_func
     retrieval_query = f"Claim: {claim} Aspect: {aspect_name} Aspect Keywords: {', '.join(current_keyword_group)}"
-    retrieval_query_embedding_dict = embedding_func(args.embed_model, [retrieval_query])
+    retrieval_query_embedding_dict = embedding_func([retrieval_query], embed_model=args.embed_model)
     if corpus_embs is None:
         seg_contents = [seg.content for seg in corpus_segments]
         corpus_segments_embeddings_dict = embedding_func(args.embed_model, seg_contents)

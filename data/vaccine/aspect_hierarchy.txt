@@ -1,0 +1,127 @@
+Aspect: The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.
+Depth: 0
+Keywords: None
+----------------------------------------
+Subaspects:
+     Aspect: efficacy and effectiveness
+     Depth: 1
+     Keywords: ['```json\n{\n    "output_keywords": [\n        "efficacy",\n        "effectiveness",\n        "pfizer",\n        "moderna",\n        "covid-19",\n        "vaccine",\n        "protection",\n        "immunity",\n        "hospitalization",\n        "severe disease",\n        "mortality",\n        "sars-cov-2",\n        "mrna vaccines",\n        "real-world data"\n    ]\n}\n```']
+     Top #1 Segment ([0.74627055]): many studies have reported real -world evidence on vaccine effectiveness (ve) for the mrna vaccines against infection, hospitalization, and death (for brevity, we cite principally systematic reviews).3-6 however, m any studies, including those sponsored by the u.s. centers for disease control (cdc). report results for both vaccines together.2,7-12 studies that report vaccine- specific results have generally suggested a modest advantage for moderna in effectiveness against hospitalization and death
+     Top #2 Segment ([0.74593939]): (2022) report a moderna advantage in reducing hospitalization risk, and an apparent advantage for a combined icu-or-death outcome, but the small sample size "precluded statistically significant comparisons." [ 33] a study of czechia through november 2021 reports two-dose rmr, 7-8 months after vaccination, of 17% for pfizer vs. 12% for moderna (2022) [ 34]. the review by black and thaw (2022) reports a moderna advantage against mortality after waning (at least 120 days after vaccination) during the delta-dominant period, with midpoint rmr estimates from multiple studies of 13.3% for pfizer vs
+     Top #3 Segment ([0.7454994]): 2 the pfizer and moderna covid-19 vaccines lack efficacy 2.1 what does the evidence show? pfizer and moderna persistently tout the 95% efficacy of their vaccines, based on the clinical trials that formed the basis of the emergency approvals granted by the fda [28, 29] and the european union [30, 31]. in pfizer's [32] and moderna's [33] more recent studies on adolescents, the claimed efficacy has been raised to no less than 100%. however, these claims cannot be taken at face value
+     ----------------------------------------
+     Subaspects:
+          Aspect: effectiveness against hospitalization
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "covid-19",\n        "hospitalization",\n        "pfizer-biontech",\n        "moderna",\n        "effectiveness",\n        "protection",\n        "vaccine efficacy",\n        "risk reduction",\n        "waning",\n        "severe disease",\n        "statistically significant"\n    ]\n}\n```']
+          ----------------------------------------
+          Aspect: effectiveness against mortality
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": ["pfizer vaccine"', '"moderna vaccine"', '"effectiveness"', '"mortality"', '"relative mortality risk"', '"vaccine effectiveness"', '"mortality rates"', '"pfizer-biontech"', '"mrna1273"]\n}\n```']
+          ----------------------------------------
+          Aspect: efficacy based on clinical trials
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": ["pfizer"', '"moderna"', '"covid-19"', '"vaccine"', '"efficacy"', '"clinical trials"', '"sars-cov-2"', '"protection"', '"evidence"', '"infection"', '"immunity"', '"antibodies"]\n}\n```']
+          ----------------------------------------
+          Aspect: effectiveness over time
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": ["effectiveness"', '"waning"', '"pfizer"', '"moderna"', '"vaccine"', '"antibody levels"', '"doses"', '"booster"', '"decline"', '"two-dose"]\n}\n```']
+          ----------------------------------------
+     ----------------------------------------
+     Aspect: side effects and safety
+     Depth: 1
+     Keywords: ['```json\n{\n    "output_keywords": [\n        "pfizer",\n        "moderna",\n        "covid-19",\n        "vaccine",\n        "side effects",\n        "safety",\n        "adverse effects",\n        "comparison",\n        "anaphylaxis",\n        "allergic reactions",\n        "risks",\n        "serious effects",\n        "frequency",\n        "severe reactions"\n    ]\n}\n```']
+     Top #1 Segment ([0.72196838]): the moderna vaccine is preferable to pfizer for ages 60+, at least until one gets to a booster dose. conversely, younge r persons are well protected by two- doses of either vaccine, and the lower pfizer dose may have lower risk of side effects - in particular myocarditis, which is an important side effect for young men, with higher risk for moderna than for pfizer. current u.s
+     Top #2 Segment ([0.68090627]): comparison between immunogenicity, adverse effects, risks, and contraindications between pfizer/biontech and moderna vaccines. figure 1. comparison between frequencies of adverse effects of pfizer/biontech and moderna vaccines12,13,20
+     Top #3 Segment ([0.67167156]): a comparison between pharmacology, indications, and adverse effects of pfizer/biontech and mod - erna vaccines is presented in table i. a compari -son between the immunogenicity, adverse effects, risks, and contraindications between pfizer/bi - ontech and moderna vaccines reported by each of the two manufacturers is presented in table ii. the percentage of these adverse effects is report - ed to be lower with the pfizer/biontech vaccine than with the moderna vaccine (figure 1), how - ever the moderna vaccine compared to the pfizer vaccine is easier to transport and store because it characteristics pfizer/biontech vaccine moderna vaccine general name pfizer/biontech vaccine12
+     ----------------------------------------
+     Subaspects:
+          Aspect: risk of myocarditis
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": ["myocarditis"', '"risk"', '"pfizer"', '"moderna"', '"side effects"', '"young men"', '"higher risk"', '"lower risk"', '"age"', '"safety"', '"comparison"', '"frequency"', '"incidence"]\n}\n```']
+          ----------------------------------------
+          Aspect: anaphylaxis risk
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": ["anaphylaxis"', '"risk"', '"pfizer vaccine"', '"moderna vaccine"', '"incidence"', '"comparison"', '"adverse effects"', '"safety"', '"reporting"', '"reaction"]\n}\n```']
+          ----------------------------------------
+          Aspect: injection site reactions
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "injection site reactions",\n        "swelling",\n        "rash",\n        "sore arm",\n        "side effects",\n        "reaction frequency",\n        "reaction severity",\n        "reactogenicity",\n        "moderna",\n        "pfizer"\n    ]\n}\n```']
+          ----------------------------------------
+     ----------------------------------------
+     Aspect: storage and distribution
+     Depth: 1
+     Keywords: ['```json\n{\n    "output_keywords": [\n        "storage temperature",\n        "ultra-low temperature",\n        "distribution",\n        "transport",\n        "vaccine storage",\n        "cold chain",\n        "temperature sensitive",\n        "storage infrastructure",\n        "temperature requirement",\n        "logistics",\n        "storage conditions",\n        "supply chain",\n        "storage facilities",\n        "temperature maintenance",\n        "storage challenges"\n    ]\n}\n```']
+     Top #1 Segment ([0.88063319]): the pfizer vaccine requires ultra-low temperature storage (-80 degc to -60 degc), while the moderna vaccine requires -30 degc storage. however, the last stage of distribution is quite challenging, especially for rural or suburban areas, where local towns, pharmacy chains and hospitals may not have the infrastructure required to store the vaccine at the required temperature. in addition, there is limited data available to address ancillary challenges of the distribution framework for both transportation and storage stages, including safety concerns due to human exposure to large amounts of co 2 from dry-ice sublimation, issues due to the pressure increase caused by dry-ice sublimation, and the potential issue caused by non-uniform cryogenic temperatures
+     Top #2 Segment ([0.86891552]): the requirement of the ultracold temperatures for the storage and transport of the most advanced covid-19 mrna vaccines, especially the -70degc freezing condition required by the bnt162b2, is a major challenge towardsvaccine distribution and thus rapid mass immunization, particularly in climatic zones iva (i.e., 30degc/65% relative humidity) and ivb (i.e., 30degc/75% relative humidity) ( 98). these vaccines should be stored and transported in controlled environment to maintain their quality and potency. the storage and transport equipment (e.g., cold rooms, refriger-ators, freezers, cold boxes, and the thermal shippers designed by pfizer) are costly to acquire and should comply with the who standards
+     Top #3 Segment ([0.86222373]): vaccine storage units at the healthcare facilities site usually consist of purpose-built or pharma - ceutical-grade (large or compact) or household-grade refrigerator or freezer. [17]. pfizer's mrna vaccine pfizer's mrna vaccine demands the most stringent stor - age needs
+     ----------------------------------------
+     Subaspects:
+          Aspect: temperature requirements for storage
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "temperature requirements",\n        "storage temperature",\n        "ultra-low temperature",\n        "pfizer vaccine",\n        "moderna vaccine",\n        "low temperature storage",\n        "distribution challenges",\n        "cryogenic temperatures",\n        "transportation",\n        "temperature sensitive",\n        "cold chain",\n        "storage conditions",\n        "temperature control"\n    ]\n}\n```']
+          ----------------------------------------
+          Aspect: distribution infrastructure challenges
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "distribution",\n        "infrastructure",\n        "challenges",\n        "pfizer",\n        "moderna",\n        "storage",\n        "transportation",\n        "temperature",\n        "ultra-low",\n        "freezing",\n        "last mile delivery",\n        "rural",\n        "suburban",\n        "pharmacy chains",\n        "hospitals",\n        "low-income countries",\n        "cost"\n    ]\n}\n```']
+          ----------------------------------------
+          Aspect: cost and compliance of storage equipment
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "pfizer",\n        "moderna",\n        "cost",\n        "storage",\n        "temperature",\n        "compliance",\n        "equipment",\n        "distribution",\n        "logistics",\n        "cold chain",\n        "freezing",\n        "refrigerated",\n        "storage conditions",\n        "temperature sensitive",\n        "logistic requirements"\n    ]\n}\n```']
+          ----------------------------------------
+          Aspect: safety concerns during distribution
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": ["pfizer"', '"moderna"', '"vaccine"', '"adverse effects"', '"distribution"', '"safety"', '"temperature sensitivity"', '"transport"', '"storage"', '"distribution challenges"', '"safety concerns"', '"temperature requirement"', '"logistics"]\n}\n```']
+          ----------------------------------------
+          Aspect: temperature stability during transport
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "temperature stability",\n        "transport",\n        "storage temperature",\n        "pfizer vaccine",\n        "moderna vaccine",\n        "ultra-low temperature",\n        "storage conditions",\n        "cold chain",\n        "logistics",\n        "temperature sensitive",\n        "temperature requirement",\n        "temperature control",\n        "cold storage",\n        "vaccine storage",\n        "temperature management"\n    ]\n}\n```']
+          ----------------------------------------
+     ----------------------------------------
+     Aspect: dosing schedule and administration
+     Depth: 1
+     Keywords: ['```json\n{\n    "output_keywords": [\n        "dosing schedule",\n        "administration",\n        "initial doses",\n        "moderna doses",\n        "pfizer doses",\n        "booster dose",\n        "timing between doses",\n        "3 weeks",\n        "4 weeks"\n    ]\n}\n```']
+     Top #1 Segment ([0.75027529]): moderna differences in rmr . in effect, the third dose allowed pfizer to catch up to moderna. for ages 60+
+     Top #2 Segment ([0.74128434]): the leading vaccines typically have defined durations of intervals between two doses for administration. overwhelming concerns about the limited supply and the issue of vaccine logistics generated a need for the continuous revision of the dosing intervals. in view of vaccines 2022 ,10, 1306 9 of 14 the rapidly changing waves of infection, and with an intention to optimize the numbers to receive a first dose, several countries, including the united kingdom, canada, india, and malaysia, implemented an extension to the schedule for the administration of the second dose [ 64-66]
+     Top #3 Segment ([0.73806966]): this suggests that the general advice for older persons to obtain a booster dose should be reinforced for pfizer recipients, who are at higher risk of mortality without a booster. however, the pfizer versus moderna difference is insignificant after a booster dose. the pfizer versus moderna difference is also insignificant for persons aged 18-59, after either two or three doses
+     ----------------------------------------
+     Subaspects:
+          Aspect: dosing intervals and timing
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "dosing intervals",\n        "timing",\n        "3 weeks",\n        "4 weeks",\n        "dose timing",\n        "interval differences",\n        "dose interval",\n        "timing differences",\n        "dose schedule",\n        "interval impact",\n        "timing effect"\n    ]\n}\n```']
+          ----------------------------------------
+          Aspect: booster dose recommendations
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "booster dose",\n        "pfizer",\n        "moderna",\n        "recommendations",\n        "effectiveness",\n        "waning",\n        "side effects",\n        "vaccine policy",\n        "u.s. recommendations",\n        "dose comparison"\n    ]\n}\n```']
+          ----------------------------------------
+          Aspect: mrna dosage and composition
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "mrna dosage",\n        "composition",\n        "rna sequences",\n        "mrna-1273",\n        "bnt162b2",\n        "dose-dependent",\n        "moderna",\n        "pfizer",\n        "mrna technology",\n        "mrna copies",\n        "moderna doses",\n        "pfizer doses"\n    ]\n}\n```']
+          ----------------------------------------
+     ----------------------------------------
+     Aspect: population demographics and response
+     Depth: 1
+     Keywords: ['```json\n{\n    "output_keywords": [\n        "pfizer",\n        "moderna",\n        "vaccine",\n        "demographics",\n        "immune response",\n        "antibody response",\n        "elderly",\n        "immunocompromised",\n        "age",\n        "gender",\n        "participants",\n        "clinical trials",\n        "specific patient demographic",\n        "antibody titers"\n    ]\n}\n```']
+     Top #1 Segment ([0.72552654]): results participant demographic information more women (n  1/4113) than men (n  1/436) participated in this study, but the percentage of women within themoderna group (57 of 79; 72.2%) did not significantly differfrom that in the pfizer group (56 of 70; 80.0%; supplementaltable 1). the mean age of participants in the moderna (45years) group was skewed slightly older than the pfizer (41years) group ( p 1/4.06; supplemental table 1). three participants tested positive for antibodies to the nucleocapsid protein
+     Top #2 Segment ([0.72183066]): 32taken together, our findings and recently published literature could help selectively target each vaccine to a specific patient demo-graphic, with moderna preferred in individuals in need of greater immune stimulation (elderly, immunocompromised, etc) and pfizer preferred in those who are primarilyconcerned about vaccine reactions. antibody response after full vaccination (14 days after dose 2) with either moderna or pfizer was higher than in convalescent donors 32 to 54 days after confirmed infection.in phase 1 clinical trials of the pfizer bnt162b2 vaccine,average igg antibody response to the s-1 binding domain after full vaccination was reported to be higher (8147 u/ml) than antibody titers seen in convalescent donors (631 u/ml). 5in our study, the median total antibody response after full vaccination with pfizer was 2880 u/ml, whereas the response in convalescent donors was 119 u/ml
+     Top #3 Segment ([0.70800663]): there are large differences in various characteristics between the unvaccinated and vaccinated, between pfizer and moderna vaccinees, and between two-dose and three-dose vaccinees. relative to two-dose recipients, the unvaccinated are younger, much less likely to be white, more likely to be male, and less educated. relative to two-dose recipients, three-dose recipients are older, more likely to be white, and better educated
+     ----------------------------------------
+     Subaspects:
+          Aspect: age and gender distribution
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "age distribution",\n        "gender distribution",\n        "females",\n        "males",\n        "ages 20-35",\n        "ages 36 to 59",\n        "ages 60+",\n        "young men",\n        "young participants",\n        "older participants",\n        "skewed distribution"\n    ]\n}\n```']
+          ----------------------------------------
+          Aspect: antibody response variation
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "antibody response",\n        "immune stimulation",\n        "igg antibody",\n        "median antibody response",\n        "serum antibody concentrations",\n        "immunogenicity",\n        "dose-dependent",\n        "stronger antibody response",\n        "spike antibody titers"\n    ]\n}\n```']
+          ----------------------------------------
+          Aspect: vaccine preference by health condition
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "vaccine preference",\n        "health condition",\n        "side effects",\n        "immune stimulation",\n        "immunocompromised",\n        "vaccine reactions",\n        "antibody response",\n        "specific patient demographic",\n        "suboptimal response",\n        "diminished antibody response",\n        "pfizer recipients",\n        "moderna recipients"\n    ]\n}\n```']
+          ----------------------------------------
+          Aspect: racial and educational differences
+          Depth: 2
+          Keywords: ['```json\n{\n    "output_keywords": [\n        "racial differences",\n        "educational differences",\n        "vaccine preference",\n        "health disparities",\n        "less educated",\n        "better educated",\n        "recipient characteristics"\n    ]\n}\n```']
+          ----------------------------------------
+     ----------------------------------------
+----------------------------------------

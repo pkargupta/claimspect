@@ -1,11 +1,14 @@
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from tqdm import tqdm
+import random
 
 def positive_rank(target_aspect, segment_embs, embed_func):
     # Query: We assume that the segment is relevant to the target_aspect's parent aspect, so we do not need to include this within the query
     keywords = [f"{keyword} with respect to {str(target_aspect.get_ancestors(as_str=True))}" for keyword in target_aspect.keywords]
-    keyword_embs = np.fromiter(embed_func(keywords).values(), dtype=np.dtype((float, 1024)))
+    embed_res = embed_func(keywords).values()
+    example_embed = random.choice(list(embed_res))  # pick an example embedding to determine the size of the embeddings
+    keyword_embs = np.fromiter(embed_res, dtype=np.dtype((float, len(example_embed))))
     target_similarity = cosine_similarity(segment_embs, keyword_embs) # S x K
 
     # the more number of subaspects/keywords discussed, the better
@@ -19,7 +22,10 @@ def negative_rank(neg_aspects, segment_embs, embed_func, breadth_weight=0.5):
     aspect_sims = np.zeros((len(neg_aspects), len(segment_embs)))
     for idx, aspect in tqdm(enumerate(neg_aspects), total=len(neg_aspects)):
         keywords = [f"{keyword} with respect to {aspect.name}" for keyword in aspect.keywords]
-        keyword_embs = np.fromiter(embed_func(keywords).values(), dtype=np.dtype((float, 1024)))
+        
+        embed_res = embed_func(keywords).values()
+        example_embed = random.choice(list(embed_res))  # pick an example embedding to determine the size of the embeddings
+        keyword_embs = np.fromiter(embed_res, dtype=np.dtype((float, len(example_embed))))
         neg_aspect_sim = cosine_similarity(segment_embs, keyword_embs) # S x K
     
         # the more number of subaspects/keywords discussed, the worse -> 
@@ -52,9 +58,9 @@ def aspect_segment_ranking(args, segments, target_aspect, neg_aspects):
     # however, which are most likely to contain all relevant subaspects? we assume that the keywords cover many subaspects
     # we also want to penalize the segments which discuss a multitude of other aspects, given that they may distract during subaspect discovery + perspective
 
-    segment_embs = list(args.embed_func(args.embed_model, segments).values())
+    segment_embs = list(args.embed_func(segments, embed_model=args.embed_model).values())
     segment_embs = np.array(segment_embs)
-    segment_scores = discriminative_rank(target_aspect, neg_aspects, segment_embs, lambda x: args.embed_func(args.embed_model, x), args.beta, args.gamma)
+    segment_scores = discriminative_rank(target_aspect, neg_aspects, segment_embs, lambda x: args.embed_func(x, embed_model=args.embed_model), args.beta, args.gamma)
     segment_ranks = sorted(np.arange(len(segments)), key=lambda x: -segment_scores[x][0])
 
     id2score = {}
