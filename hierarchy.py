@@ -22,9 +22,10 @@ class Segment:
     content: str
 
 class AspectNode:
-    def __init__(self, idx, name, parent=None, keywords=None):
+    def __init__(self, idx, name, description, parent=None, keywords=None):
         self.id = idx
         self.name = name
+        self.description = description
         self.keywords = keywords
         self.parent = parent
         self.depth = 0 if self.parent is None else self.parent.depth + 1
@@ -32,6 +33,7 @@ class AspectNode:
         self.sub_aspects = []
         self.ranked_segments = {}
         self.related_papers = {}  # Dictionary for faster lookup by paper_id
+        self.perspectives = None
 
     def add_sub_aspect(self, sub_aspect):
         """Adds a sub-aspect to the current node."""
@@ -105,8 +107,22 @@ class AspectNode:
                 all_segments.extend(entry["relevant_segments"])
         
         return all_segments
+
+    def compute_stats(self):
+        s_papers = set()
+        for seg_id in self.perspectives["supports_claim"]["perspective_segments"]:
+            s_papers.add(self.ranked_segments[seg_id].paper_id)
+        n_papers = set()
+        for seg_id in self.perspectives["neutral_to_claim"]["perspective_segments"]:
+            n_papers.add(self.ranked_segments[seg_id].paper_id)
+
+        o_papers = set()
+        for seg_id in self.perspectives["opposes_claim"]["perspective_segments"]:
+            o_papers.add(self.ranked_segments[seg_id].paper_id)
+
+        return s_papers, n_papers, o_papers 
     
-    def display(self, indent_multiplier=2, visited=None):
+    def display(self, indent_multiplier=2, visited=None, corpus_len=0):
         """
         Displays the aspect hierarchy starting from this node.
 
@@ -114,26 +130,52 @@ class AspectNode:
         indent_multiplier (int): The number of spaces used for indentation, multiplied by the depth.
         visited (set): A set of visited node IDs to handle cycles in the directed acyclic graph.
         """
+        
         if visited is None:
             visited = set()
         if self.id in visited:
-            return
+            return None
+
+        output_dict = {"aspect_name": self.name,
+                       "aspect_description": self.description,
+                       "keywords": self.keywords}
+        
         visited.add(self.id)
 
         indent = " " * (self.depth * indent_multiplier)
         print(f"{indent}Aspect: {self.name}")
+        print(f"{indent}Aspect Description: {self.description}")
         print(f"{indent}Depth: {self.depth}")
         print(f"{indent}Keywords: {self.keywords}")
         if len(self.ranked_segments) > 0:
+            output_dict['top_10_segments'] = [str(self.ranked_segments[i]) for i in range(10) if i in self.ranked_segments]
             print(f"{indent}Top #1 Segment ({self.ranked_segments[0][1]}): {self.ranked_segments[0][0].content}")
             print(f"{indent}Top #2 Segment ({self.ranked_segments[1][1]}): {self.ranked_segments[1][0].content}")
             print(f"{indent}Top #3 Segment ({self.ranked_segments[2][1]}): {self.ranked_segments[2][0].content}")
+
+        if self.perspectives:
+            s_papers, n_papers, o_papers = self.compute_stats()
+            
+            output_dict['perspectives'] = self.perspectives
+            output_dict['perspectives']['support_ratio'] = f"{len(s_papers)}/{corpus_len}"
+            output_dict['perspectives']['neutral_ratio'] = f"{len(n_papers)}/{corpus_len}"
+            output_dict['perspectives']['oppose_ratio'] = f"{len(o_papers)}/{corpus_len}"
+            
+            print(f"{indent}Support ({len(s_papers)}/{corpus_len}): {self.perspectives['supports_claim']}")
+            print(f"{indent}Neutral ({len(n_papers)}/{corpus_len}): {self.perspectives['neutral_to_claim']}")
+            print(f"{indent}Oppose ({len(o_papers)}/{corpus_len}): {self.perspectives['opposes_claim']}")
+            
         if self.sub_aspects:
             print(f"{indent}{'-'*40}")
             print(f"{indent}Subaspects:")
+            output_dict['children'] = []
             for subaspect in self.sub_aspects:
-                subaspect.display(indent_multiplier, visited)
+                sub_dict = subaspect.display(indent_multiplier, visited, corpus_len)
+                if sub_dict is not None:
+                    output_dict['children'].append(sub_dict)
+                
         print(f"{indent}{'-'*40}")
+        return output_dict
 
 
 class Tree:

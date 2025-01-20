@@ -3,16 +3,23 @@ import numpy as np
 from tqdm import tqdm
 import random
 
+def average_with_harmonic_series(arr, axis=0):
+    weights = [0.0] * arr.shape[axis]
+    for i in range(arr.shape[axis]):
+        weights[i] = 1. / (i + 1)
+    return np.average(arr, weights=weights, axis=axis)
+
 def positive_rank(target_aspect, segment_embs, embed_func):
     # Query: We assume that the segment is relevant to the target_aspect's parent aspect, so we do not need to include this within the query
     keywords = [f"{keyword} with respect to {str(target_aspect.get_ancestors(as_str=True))}" for keyword in target_aspect.keywords]
+    keywords.insert(0, f"{target_aspect.name}: {target_aspect.description}")
     embed_res = embed_func(keywords).values()
     example_embed = random.choice(list(embed_res))  # pick an example embedding to determine the size of the embeddings
     keyword_embs = np.fromiter(embed_res, dtype=np.dtype((float, len(example_embed))))
     target_similarity = cosine_similarity(segment_embs, keyword_embs) # S x K
 
     # the more number of subaspects/keywords discussed, the better
-    mean_pos = target_similarity.mean(axis=1).reshape((len(segment_embs), -1)) # S x 1
+    mean_pos = average_with_harmonic_series(target_similarity, axis=1).reshape((len(segment_embs), -1)) # S x 1
     return mean_pos
 
 def negative_rank(neg_aspects, segment_embs, embed_func, breadth_weight=0.5):
@@ -22,14 +29,14 @@ def negative_rank(neg_aspects, segment_embs, embed_func, breadth_weight=0.5):
     aspect_sims = np.zeros((len(neg_aspects), len(segment_embs)))
     for idx, aspect in tqdm(enumerate(neg_aspects), total=len(neg_aspects)):
         keywords = [f"{keyword} with respect to {aspect.name}" for keyword in aspect.keywords]
-        
+        keywords.insert(0, f"{aspect.name}: {aspect.description}")
         embed_res = embed_func(keywords).values()
         example_embed = random.choice(list(embed_res))  # pick an example embedding to determine the size of the embeddings
         keyword_embs = np.fromiter(embed_res, dtype=np.dtype((float, len(example_embed))))
         neg_aspect_sim = cosine_similarity(segment_embs, keyword_embs) # S x K
     
         # the more number of subaspects/keywords discussed, the worse -> 
-        mean_neg = neg_aspect_sim.mean(axis=1) # S x 1
+        mean_neg = average_with_harmonic_series(neg_aspect_sim, axis=1) # S x 1
         aspect_sims[idx] = mean_neg
     
     breadth_rank = aspect_sims.mean(axis=0).reshape((len(segment_embs), -1))
