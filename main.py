@@ -165,7 +165,6 @@ def main(args):
     hierarchical_segment_classification(claim, tree)
     # now the relevant papers and segments from the root has been passed to the child nodes
     # we can easily get them by calling node.get_all_segments()
-    breakpoint()
 
     print("######## DISCOVERING PERSPECTIVES ########")
     perspective_discovery(args, id2node)

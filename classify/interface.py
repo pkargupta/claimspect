@@ -1,6 +1,7 @@
 import os
 import json
 import time
+from copy import deepcopy
 
 from classify.core_class_anno.core_class_annotation import run_annotation
 
@@ -130,7 +131,7 @@ def write_label_hierarchy_file(tree, cache_dir):
     
 def write_corpus_file(tree, cache_dir):
     """Write the corpus file."""
-    segments = tree.root.get_all_segments()[:3]  # TODO: debug use
+    segments = tree.root.get_all_segments()
     segment_str_list = [seg.content for seg in segments]
     time_stamp = int(time.time()*1000)
     corpus_path = os.path.join(cache_dir, f'corpus_file_{time_stamp}.txt')
@@ -167,14 +168,13 @@ def convert_results_to_tree(tree, results, node_idx2node_name, corpus_idx2corpus
     
     """Convert the results to a tree."""
     node_idx2corpus_idx = group_by_ancestor(results)
-    # deep copy the original paper info
-    original_paper_info = tree.root.related_papers.items()
     
     for node_idx, corpus_idx_list in node_idx2corpus_idx.items():
         
-        if node_idx == '0': continue  # skip the root
-        breakpoint()
+        # deep copy the original paper info
+        original_paper_info = deepcopy(tree.root.related_papers)
         
+        if node_idx == '0': continue  # skip the root
         node_name = node_idx2node_name[int(node_idx)]
         corpus_str_list = [corpus_idx2corpus_str[int(corpus_idx)] for corpus_idx in corpus_idx_list]
         
@@ -183,7 +183,7 @@ def convert_results_to_tree(tree, results, node_idx2node_name, corpus_idx2corpus
             raise ValueError(f"Node with name '{node_name}' not found in the tree.")
 
         classified_papers_dict = {}
-        for paper_id, paper in original_paper_info:
+        for paper_id, paper in original_paper_info.items():
             original_segments = paper["relevant_segments"]
             classified_segments = []
             for segment in original_segments:
@@ -197,9 +197,7 @@ def convert_results_to_tree(tree, results, node_idx2node_name, corpus_idx2corpus
             classified_papers_dict[paper_id] = paper
         
         node.related_papers = classified_papers_dict
-        breakpoint()
-        # assert [seg.content for seg in node.get_all_segments()] == corpus_str_list
-        print([seg.content for seg in node.get_all_segments()] == corpus_str_list)
+        assert [seg.content for seg in node.get_all_segments()] == corpus_str_list
     
 def get_cache_dir(
     cache_dir: str = '.cache',
