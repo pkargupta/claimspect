@@ -139,7 +139,6 @@ Please help me determine whether this segment is related to the claim so that I 
             best_ratio = left
 
         return int(best_ratio * len(ordered_segments))
-        
 
 
     def keyword_ensemble_embedding_sub_filter(self, claim: str, keyword_list: list[str], list_of_segments: list[str]) -> list[str]:
@@ -147,7 +146,11 @@ Please help me determine whether this segment is related to the claim so that I 
         # Filter segments based on their embedding similarity to the claim
         keyword_query_list = [f"{keyword} with respect to {claim}" for keyword in keyword_list]
         keyword_embeddings_dict = self.embedding_func(keyword_query_list)
-        average_keyword_embedding = np.array(sum(keyword_embeddings_dict.values()) / len(keyword_embeddings_dict))
+        
+        keyword_embedding_list = list(keyword_embeddings_dict.values())
+        keyword_embedding_np_list = np.array(keyword_embedding_list)
+        average_keyword_embedding = np.mean(keyword_embedding_np_list, axis=0)
+        
         claim_embedding = np.array(self.embedding_func([claim])[claim])  # Embed the claim
         weighted_claim_embedding = self.weight_claim * claim_embedding + self.weight_keywords * average_keyword_embedding
         

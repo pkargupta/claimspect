@@ -14,8 +14,10 @@ from api.openai.embed import embed as openai_embed
 from api.openai.chat import chat
 
 from hierarchy import Paper, AspectNode, Tree, Segment
-from filter.keyword_ensemble_embedding_llm_judge import KeywordEnsembleEmbeddingLLMFilter
-from keyword_generation.keyword_extractor import extract_keyword, extract_keywords, stage1_retrieve_top_k_corpus_segments
+from filter.interface import filter_segments
+from classify.interface import hierarchical_segment_classification
+
+from keyword_generation.keyword_extractor import extract_keywords, stage1_retrieve_top_k_corpus_segments
 from prompts import aspect_list_schema, aspect_prompt
 from segment_ranking import aspect_segment_ranking
 from discovery import subaspect_discovery, perspective_discovery
@@ -64,53 +66,6 @@ def coarse_grained_aspect_discovery(args, claim, temperature=0.3, top_p=0.99):
 
     print(f"Generated coarse-grained aspects for claim '{claim}': {aspects}")
     return aspects
-
-def hierarchical_segment_classification(claim, aspect_hierarchy):
-    """Step 5: Classify segments into the aspect hierarchy."""
-    tree = Tree(AspectNode(name=claim, description="Root of the aspect hierarchy"))
-    for aspect, sub_aspects in aspect_hierarchy.items():
-        aspect_node = AspectNode(name=aspect, description=f"Aspect node for {aspect}")
-        for sub_aspect in sub_aspects:
-            aspect_node.add_sub_aspect(AspectNode(name=sub_aspect, description=f"Sub-aspect node for {sub_aspect}"))
-        tree.add_aspect(tree.root.name, aspect_node)
-    tree.display_tree()
-    return tree
-
-def filter_segments(args, tree):
-    
-    # extract segments
-    segments = tree.root.get_all_segments()
-    segment_str_list = [seg.content for seg in segments]
-    major_aspects = [aspect.name for aspect in tree.root.sub_aspects]
-    
-    # init filter
-    filter_obj = KeywordEnsembleEmbeddingLLMFilter(aspect_list=major_aspects, 
-                                                   embedding_model_name=args.embedding_model_name,
-                                                   chat_model_name=args.chat_model_name)
-    
-    # filter segments
-    new_segment_str_list = filter_obj.filter(args.claim, segment_str_list, major_aspects)
-    
-    # change the results 
-    filtered_papers_dict = {}
-    for paper_id, paper in tree.root.related_papers.items():
-        original_segments = paper["relevant_segments"]
-        filtered_segments = []
-        for segment in original_segments:
-            if segment.content in new_segment_str_list:
-                filtered_segments.append(segment)
-        
-        # if no filtered segments, remove the paper
-        if len(filtered_segments) == 0:
-            continue
-        
-        # else, reduce the relevant segments to the filtered ones
-        paper["relevant_segments"] = filtered_segments
-        
-        # update the paper in the dict
-        filtered_papers_dict[paper_id] = paper
-    
-    tree.root.related_papers = filtered_papers_dict
 
 def main(args):
     # input corpus -> @Runchu is writing the dataset loader; we assume we have a corpus of Paper classes where the Paper class has an attribute called segments
@@ -200,6 +155,12 @@ def main(args):
                 id2node.append(subaspect_node)
                 
                 queue.append(subaspect_node)
+                
+    """ Filtering: filter out segments that are not relevant to the claim """
+    filter_segments(args, tree)  # 7000 -> 192
+    
+    """ Hierarchical segment classification """
+    hierarchical_segment_classification(claim, tree)
 
     print("######## DISCOVERING PERSPECTIVES ########")
     perspective_discovery(args, id2node)
@@ -212,16 +173,6 @@ def main(args):
     with open(f'{args.data_dir}/{args.topic}/hierarchy.json', 'w', encoding='utf-8') as f:
         json.dump(hierarchy_dict, f, ensure_ascii=False, indent=4)
 
-    """ Filtering: filter out segments that are not relevant to the claim """
-    filter_segments(tree)  # 7000 -> 192
-    
-    """ Hierarchical segment classification """
-    hierarchical_classification = hierarchical_segment_classification(claim, tree)
-    
-    # tree = hierarchical_segment_classification(claim, aspect_hierarchy)
-
-    # # Perspective discovery
-    # perspective_discovery(tree, claim)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
