@@ -71,19 +71,19 @@ class Node:
                 return ans
         return None
 
-def createGraph(args):
+def createGraph(label_path, label_hierarchy_path):
     root = None
 
     id2label = {}
     label2id = {}
-    with open(args.label_path) as f:
+    with open(label_path) as f:
         for line in f:
             label_id, label_name = line.strip().split('\t')
             id2label[label_id] = label_name
             label2id[label_name] = label_id
 
     # construct graph from file
-    with open(args.label_hierarchy_path) as f:
+    with open(label_hierarchy_path) as f:
         ## for each line in the file
         root = Node(-1, 'ROOT')
         for line in f:
@@ -180,22 +180,11 @@ def process_document(root_node, id2label, label2id, document_text, gpt_template,
     return {'response':response, 
             'core classes':classes, 
             'with ancestors': list(class_set)}
-
-
-if __name__ == '__main__':
-
-    """ args init """
-    parser = argparse.ArgumentParser(description='main', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--llm_enrichment_path', type=str)
-    parser.add_argument('--corpus_path', type=str)
-    parser.add_argument('--label_path', type=str)
-    parser.add_argument('--label_hierarchy_path', type=str)
-    parser.add_argument('--gpu', type=int, default=0)
-    parser.add_argument('--output_path', type=str)
-    args = parser.parse_args()
-
+    
+def run_annotation(claim, llm_enrichment_path, corpus_path, label_path, label_hierarchy_path, output_path, gpu=0):
+    
     """ load label-keyterm dict """
-    enriched_file = args.llm_enrichment_path
+    enriched_file = llm_enrichment_path
     label_keyterm_dict = {}
     with open(enriched_file) as file:
         for line in file:
@@ -206,16 +195,14 @@ if __name__ == '__main__':
             label_keyterm_dict[node] = keyword_list
     
     """ prompt init """
-    nli_template = 'This corpus segment talks about {}.'
-    gpt_template = 'You will be provided with a corpus segment. Please select the suitable aspect it talks about from the following aspects: {}. Separate by comma if there are multiple. Just give the aspect names as shown in the provided list starting with Aspect:.'
+    gpt_template = f'You will be provided with a corpus segment. This segment is about a claim: {claim}' +'Please select the suitable aspect it talks about from the following aspects: {}. Separate by comma if there are multiple. Just give the aspect names as shown in the provided list starting with Aspect:.'
 
     """ model init """
     model_name = 'all-mpnet-base-v2'
-    model = SentenceTransformer(model_name, device=f'cuda:{args.gpu}') 
+    model = SentenceTransformer(model_name, device=f'cuda:{gpu}') 
     
     """ construct graph from file """
-    root, id2label, label2id = createGraph(args)
-    corpus_path = args.corpus_path
+    root, id2label, label2id = createGraph(label_path, label_hierarchy_path)
     num_line = get_num_lines(corpus_path)
     num_class = len(id2label)
     writing_result = {}
@@ -252,4 +239,22 @@ if __name__ == '__main__':
         writing_result[doc_id] = process_document(root, id2label, label2id, doc, gpt_template, doc_emb, key_term_emb_dict)
         print(writing_result[doc_id])
     
-    json.dump(writing_result, open(args.output_path, 'w'), indent=1)
+    json.dump(writing_result, open(output_path, 'w'), indent=1)
+
+
+if __name__ == '__main__':
+
+    """ args init """
+    parser = argparse.ArgumentParser(description='main', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--llm_enrichment_path', type=str)
+    parser.add_argument('--corpus_path', type=str)
+    parser.add_argument('--label_path', type=str)
+    parser.add_argument('--label_hierarchy_path', type=str)
+    parser.add_argument('--output_path', type=str)
+    parser.add_argument('--gpu', type=int, default=0)
+    parser.add_argument('--claim', type=str, default='Pfizer COVID-19 vaccine is better than Moderna COVID-19 vaccine.')
+    args = parser.parse_args()
+    
+    """ run annotation """
+    run_annotation(args.claim, args.llm_enrichment_path, args.corpus_path, args.label_path, args.label_hierarchy_path, args.output_path, args.gpu)
+

@@ -121,6 +121,7 @@ def extract_keyword(args, claim: str, aspect_name: str, aspect_description: str,
         chat_func = get_chat_function(args)
         prompt = keyword_extraction_prompt(claim, aspect_name, aspect_description, max_keyword_num, seg_contents)
         chat_response = chat_func([prompt])
+        
         if type(chat_response[0]) == str:
             keyword_candidates = [kw.strip().lower() for kw in chat_response[0].split(", ")]
         else:
@@ -141,7 +142,7 @@ def extract_keywords(args, claim: str, aspects: list[dict], corpus_segments: lis
                     min_keyword_num: int, max_keyword_num: int, iteration_num: int=1, corpus_embs=None, is_subaspect=False) -> list[str]:
     
     current_keyword_group = [aspect["subaspect_keywords"] if is_subaspect else aspect["aspect_keywords"] for aspect in aspects]
-    
+
     for i in range(iteration_num):
 
         aspect_prompts = []
@@ -157,7 +158,6 @@ def extract_keywords(args, claim: str, aspects: list[dict], corpus_segments: lis
                                                                    corpus_segments, retrieved_corpus_num,
                                                                    current_keyword_group[idx], corpus_embs)
             seg_contents = [seg.content for seg in top_k_segments]
-
             prompt = keyword_extraction_prompt(claim, aspect_names[idx], aspect_descriptions[idx], max_keyword_num, seg_contents)
             aspect_prompts.append(prompt)
 
@@ -168,10 +168,17 @@ def extract_keywords(args, claim: str, aspects: list[dict], corpus_segments: lis
         aspect_keyword_prompts = []
         for idx, chat_response in enumerate(chat_responses):
             
-            if type(chat_response) == str:
-                keyword_candidates = [kw.strip().lower() for kw in chat_response.split(", ")]
-            else:
+            if '```json' in chat_response:
+                # remove the prefix and suffix
+                chat_response = chat_response[7:-3]
+                chat_response = json.loads(chat_response)['output_keywords']
                 keyword_candidates = [kw.strip().lower() for kw in chat_response]
+            
+            else:  
+                if type(chat_response) == str:
+                    keyword_candidates = [kw.strip().lower() for kw in chat_response.split(", ")]
+                else:
+                    keyword_candidates = [kw.strip().lower() for kw in chat_response]
 
             aspect_keyword_prompts.append(keyword_filter_prompt(claim, aspect_names[idx], aspect_descriptions[idx],
                                                                 min_keyword_num, max_keyword_num, keyword_candidates))  
@@ -181,10 +188,18 @@ def extract_keywords(args, claim: str, aspects: list[dict], corpus_segments: lis
 
         current_keyword_group = []
         for idx, chat_response in enumerate(chat_responses):
-            if type(chat_response) == str:
-                current_keyword_group.append([kw.strip().lower() for kw in chat_response.split(", ")])
-            else:
+            
+            if '```json' in chat_response:
+                # remove the prefix and suffix
+                chat_response = chat_response[7:-3]
+                chat_response = json.loads(chat_response)['output_keywords']
                 current_keyword_group.append([kw.strip().lower() for kw in chat_response])
+            
+            else:
+                if type(chat_response) == str:
+                    current_keyword_group.append([kw.strip().lower() for kw in chat_response.split(", ")])
+                else:
+                    current_keyword_group.append([kw.strip().lower() for kw in chat_response])
     
     return current_keyword_group
 

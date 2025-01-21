@@ -158,9 +158,14 @@ def main(args):
                 
     """ Filtering: filter out segments that are not relevant to the claim """
     filter_segments(args, tree)  # 7000 -> 192
+    # the modification is made at the relevant papers and relevant segments of the root node. 
+    # now these two part only contain the relevant papers and segments after filtering
     
     """ Hierarchical segment classification """
     hierarchical_segment_classification(claim, tree)
+    # now the relevant papers and segments from the root has been passed to the child nodes
+    # we can easily get them by calling node.get_all_segments()
+    breakpoint()
 
     print("######## DISCOVERING PERSPECTIVES ########")
     perspective_discovery(args, id2node)
