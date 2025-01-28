@@ -7,14 +7,21 @@ from api.openai.chat import chat
 from api.openai.embed import embed as openai_embed
 from sklearn.metrics.pairwise import cosine_similarity
 
+import json
+from vllm import SamplingParams
+from outlines.serve.vllm import JSONLogitsProcessor
+from pydantic import BaseModel, StringConstraints
+from typing_extensions import Annotated
+
+class relevance_schema(BaseModel):
+    is_segment_relevant_to_claim : Annotated[str, StringConstraints(strip_whitespace=True)]
+
 class KeywordEnsembleEmbeddingLLMFilter(AbstractFilter):
     
-    def __init__(self, 
+    def __init__(self, args,
                  aspect_list: list[str],
                  minimal_occurrences: int = 3,  # Minimal number of occurrences of a keyword for a segment to be kept
                  char_length_threshold: int = 500,
-                 embedding_model_name: str = 'e5',
-                 chat_model_name: str = 'gpt-4o',
                  weight_keywords: float = 0.5,
                  boundary_density: float = 0.2,
                  density_interval: int = 9,
@@ -30,38 +37,15 @@ class KeywordEnsembleEmbeddingLLMFilter(AbstractFilter):
         # Initialize filter parameters
         self.minimal_occurrences = minimal_occurrences
         self.char_length_threshold = char_length_threshold
-        # Initialize the embedding model based on the given name
-        self.embedding_model = self.get_embedding_model(embedding_model_name)
-        self.chat_model_name = chat_model_name
-        # Initialize the embedding function based on the given name
-        self.embedding_func = self.get_embedding_func(embedding_model_name)
-    
-    def get_embedding_model(self, model_name: str):
-        # Return the embedding model based on the model name
-        if model_name == 'e5':
-            return E5()  # Use the E5 model
-        elif model_name == 'openai':
-            return None  # OpenAI model is not defined here
-        else:
-            # Raise an error for invalid model names
-            raise ValueError(f'Invalid embedding model name: {model_name}')
+        self.embedding_model = args.embed_model
+        self.embedding_func = args.embed_func
+        self.chat_model_name = args.chat_model_name
+        self.chat_model = args.chat_model
+        
     
     def calculate_cosine_similarity(self, embed1, embed2):
         # Calculate cosine similarity between two embeddings
         return cosine_similarity([embed1], [embed2])[0][0]
-    
-    def get_embedding_func(self, model_name: str):
-        # Return the embedding function based on the model name
-        if model_name == 'e5':
-            # Define a function that uses e5_embed with the E5 model
-            def new_e5_embed(input_strs: list[str]): 
-                return e5_embed(self.embedding_model, input_strs)
-            return new_e5_embed
-        elif model_name == 'openai':
-            return openai_embed  # Use the OpenAI embedding function
-        else:
-            # Raise an error for invalid model names
-            raise ValueError(f'Invalid embedding model name: {model_name}')
     
     def length_sub_filter(self, list_of_segments: list[str]) -> list[str]:
         # Filter segments based on the character length threshold
@@ -70,7 +54,7 @@ class KeywordEnsembleEmbeddingLLMFilter(AbstractFilter):
     def llm_judge_relevance(self, segments: list[str], claim: str) -> list[bool]:
         aspects = self.aspect_list
         """ llm judge relevance of segments to claim """
-        prompt_template = """I am currently analyzing a claim based on a segment from the literature from several different aspects.
+        prompt_template = lambda segment, claim, aspects: f"""I am currently analyzing a claim based on a segment from the literature from several different aspects.
 
 The segment is: {segment}
 
@@ -78,10 +62,23 @@ The claim is: {claim}
 
 The aspects are: {aspects}
 
-Please help me determine whether this segment is related to the claim so that I can analyze this claim based on it from at least one of these aspects. Your output should be 'Yes' or 'No'. """
-        prompts = [prompt_template.format(segment=segment, claim=claim, aspects=', '.join(aspects)) for segment in segments]
-        if self.chat_model_name == 'gpt-4o' or self.chat_model_name == 'gpt-4o-mini':
+Please help me determine whether this segment is related to the claim so that I can analyze this claim based on it from at least one of these aspects. Your output should be 'Yes' or 'No' in the following JSON format:
+{{
+    "is_segment_relevant_to_claim": <string value ony answering either "Yes" or "No">
+}}
+"""
+        
+        prompts = [prompt_template(segment=segment, claim=claim, aspects=', '.join(aspects)) for segment in segments]
+        
+        if self.chat_model_name == "vllm":
+            logits_processor = JSONLogitsProcessor(schema=relevance_schema, llm=self.chat_model.llm_engine)
+            sampling_params = SamplingParams(max_tokens=300, logits_processors=[logits_processor], temperature=0.01)
+            outputs = self.chat_model.generate(prompts, sampling_params=sampling_params)
+            responses = [json.loads(output.outputs[0].text)['is_segment_relevant_to_claim'] for output in outputs]
+        
+        elif (self.chat_model_name == "gpt-4o") or (self.chat_model_name == "gpt-4o-mini"):
             responses = chat(prompts,temperature=0.01, model_name=self.chat_model_name)
+            
         else:
             raise ValueError(f'Invalid chat model name: {self.chat_model_name} not implemented yet.')
 
@@ -145,16 +142,16 @@ Please help me determine whether this segment is related to the claim so that I 
         
         # Filter segments based on their embedding similarity to the claim
         keyword_query_list = [f"{keyword} with respect to {claim}" for keyword in keyword_list]
-        keyword_embeddings_dict = self.embedding_func(keyword_query_list)
+        keyword_embeddings_dict = self.embedding_func(keyword_query_list, self.embedding_model)
         
         keyword_embedding_list = list(keyword_embeddings_dict.values())
         keyword_embedding_np_list = np.array(keyword_embedding_list)
         average_keyword_embedding = np.mean(keyword_embedding_np_list, axis=0)
         
-        claim_embedding = np.array(self.embedding_func([claim])[claim])  # Embed the claim
+        claim_embedding = np.array(self.embedding_func([claim], self.embedding_model)[claim])  # Embed the claim
         weighted_claim_embedding = self.weight_claim * claim_embedding + self.weight_keywords * average_keyword_embedding
         
-        segment_embeddings = self.embedding_func(list_of_segments)  # Embed the segments
+        segment_embeddings = self.embedding_func(list_of_segments, self.embedding_model)  # Embed the segments
         ordered_segments = []
         # Calculate similarity for each segment embedding
         for segment, segment_embedding in segment_embeddings.items():

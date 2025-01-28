@@ -26,8 +26,6 @@ def aspect_candidate_gen(topic, k=5):
     )
     message = outputs[0]["generated_text"][len(model_prompt):]
 
-    print(message)
-
     gen_aspects = re.findall(r'aspect_\d+:\s*\[*(.*)\]*', message, re.IGNORECASE)
     gen_keywords = re.findall(r'aspect_\d+_keywords:\s*\[*(.*)\]*', message, re.IGNORECASE)
 

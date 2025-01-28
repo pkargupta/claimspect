@@ -33,6 +33,7 @@ class AspectNode:
         self.sub_aspects = []
         self.ranked_segments = {}
         self.related_papers = {}  # Dictionary for faster lookup by paper_id
+        self.mapped_segs = None
         self.perspectives = None
 
     def add_sub_aspect(self, sub_aspect):
@@ -111,14 +112,14 @@ class AspectNode:
     def compute_stats(self):
         s_papers = set()
         for seg_id in self.perspectives["supports_claim"]["perspective_segments"]:
-            s_papers.add(self.ranked_segments[seg_id].paper_id)
+            s_papers.add(self.mapped_segs[seg_id].paper_id)
         n_papers = set()
         for seg_id in self.perspectives["neutral_to_claim"]["perspective_segments"]:
-            n_papers.add(self.ranked_segments[seg_id].paper_id)
+            n_papers.add(self.mapped_segs[seg_id].paper_id)
 
         o_papers = set()
         for seg_id in self.perspectives["opposes_claim"]["perspective_segments"]:
-            o_papers.add(self.ranked_segments[seg_id].paper_id)
+            o_papers.add(self.mapped_segs[seg_id].paper_id)
 
         return s_papers, n_papers, o_papers 
     
@@ -153,13 +154,14 @@ class AspectNode:
             print(f"{indent}Top #2 Segment ({self.ranked_segments[1][1]}): {self.ranked_segments[1][0].content}")
             print(f"{indent}Top #3 Segment ({self.ranked_segments[2][1]}): {self.ranked_segments[2][0].content}")
 
-        if self.perspectives:
+        if (self.perspectives) and (self.mapped_segs is not None):
             s_papers, n_papers, o_papers = self.compute_stats()
             
             output_dict['perspectives'] = self.perspectives
             output_dict['perspectives']['support_ratio'] = f"{len(s_papers)}/{corpus_len}"
             output_dict['perspectives']['neutral_ratio'] = f"{len(n_papers)}/{corpus_len}"
             output_dict['perspectives']['oppose_ratio'] = f"{len(o_papers)}/{corpus_len}"
+            output_dict['mapped_segs'] = [str((i.paper_id, i.local_id, i.content)) for i in self.mapped_segs]
             
             print(f"{indent}Support ({len(s_papers)}/{corpus_len}): {self.perspectives['supports_claim']}")
             print(f"{indent}Neutral ({len(n_papers)}/{corpus_len}): {self.perspectives['neutral_to_claim']}")

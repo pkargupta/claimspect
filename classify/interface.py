@@ -122,7 +122,7 @@ def write_label_hierarchy_file(tree, cache_dir):
     
     with open(label_file_path, 'w') as f:
         for idx, name in idx_to_name.items():
-            f.write(f'{idx}\t{name.replace(' ', '_')}\n')
+            f.write(f"{idx}\t{name.replace(' ', '_')}\n")
     with open(label_hierarchy_path, 'w') as f:
         for parent_idx, child_idx in hierarchy:
             f.write(f'{parent_idx}\t{child_idx}\n')
@@ -150,7 +150,7 @@ def write_enrich_file(tree, cache_dir):
     enrichment_path = os.path.join(cache_dir, f'enrichment_file_{time_stamp}.txt')
     with open(enrichment_path, 'w') as f:
         for aspect, keywords in keyword_dict.items():
-            f.write(f'{aspect.replace(' ', '_')}:{",".join(keywords)}\n')
+            f.write(f"{aspect.replace(' ', '_')}:{','.join(keywords)}\n")
     return enrichment_path
     
 def get_output_path(cache_dir: str):
@@ -206,7 +206,7 @@ def get_cache_dir(
     return cache_dir
 
 
-def hierarchical_segment_classification(claim, tree):
+def hierarchical_segment_classification(args, claim, tree):
     
     """Step 5: Classify segments into the aspect hierarchy."""
     
@@ -219,7 +219,7 @@ def hierarchical_segment_classification(claim, tree):
     output_path = get_output_path(cache_dir)
 
     # run annotation
-    run_annotation(claim, enrichment_path, corpus_path, label_file_path, label_hierarchy_path, output_path)
+    run_annotation(args, claim, enrichment_path, corpus_path, label_file_path, label_hierarchy_path, output_path)
     results = load_results(output_path)
     convert_results_to_tree(tree, results, node_idx2node_name, corpus_idx2corpus_str)
     

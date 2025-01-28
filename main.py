@@ -56,7 +56,7 @@ def coarse_grained_aspect_discovery(args, claim, temperature=0.3, top_p=0.99):
         output = args.chat_model.generate(aspect_prompt(claim), sampling_params=sampling_params)[0].outputs[0].text
         aspects = json.loads(output)['aspect_list']
     
-    if args.chat_model_name == "gpt-4o" or "gpt-4o-mini":
+    if (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
         # OPTION 2: generation code for openai model
         response = args.chat_model([aspect_prompt(claim)])[0]
         # extract the part in ```json``` from the response
@@ -88,13 +88,12 @@ def main(args):
 
     # Coarse-grained aspect discovery + keyword generation
     aspects = coarse_grained_aspect_discovery(args, claim)
-    
+
     # Expand tree with first level
     print("######## EXPAND AND ENRICH TREE WITH ASPECTS ########")
     all_segments = root_node.get_all_segments()
     seg_contents = [seg.content for seg in all_segments]
-    corpus_embs = args.embed_func(seg_contents, embed_model=args.embed_model)
-    
+    corpus_embs = args.embed_func(text=seg_contents, model=args.embed_model)
     refined_keywords = extract_keywords(args=args, claim=claim, aspects=aspects, corpus_segments=all_segments,
                                         retrieved_corpus_num=5, min_keyword_num=5, max_keyword_num=15, iteration_num=1,
                                         corpus_embs=corpus_embs)
@@ -162,7 +161,7 @@ def main(args):
     # now these two part only contain the relevant papers and segments after filtering
     
     """ Hierarchical segment classification """
-    hierarchical_segment_classification(claim, tree)
+    hierarchical_segment_classification(args, claim, tree)
     # now the relevant papers and segments from the root has been passed to the child nodes
     # we can easily get them by calling node.get_all_segments()
 
@@ -193,15 +192,15 @@ if __name__ == "__main__":
 
     if args.embedding_model_name == "e5":
         args.embed_model = E5()
-        args.embed_func = e5_embed
+        args.embed_func = lambda text, model: e5_embed(embed_model=model, text_list=text)
     else:
         args.embed_model = args.embedding_model_name
-        args.embed_func = openai_embed
+        args.embed_func = lambda text, model: openai_embed(inputs=text, model_name=model)
 
     if args.chat_model_name == "vllm":
         args.chat_model = LLM(model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True)
     
-    elif args.chat_model_name == "gpt-4o" or "gpt-4o-mini":
+    elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
         def openai_model_specific_chat(prompts: list[str]) -> list[str]:
             return chat(prompts, model_name=args.chat_model_name, seed=42, temperature=0.3, top_p=0.99)
         args.chat_model = openai_model_specific_chat

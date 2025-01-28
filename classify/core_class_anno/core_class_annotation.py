@@ -9,29 +9,63 @@ import queue
 
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity as cos
-from api.openai.chat import chat
 
-def api_call(doc, class_names, instruction, demos=[]):
+from vllm import SamplingParams
+from outlines.serve.vllm import JSONLogitsProcessor
+import json
+from pydantic import BaseModel, conlist
+
+class cls_schema(BaseModel):
+    aspect_label: conlist(str, max_length=5)
+
+def api_call(args, doc, class_names, instruction, demos=[]):
     '''
+    args
     doc str: query
     instruction str: system instruction
     demos List((str, str)): demonstrations, if any
     temperature: None for default temprature
     '''
-    
     class_names = [item.lower() for item in class_names]
-    messages = [{"role": "system", "content": instruction}]
     
-    for demo_doc, demo_label in demos[::-1]:
-        messages.append({"role": "user", "content": demo_doc})
-        messages.append({"role": "assistant", "content": demo_label})
-    
-    messages.append({"role": "user", "content": doc})
-    
-    assert len(messages) == 2
-    input_text = messages[0]["content"] + messages[1]["content"]
-    response = chat([input_text])[0]
-    temp_raw = response.split(':')[-1].strip()
+    if args.chat_model_name == "vllm":
+        
+        logits_processor = JSONLogitsProcessor(schema=cls_schema, llm=args.chat_model.llm_engine)
+        sampling_params = SamplingParams(max_tokens=500, logits_processors=[logits_processor], temperature=0.1, top_p=0.99)
+
+        prompt = "You are a multi-label text classifier." + instruction + f"""
+Your corpus_segment is below:
+corpus_segment: {doc}
+
+Your aspect_options are the following:
+aspect_options: {str(class_names)}
+
+Output your answer in the following JSON format:
+{{
+    aspect_label: <list of strings, where the string values are the names of the aspects from aspect_options that the corpus_segment discusses (with reasonable confidence); if no options are applicable, leave the list empty>
+}}
+        """
+        
+        output = args.chat_model.generate([prompt], sampling_params=sampling_params)[0].outputs[0].text
+        aspects = json.loads(output)['aspect_label']
+        temp_raw = ', '.join(aspects)
+        
+    elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
+        messages = [{"role": "system", "content": instruction}]
+        
+        for demo_doc, demo_label in demos[::-1]:
+            messages.append({"role": "user", "content": demo_doc})
+            messages.append({"role": "assistant", "content": demo_label})
+        
+        messages.append({"role": "user", "content": doc})
+        
+        assert len(messages) == 2
+        input_text = messages[0]["content"] + messages[1]["content"]
+        
+        response = args.chat_model([input_text])[0]
+        temp_raw = response.split(':')[-1].strip()
+    else:
+        raise ValueError(f'Invalid chat model name: {args.chat_model_name} not implemented yet.')
 
     return temp_raw
 
@@ -148,7 +182,7 @@ def bfs(root, doc_emb, key_term_emb_dict):
     # return a list of class names that are selected
     return similarity_score_dic
 
-def process_document(root_node, id2label, label2id, document_text, gpt_template, doc_emb, key_term_emb_dict):
+def process_document(args, root_node, id2label, label2id, document_text, gpt_template, doc_emb, key_term_emb_dict):
     
     # make a tree copy
     root = copy.deepcopy(root_node)
@@ -160,7 +194,7 @@ def process_document(root_node, id2label, label2id, document_text, gpt_template,
 
     class_names = [id2label[cid].replace('_', ' ') for cid in sim_dic]
     instruction = gpt_template.format(', '.join(class_names))
-    response = api_call(document_text, class_names, instruction, demos=[])
+    response = api_call(args, document_text, class_names, instruction, demos=[])
     class_names = [cn.replace(' ', '_') for cn in response.split(', ')]
     classes = [label2id[cn] for cn in class_names if cn in label2id]
 
@@ -181,7 +215,7 @@ def process_document(root_node, id2label, label2id, document_text, gpt_template,
             'core classes':classes, 
             'with ancestors': list(class_set)}
     
-def run_annotation(claim, llm_enrichment_path, corpus_path, label_path, label_hierarchy_path, output_path, gpu=0):
+def run_annotation(args, claim, llm_enrichment_path, corpus_path, label_path, label_hierarchy_path, output_path, gpu=0):
     
     """ load label-keyterm dict """
     enriched_file = llm_enrichment_path
@@ -195,7 +229,7 @@ def run_annotation(claim, llm_enrichment_path, corpus_path, label_path, label_hi
             label_keyterm_dict[node] = keyword_list
     
     """ prompt init """
-    gpt_template = f'You will be provided with a corpus segment. This segment is about a claim: {claim}' +'Please select the suitable aspect it talks about from the following aspects: {}. Separate by comma if there are multiple. Just give the aspect names as shown in the provided list starting with Aspect:.'
+    gpt_template = f'You will be provided with a corpus segment. This segment is about a claim: {claim}' +'Please select the suitable aspect it talks about from the following aspects: {}. Separate by comma if there are multiple. Just give the aspect names as shown in the provided list starting with aspect:.'
 
     """ model init """
     model_name = 'all-mpnet-base-v2'
@@ -236,7 +270,7 @@ def run_annotation(claim, llm_enrichment_path, corpus_path, label_path, label_hi
     for index,(doc_id,doc) in tqdm(enumerate(zip(all_docs_id,all_docs))):
         print(index)
         doc_emb=total_doc_embedding[index]
-        writing_result[doc_id] = process_document(root, id2label, label2id, doc, gpt_template, doc_emb, key_term_emb_dict)
+        writing_result[doc_id] = process_document(args, root, id2label, label2id, doc, gpt_template, doc_emb, key_term_emb_dict)
         print(writing_result[doc_id])
     
     json.dump(writing_result, open(output_path, 'w'), indent=1)

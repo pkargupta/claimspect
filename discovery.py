@@ -15,7 +15,7 @@ def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temper
         output = args.chat_model.generate(subaspect_prompt(parent_aspect.name, parent_aspect.description, args.claim, subset), sampling_params=sampling_params)[0].outputs[0].text
         subaspects = json.loads(output)['subaspect_list']
     
-    elif args.chat_model_name == "gpt-4o" or "gpt-4o-mini":
+    elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
         # OPTION 2: Use GPT-4o
         subset = [segments[rank2id[i]] for i in np.arange(top_k)]
         response = args.chat_model([subaspect_prompt(parent_aspect.name, parent_aspect.description, args.claim, subset)])[0]
@@ -27,12 +27,14 @@ def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temper
     return subaspects
 
 
-def perspective_discovery(args, id2node, temperature=0.1, top_p=0.99):
+def perspective_discovery(args, id2node, temperature=0.1, top_p=0.99, top_k=20):
     # construct prompts
     perspective_prompts = {}
     for node in id2node:
-        if len(node.ranked_segments):
-            prompt = perspective_prompt(args.claim, node.name, node.description, node.ranked_segments)
+        segments = node.get_all_segments()
+        node.mapped_segs = segments
+        if len(segments):
+            prompt = perspective_prompt(args.claim, node.name, node.description, segments[:top_k])
             perspective_prompts[node.id] = prompt
 
     # generate perspectives & classify

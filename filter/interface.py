@@ -8,9 +8,7 @@ def filter_segments(args, tree):
     major_aspects = [aspect.name for aspect in tree.root.sub_aspects]
     
     # init filter
-    filter_obj = KeywordEnsembleEmbeddingLLMFilter(aspect_list=major_aspects, 
-                                                   embedding_model_name=args.embedding_model_name,
-                                                   chat_model_name=args.chat_model_name)
+    filter_obj = KeywordEnsembleEmbeddingLLMFilter(args, aspect_list=major_aspects)
     # filter segments
     new_segment_str_list = filter_obj.filter(args.claim, segment_str_list, major_aspects)
     
