@@ -1,5 +1,4 @@
 import re
-import tqdm
 import GPUtil
 import torch
 import warnings

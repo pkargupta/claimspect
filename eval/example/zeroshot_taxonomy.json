@@ -1,0 +1,49 @@
+{
+    "aspect": "The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.",
+    "children": [
+        {
+            "aspect": "Efficacy",
+            "children": [
+                {
+                    "aspect": "Effectiveness against COVID-19 infection"
+                },
+                {
+                    "aspect": "Effectiveness against COVID-19 variants"
+                },
+                {
+                    "aspect": "Duration of protection"
+                }
+            ]
+        },
+        {
+            "aspect": "Safety",
+            "children": [
+                {
+                    "aspect": "Incidence of side effects"
+                },
+                {
+                    "aspect": "Severity of side effects"
+                }
+            ]
+        },
+        {
+            "aspect": "Distribution and accessibility",
+            "children": [
+                {
+                    "aspect": "Availability and supply"
+                },
+                {
+                    "aspect": "Storage requirements"
+                }
+            ]
+        },
+        {
+            "aspect": "Cost",
+            "children": [
+                {
+                    "aspect": "Price per dose"
+                }
+            ]
+        }
+    ]
+}
