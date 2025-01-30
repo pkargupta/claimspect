@@ -50,7 +50,7 @@ def load_claim(json_path):
         return None
 
 
-def build_prompt(claim, height, literature: str):
+def build_prompt(claim, height, literature: str, node_num_per_level):
     """
     Construct the LLM prompt based on the claim and taxonomy height.
 
@@ -68,13 +68,14 @@ def build_prompt(claim, height, literature: str):
         "can be broken down into its core aspects and sub-aspects, which are easier to evaluate individually.\n\n"
         f"Given the claim: '{claim}', generate a taxonomy of the claim with a specified height of {height}.\n\n"
         f"Here are some literautre segments to help you generate the taxonomy: {literature}\n"
+        f'Generate up to {node_num_per_level} nodes per level in the taxonomy.\n'
         "The taxonomy should be structured as a dictionary, formatted as follows:\n"
         "{"
-        '   "aspect": "the claim itself",  # the root aspect should be the claim itself (a sentence), '
+        '   "aspect_name": "the claim itself",  # the root aspect should be the claim itself (a sentence), '
         'but other aspects should be the aspect name (words or phrases)\n'
         '   "children": [\n'
-        '       { "aspect": "Sub-aspect 1", "children": [...] },\n'
-        '       { "aspect": "Sub-aspect 2", "children": [...] }, ...\n'
+        '       { "aspect_name": "Sub-aspect 1", "children": [...] },\n'
+        '       { "aspect_name": "Sub-aspect 2", "children": [...] }, ...\n'
         "   ]\n"
         "}\n\n"
         "Ensure that the output is a valid JSON object, directly serializable using json.loads(). "
@@ -177,6 +178,7 @@ def main():
     parser.add_argument("--data_dir", default="data")
     parser.add_argument("--topic", default="vaccine")
     parser.add_argument("--rag_segment_num", default=20)
+    parser.add_argument("--node_num_per_level", default=5)
     args = parser.parse_args()
 
     # Load the claim
@@ -214,7 +216,7 @@ def main():
     literature = "\n".join(selected_segments)
 
     # Build the prompt and generate the taxonomy
-    prompt = build_prompt(claim, args.height, literature)
+    prompt = build_prompt(claim, args.height, literature, args.node_num_per_level)
     taxonomy = generate_taxonomy(prompt, args.model_name)
     if not taxonomy:
         logging.error("Failed to generate a valid taxonomy. Exiting.")

@@ -1,61 +1,58 @@
 {
-    "aspect": "The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.",
+    "aspect_name": "The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.",
     "children": [
         {
-            "aspect": "Efficacy",
+            "aspect_name": "Efficacy",
             "children": [
                 {
-                    "aspect": "Efficacy percentage"
+                    "aspect_name": "Reported Efficacy"
                 },
                 {
-                    "aspect": "Effectiveness over time"
+                    "aspect_name": "Efficacy for Different Age Groups"
                 }
             ]
         },
         {
-            "aspect": "Safety and Side Effects",
+            "aspect_name": "Adverse Effects",
             "children": [
                 {
-                    "aspect": "Serious adverse effects"
+                    "aspect_name": "Frequency of Adverse Effects"
                 },
                 {
-                    "aspect": "Allergic reactions"
-                },
-                {
-                    "aspect": "Risk of myocarditis"
+                    "aspect_name": "Severity of Side Effects"
                 }
             ]
         },
         {
-            "aspect": "Immunogenicity",
+            "aspect_name": "Immune Response",
             "children": [
                 {
-                    "aspect": "CD8 T-cell response"
+                    "aspect_name": "Antibody Response"
                 },
                 {
-                    "aspect": "Antibody response"
+                    "aspect_name": "Cellular Response"
                 }
             ]
         },
         {
-            "aspect": "Demographic Suitability",
+            "aspect_name": "Logistics",
             "children": [
                 {
-                    "aspect": "Age group differences"
+                    "aspect_name": "Cost"
                 },
                 {
-                    "aspect": "Health status of recipients"
+                    "aspect_name": "Storage Requirements"
                 }
             ]
         },
         {
-            "aspect": "Cost and Accessibility",
+            "aspect_name": "Population Demographics",
             "children": [
                 {
-                    "aspect": "Cost of vaccines"
+                    "aspect_name": "Age"
                 },
                 {
-                    "aspect": "Storage and transportation requirements"
+                    "aspect_name": "Health Status of Vaccinees"
                 }
             ]
         }

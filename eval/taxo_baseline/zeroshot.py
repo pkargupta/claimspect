@@ -16,19 +16,20 @@ def load_claim(json_path):
         logging.error(f"Error loading claim from {json_path}: {e}")
         return None
 
-def build_prompt(claim, height):
+def build_prompt(claim, height, node_num_per_level):
     """Construct the LLM prompt based on the claim and taxonomy height."""
     return (
         "Claims made by individuals or entities are often nuanced and cannot always be strictly categorized as entirely 'true' or 'false'—"
         "particularly in scientific and political contexts. Instead, a claim can be broken down "
         "into its core aspects and sub-aspects, which are easier to evaluate individually.\n\n"
         f"Given the claim: '{claim}', generate a taxonomy of the claim with a specified height of {height}.\n\n"
+        f'Generate up to {node_num_per_level} nodes per level in the taxonomy.\n'
         "The taxonomy should be structured as a dictionary, formatted as follows:\n"
         "{"
-        '   "aspect": "the claim itself",  # the root aspect should be the claim itself (a sentence), but other aspects should be the aspect name (words or phrases)\n'
+        '   "aspect_name": "the claim itself",  # the root aspect should be the claim itself (a sentence), but other aspects should be the aspect name (words or phrases)\n'
         '   "children": [\n'
-        '       { "aspect": "Sub-aspect 1", "children": [...] },\n'
-        '       { "aspect": "Sub-aspect 2", "children": [...] }, ...\n'
+        '       { "aspect_name": "Sub-aspect 1", "children": [...] },\n'
+        '       { "aspect_name": "Sub-aspect 2", "children": [...] }, ...\n'
         "   ]\n"
         "}\n\n"
         "Ensure that the output is a valid JSON object, directly serializable using `json.loads()`. "
@@ -69,6 +70,7 @@ def main():
     parser.add_argument("--height", type=int, default=2, help="Height of the taxonomy tree")
     parser.add_argument("--output_path", type=str, default="eval/example/zeroshot_taxonomy.json", help="Output file path")
     parser.add_argument("--input_path", type=str, default="eval/example/hierarchy.json", help="Input JSON file with claim")
+    parser.add_argument("--node_num_per_level", type=int, default=5, help="Number of nodes per level in the taxonomy")
 
     args = parser.parse_args()
 
@@ -79,7 +81,7 @@ def main():
         return
 
     # Generate prompt
-    prompt = build_prompt(claim, args.height)
+    prompt = build_prompt(claim, args.height, args.node_num_per_level)
 
     # Generate taxonomy from LLM
     taxonomy = generate_taxonomy(prompt, args.model_name)

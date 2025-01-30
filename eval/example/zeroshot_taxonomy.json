@@ -1,47 +1,55 @@
 {
-    "aspect": "The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.",
+    "aspect_name": "The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.",
     "children": [
         {
-            "aspect": "Efficacy",
+            "aspect_name": "Efficacy",
             "children": [
                 {
-                    "aspect": "Effectiveness against COVID-19 infection"
+                    "aspect_name": "Efficacy in preventing infection"
                 },
                 {
-                    "aspect": "Effectiveness against COVID-19 variants"
-                },
-                {
-                    "aspect": "Duration of protection"
+                    "aspect_name": "Efficacy in preventing severe disease"
                 }
             ]
         },
         {
-            "aspect": "Safety",
+            "aspect_name": "Safety",
             "children": [
                 {
-                    "aspect": "Incidence of side effects"
+                    "aspect_name": "Short-term side effects"
                 },
                 {
-                    "aspect": "Severity of side effects"
+                    "aspect_name": "Long-term safety data"
                 }
             ]
         },
         {
-            "aspect": "Distribution and accessibility",
+            "aspect_name": "Distribution and Accessibility",
             "children": [
                 {
-                    "aspect": "Availability and supply"
+                    "aspect_name": "Availability"
                 },
                 {
-                    "aspect": "Storage requirements"
+                    "aspect_name": "Storage requirements"
                 }
             ]
         },
         {
-            "aspect": "Cost",
+            "aspect_name": "Public Perception",
             "children": [
                 {
-                    "aspect": "Price per dose"
+                    "aspect_name": "Public trust and acceptance"
+                }
+            ]
+        },
+        {
+            "aspect_name": "Cost",
+            "children": [
+                {
+                    "aspect_name": "Cost to individuals"
+                },
+                {
+                    "aspect_name": "Cost to healthcare systems"
                 }
             ]
         }
