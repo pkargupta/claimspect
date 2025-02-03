@@ -68,7 +68,7 @@ def build_prompt(claim, height, literature: str, node_num_per_level):
         "can be broken down into its core aspects and sub-aspects, which are easier to evaluate individually.\n\n"
         f"Given the claim: '{claim}', generate a taxonomy of the claim with a specified height of {height}.\n\n"
         f"Here are some literautre segments to help you generate the taxonomy: {literature}\n"
-        f'Generate up to {node_num_per_level} nodes per level in the taxonomy.\n'
+        f'Generate up to {node_num_per_level} subnodes per node in the taxonomy.\n'
         "The taxonomy should be structured as a dictionary, formatted as follows:\n"
         "{"
         '   "aspect_name": "the claim itself",  # the root aspect should be the claim itself (a sentence), '

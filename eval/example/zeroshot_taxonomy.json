@@ -5,10 +5,10 @@
             "aspect_name": "Efficacy",
             "children": [
                 {
-                    "aspect_name": "Efficacy in preventing infection"
+                    "aspect_name": "Effectiveness in preventing COVID-19"
                 },
                 {
-                    "aspect_name": "Efficacy in preventing severe disease"
+                    "aspect_name": "Duration of protection"
                 }
             ]
         },
@@ -16,29 +16,21 @@
             "aspect_name": "Safety",
             "children": [
                 {
-                    "aspect_name": "Short-term side effects"
+                    "aspect_name": "Incidence of side effects"
                 },
                 {
-                    "aspect_name": "Long-term safety data"
+                    "aspect_name": "Severity of side effects"
                 }
             ]
         },
         {
-            "aspect_name": "Distribution and Accessibility",
+            "aspect_name": "Availability",
             "children": [
                 {
-                    "aspect_name": "Availability"
+                    "aspect_name": "Distribution channels"
                 },
                 {
-                    "aspect_name": "Storage requirements"
-                }
-            ]
-        },
-        {
-            "aspect_name": "Public Perception",
-            "children": [
-                {
-                    "aspect_name": "Public trust and acceptance"
+                    "aspect_name": "Manufacturing capacity"
                 }
             ]
         },
@@ -46,10 +38,21 @@
             "aspect_name": "Cost",
             "children": [
                 {
-                    "aspect_name": "Cost to individuals"
+                    "aspect_name": "Price per dose"
                 },
                 {
-                    "aspect_name": "Cost to healthcare systems"
+                    "aspect_name": "Insurance coverage"
+                }
+            ]
+        },
+        {
+            "aspect_name": "Public perception",
+            "children": [
+                {
+                    "aspect_name": "Trust in vaccine"
+                },
+                {
+                    "aspect_name": "Vaccine hesitancy"
                 }
             ]
         }
