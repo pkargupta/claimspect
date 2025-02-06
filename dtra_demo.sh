@@ -3,6 +3,6 @@ python -m main \
     --data_dir "data" \
     --topic "dtra" \
     --chat_model_name "gpt-4o" \
-    --embedding_model_name "e5"
-
-    
+    --embedding_model_name "e5" \
+    --max_aspect_children_num 3 \
+    --max_subaspect_children_num 3

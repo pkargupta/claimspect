@@ -53,12 +53,12 @@ def coarse_grained_aspect_discovery(args, claim, temperature=0.3, top_p=0.99):
         # OPTION 1: generation code for vllm
         logits_processor = JSONLogitsProcessor(schema=aspect_list_schema, llm=args.chat_model.llm_engine)
         sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], temperature=temperature, top_p=top_p)
-        output = args.chat_model.generate(aspect_prompt(claim), sampling_params=sampling_params)[0].outputs[0].text
+        output = args.chat_model.generate(aspect_prompt(claim,k=args.max_aspect_children_num), sampling_params=sampling_params)[0].outputs[0].text
         aspects = json.loads(output)['aspect_list']
     
     if (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
         # OPTION 2: generation code for openai model
-        response = args.chat_model([aspect_prompt(claim)])[0]
+        response = args.chat_model([aspect_prompt(claim, k=args.max_aspect_children_num)])[0]
         # extract the part in ```json``` from the response
         if "```json" in response:
             response = response.split("```json")[1].split("```")[0].strip()
@@ -157,7 +157,7 @@ def main(args):
                 
     """ Filtering: filter out segments that are not relevant to the claim """
     print("######## FILTERING SEGMENTS ########")
-    filter_segments(args, tree)  # 7000 -> 192
+    # filter_segments(args, tree)  # 7000 -> 192
     # the modification is made at the relevant papers and relevant segments of the root node. 
     # now these two part only contain the relevant papers and segments after filtering
     
@@ -190,6 +190,8 @@ if __name__ == "__main__":
     parser.add_argument("--beta", type=float, default=1)
     parser.add_argument("--gamma", type=float, default=2)
     parser.add_argument("--max_depth", type=int, default=2)
+    parser.add_argument("--max_aspect_children_num", type=int, default=5)
+    parser.add_argument("--max_subaspect_children_num", type=int, default=5)
     args = parser.parse_args()
 
     if args.embedding_model_name == "e5":
