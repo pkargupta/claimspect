@@ -156,11 +156,13 @@ def main(args):
                 queue.append(subaspect_node)
                 
     """ Filtering: filter out segments that are not relevant to the claim """
+    print("######## FILTERING SEGMENTS ########")
     filter_segments(args, tree)  # 7000 -> 192
     # the modification is made at the relevant papers and relevant segments of the root node. 
     # now these two part only contain the relevant papers and segments after filtering
     
     """ Hierarchical segment classification """
+    print("######## HIERARCHICAL SEGMENT CLASSIFICATION ########")
     hierarchical_segment_classification(args, claim, tree)
     # now the relevant papers and segments from the root has been passed to the child nodes
     # we can easily get them by calling node.get_all_segments()

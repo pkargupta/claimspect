@@ -37,15 +37,22 @@ def perspective_discovery(args, id2node, temperature=0.1, top_p=0.99, top_k=20):
             prompt = perspective_prompt(args.claim, node.name, node.description, segments[:top_k])
             perspective_prompts[node.id] = prompt
 
-    # generate perspectives & classify
-    logits_processor = JSONLogitsProcessor(schema=perspective_schema, llm=args.chat_model.llm_engine)
-    sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], temperature=temperature, top_p=top_p)
-
-    outputs = args.chat_model.generate(list(perspective_prompts.values()), sampling_params=sampling_params)
+    if args.chat_model_name == "vllm":
+        # generate perspectives & classify
+        logits_processor = JSONLogitsProcessor(schema=perspective_schema, llm=args.chat_model.llm_engine)
+        sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], temperature=temperature, top_p=top_p)
+        outputs = args.chat_model.generate(list(perspective_prompts.values()), sampling_params=sampling_params)
+    
+    elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
+        # OPTION 2: Use GPT-4o
+        responses = args.chat_model(list(perspective_prompts.values()))
+        outputs = responses    
 
     # add perspectives into nodes
     for n_id, output in zip(perspective_prompts, outputs):
-        o = output.outputs[0].text
+        o = output.outputs[0].text if args.chat_model_name == "vllm" else output
+        if "```json" in o:
+            o = o.split("```json")[1].split("```")[0].strip()
         perspective = json.loads(o)
         id2node[n_id].perspectives = perspective
 
