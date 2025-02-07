@@ -33,17 +33,17 @@ if __name__ == "__main__":
 
     if args.chat_model_name == "vllm":
         # args.chat_model = LLM(model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True)
-        args.chat_model = LLM(model="meta-llama/Llama-3.1-8B-Instruct", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True, gpu_memory_utilization=0.9)
+        args.chat_model = LLM(model="meta-llama/Llama-3.1-8B-Instruct", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True, gpu_memory_utilization=0.8)
     
     elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
-        def openai_model_specific_chat(prompts: list[str]) -> list[str]:
-            return chat(prompts, model_name=args.chat_model_name, seed=42, temperature=0.3, top_p=0.99)
+        def openai_model_specific_chat(prompts: list[str], temperature=0.3, top_p=0.99) -> list[str]:
+            return chat(prompts, model_name=args.chat_model_name, seed=42, temperature=temperature, top_p=top_p)
         args.chat_model = openai_model_specific_chat
 
     with open(f"{args.data_dir}/{args.topic}/claims.json", "r") as f:
         claims = json.load(f)
 
-    for c in claims[:2]:
+    for c in claims[:1]:
         args.claim_id = c["id"]
         args.claim = c["body"]
         dir = f'{args.data_dir}/{args.topic}/{args.claim_id}/'

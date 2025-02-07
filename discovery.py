@@ -3,6 +3,7 @@ from vllm import SamplingParams
 from vllm.sampling_params import GuidedDecodingParams
 import json
 import numpy as np
+from tqdm import tqdm
 
 from prompts import subaspect_list_schema, subaspect_prompt, perspective_prompt, perspective_schema
 from prompts import stance_schema, stance_prompt, perspective_desc_schema, perspective_desc_prompt
@@ -29,7 +30,7 @@ def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temper
 
 
 def perspective_discovery(args, id2node, temperature=0.1, top_p=0.99, top_k=20):
-    for node in id2node:
+    for node in tqdm(id2node):
         # STAGE 1: for each node, get all segments
         segments = node.get_all_segments()
         node.mapped_segs = segments

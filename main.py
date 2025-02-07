@@ -190,7 +190,7 @@ def main(args):
                 
     """ Filtering: filter out segments that are not relevant to the claim """
     print("######## FILTERING SEGMENTS ########")
-    # filter_segments(args, tree)  # 7000 -> 192
+    filter_segments(args, tree)  # 7000 -> 192
     # the modification is made at the relevant papers and relevant segments of the root node. 
     # now these two part only contain the relevant papers and segments after filtering
     
@@ -239,8 +239,8 @@ if __name__ == "__main__":
         args.chat_model = LLM(model="meta-llama/Llama-3.1-8B-Instruct", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True, gpu_memory_utilization=0.85)
     
     elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
-        def openai_model_specific_chat(prompts: list[str]) -> list[str]:
-            return chat(prompts, model_name=args.chat_model_name, seed=42, temperature=0.3, top_p=0.99)
+        def openai_model_specific_chat(prompts: list[str], temperature=0.3, top_p=0.99) -> list[str]:
+            return chat(prompts, model_name=args.chat_model_name, seed=42, temperature=temperature, top_p=top_p)
         args.chat_model = openai_model_specific_chat
     
     main(args)
