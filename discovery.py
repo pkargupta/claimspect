@@ -1,17 +1,18 @@
 from vllm import LLM
 from vllm import SamplingParams
-from outlines.serve.vllm import JSONLogitsProcessor
+from vllm.sampling_params import GuidedDecodingParams
 import json
 import numpy as np
 
 from prompts import subaspect_list_schema, subaspect_prompt, perspective_prompt, perspective_schema
+from prompts import stance_schema, stance_prompt, perspective_desc_schema, perspective_desc_prompt
 
 def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temperature=0.7, top_p=0.99):
 
     if args.chat_model_name == "vllm":
         subset = [segments[rank2id[i]] for i in np.arange(top_k)]
-        logits_processor = JSONLogitsProcessor(schema=subaspect_list_schema, llm=args.chat_model.llm_engine)
-        sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], temperature=temperature, top_p=top_p)
+        guided_decoding_params = GuidedDecodingParams(json=subaspect_list_schema.model_json_schema())
+        sampling_params = SamplingParams(max_tokens=2000, guided_decoding=guided_decoding_params, temperature=temperature, top_p=top_p)
         output = args.chat_model.generate(subaspect_prompt(parent_aspect.name, parent_aspect.description, args.claim, subset, k=args.max_subaspect_children_num), sampling_params=sampling_params)[0].outputs[0].text
         subaspects = json.loads(output)['subaspect_list']
     
@@ -28,32 +29,72 @@ def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temper
 
 
 def perspective_discovery(args, id2node, temperature=0.1, top_p=0.99, top_k=20):
-    # construct prompts
-    perspective_prompts = {}
     for node in id2node:
+        # STAGE 1: for each node, get all segments
         segments = node.get_all_segments()
         node.mapped_segs = segments
+
+        # STAGE 2: classify the stance of each segment
         if len(segments):
-            prompt = perspective_prompt(args.claim, node.name, node.description, segments[:top_k])
-            perspective_prompts[node.id] = prompt
+            stance_prompts = [stance_prompt(args.claim, node.name, node.description, seg) for seg in segments]
+            if args.chat_model_name == "vllm":
+                # stance detection
+                guided_decoding_params = GuidedDecodingParams(json=stance_schema.model_json_schema())
+                sampling_params = SamplingParams(max_tokens=1000, guided_decoding=guided_decoding_params, temperature=temperature, top_p=top_p)
+                outputs = args.chat_model.generate(stance_prompts, sampling_params=sampling_params)
+            
+            elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
+                # OPTION 2: Use GPT-4o
+                responses = args.chat_model(stance_prompts)
+                outputs = responses
 
-    if args.chat_model_name == "vllm":
-        # generate perspectives & classify
-        logits_processor = JSONLogitsProcessor(schema=perspective_schema, llm=args.chat_model.llm_engine)
-        sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], temperature=temperature, top_p=top_p)
-        outputs = args.chat_model.generate(list(perspective_prompts.values()), sampling_params=sampling_params)
-    
-    elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
-        # OPTION 2: Use GPT-4o
-        responses = args.chat_model(list(perspective_prompts.values()))
-        outputs = responses    
+            stance_clusters = {"supports_claim":[],
+                               "neutral_to_claim":[],
+                               "opposes_claim":[],
+                               "irrelevant_to_claim":[]}
+            # cluster the stances
+            for seg_id, output in enumerate(outputs):
+                o = output.outputs[0].text if args.chat_model_name == "vllm" else output
+                if "```json" in o:
+                    o = o.split("```json")[1].split("```")[0].strip()
+                segment_stance = json.loads(o)
+                if not (segment_stance["irrelevant_to_claim"]):
+                    if segment_stance["supports_claim"]:
+                        stance_clusters["supports_claim"].append((seg_id, segments[seg_id], segment_stance["explanation"]))
+                    elif segment_stance["neutral_to_claim"]:
+                        stance_clusters["neutral_to_claim"].append((seg_id, segments[seg_id], segment_stance["explanation"]))
+                    else:
+                        stance_clusters["opposes_claim"].append((seg_id, segments[seg_id], segment_stance["explanation"]))
+                else:
+                    stance_clusters["irrelevant_to_claim"].append((seg_id, segments[seg_id], segment_stance["explanation"]))
 
-    # add perspectives into nodes
-    for n_id, output in zip(perspective_prompts, outputs):
-        o = output.outputs[0].text if args.chat_model_name == "vllm" else output
-        if "```json" in o:
-            o = o.split("```json")[1].split("```")[0].strip()
-        perspective = json.loads(o)
-        id2node[n_id].perspectives = perspective
+            # STAGE 3: for each stance cluster, determine a description
+            perspective_prompts = [perspective_desc_prompt(args.claim, node.name, node.description, "supportive", stance_clusters["supports_claim"]),
+                                   perspective_desc_prompt(args.claim, node.name, node.description, "neutral", stance_clusters["neutral_to_claim"]),
+                                   perspective_desc_prompt(args.claim, node.name, node.description, "in opposition", stance_clusters["opposes_claim"])]
+            if args.chat_model_name == "vllm":
+                # generate perspectives & classify
+                guided_decoding_params = GuidedDecodingParams(json=perspective_desc_schema.model_json_schema())
+                sampling_params = SamplingParams(max_tokens=2000, guided_decoding=guided_decoding_params, temperature=temperature, top_p=top_p)
+                outputs = args.chat_model.generate(perspective_prompts, sampling_params=sampling_params)
+            
+            elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
+                # OPTION 2: Use GPT-4o
+                responses = args.chat_model(perspective_prompts)
+                outputs = responses
+            
+            perspective = {"supports_claim":{}, "neutral_to_claim":{}, "opposes_claim":{}}
+            for p, output in zip(["supports_claim", "neutral_to_claim", "opposes_claim"], outputs):
+                o = output.outputs[0].text if args.chat_model_name == "vllm" else output
+                if "```json" in o:
+                    o = o.split("```json")[1].split("```")[0].strip()
+                
+                perspective_output = json.loads(o)
+                
+                perspective[p] = {"perspective_segments": [seg_id for (seg_id, seg, exp) in stance_clusters[p]] 
+                                  if len(stance_clusters[p]) else [],
+                                  "perspective_description": perspective_output["perspective_description"]}
+            
+            node.perspectives = perspective
 
     return

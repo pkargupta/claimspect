@@ -6,7 +6,7 @@ from hierarchy import Segment
 from prompts import keyword_extraction_prompt, keyword_filter_prompt
 
 from vllm import SamplingParams
-from outlines.serve.vllm import JSONLogitsProcessor
+from vllm.sampling_params import GuidedDecodingParams
 from pydantic import BaseModel, StringConstraints, conlist
 from typing_extensions import Annotated
 import json
@@ -54,8 +54,8 @@ def get_chat_function(args):
     
     elif args.chat_model_name == "vllm":
         def vllm(prompts: list[str], batch=False) -> list[str]:
-            logits_processor = JSONLogitsProcessor(schema=keyword_schema, llm=args.chat_model.llm_engine)
-            sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], seed=42, temperature=0.7)
+            guided_decoding_params = GuidedDecodingParams(json=keyword_schema.model_json_schema())
+            sampling_params = SamplingParams(max_tokens=2000, guided_decoding=guided_decoding_params, seed=42, temperature=0.7)
             if batch:
                 outputs = args.chat_model.generate(prompts, sampling_params=sampling_params)
                 return [json.loads(o.outputs[0].text)['output_keywords'] for o in outputs]

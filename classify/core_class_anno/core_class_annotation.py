@@ -11,7 +11,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity as cos
 
 from vllm import SamplingParams
-from outlines.serve.vllm import JSONLogitsProcessor
+from vllm.sampling_params import GuidedDecodingParams
 import json
 from pydantic import BaseModel, conlist
 
@@ -29,9 +29,8 @@ def api_call(args, doc, class_names, instruction, demos=[]):
     class_names = [item.lower() for item in class_names]
     
     if args.chat_model_name == "vllm":
-        
-        logits_processor = JSONLogitsProcessor(schema=cls_schema, llm=args.chat_model.llm_engine)
-        sampling_params = SamplingParams(max_tokens=500, logits_processors=[logits_processor], temperature=0.1, top_p=0.99)
+        guided_decoding_params = GuidedDecodingParams(json=cls_schema.model_json_schema())
+        sampling_params = SamplingParams(max_tokens=500, guided_decoding=guided_decoding_params, temperature=0.1, top_p=0.99)
 
         prompt = "You are a multi-label text classifier." + instruction + f"""
 Your corpus_segment is below:

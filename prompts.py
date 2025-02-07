@@ -111,6 +111,76 @@ Your output should be in the following JSON format:
 """
 
 ############ PERSPECTIVE DISCOVERY ############
+class stance_schema(BaseModel):
+    explanation: Annotated[str, StringConstraints(strip_whitespace=True)]
+    supports_claim: bool
+    neutral_to_claim: bool
+    opposes_claim: bool
+    irrelevant_to_claim: bool
+
+def stance_prompt(claim, aspect_name, aspect_description, segment):
+    
+    prompt = f"""You are a stance detector, which determines the stance that a segment from a scientific paper has towards an aspect of a specific claim. Oftentimes, scientific papers do not provide explicit, outright stances, so your job is to figure out what stance the data or statement that they are presenting implies.
+ 
+Segment: {segment.content}
+
+What is the segment's stance specifically with respect to {aspect_name} for if {claim}? {aspect_name} can be described as {aspect_description}.
+
+Claim: {claim}
+Aspect to consider: {aspect_name}: {aspect_description}
+    
+Your stance options are the following:
+
+- supports_claim: The segment either implicitly or explicitly indicates that claim is true specific to the given aspect.
+- neutral_to_claim: The segment is relevant to the claim and aspect, but does not indicate whether the claim is true specific to the given aspect.
+- opposes_claim: The segment either implicitly or explicitly indicates that the claim is false specific to the given aspect.
+- irrelevant_to_claim: The segment does not contain relevant information on the claim and the given aspect.
+
+Your output should be in the following JSON format:
+---
+{{
+    "explanation": <a 1-2 sentence brief explanation of the segment's stance>
+    "supports_claim": <boolean value, True or False>,
+    "neutral_to_claim": <boolean value, True or False>,
+    "opposes_claim": <boolean value, True or False>,
+    "irrelevant_to_claim": <boolean value, True or False>,
+}}
+---
+"""
+    return prompt
+
+class perspective_desc_schema(BaseModel):
+    perspective_description: Annotated[str, StringConstraints(strip_whitespace=True)]
+
+def perspective_desc_prompt(claim, aspect_name, aspect_description, stance, segments):
+
+    formatted_segments = ""
+    for idx, seg in enumerate(segments):
+        formatted_segments += f"Segment #{idx}: {seg[1].content}\n\tSegment's explanation behind their stance: {seg[2]}\n"
+    if formatted_segments == "":
+        formatted_segments = "No segments."
+    
+    return f"""You are a dilligent, detailed assistant which summarizes the overall perspective of WHY the following research paper segments are {stance} towards the claim, {claim} with respect to {aspect_name}. {aspect_name} can be described as {aspect_description}.
+    
+Here is information on your input claim and aspect.
+Claim: {claim}
+Aspect to consider: {aspect_name}: {aspect_description}
+
+Here are your segments; each one is also paired with an explanation behind their stance:
+{formatted_segments}
+
+Only if there are no segments, then output "No segments were identified that are {stance} towards the claim" as your description.
+
+Your output should be in the following JSON format:
+---
+{{
+    "perspective_description": <output a brief, 2-3 sentence-long string where the value is a summary of the segments' stances/perspectives towards {aspect_name} of the claim, {claim}>
+}}
+---
+"""
+
+
+
 class perspective_cluster(BaseModel):
     perspective_description: Annotated[str, StringConstraints(strip_whitespace=True)]
     perspective_segments: conlist(int)

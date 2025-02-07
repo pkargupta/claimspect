@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 import json
 from vllm import SamplingParams
-from outlines.serve.vllm import JSONLogitsProcessor
+from vllm.sampling_params import GuidedDecodingParams
 from pydantic import BaseModel, StringConstraints
 from typing_extensions import Annotated
 
@@ -71,8 +71,8 @@ Please help me determine whether this segment is related to the claim so that I 
         prompts = [prompt_template(segment=segment, claim=claim, aspects=', '.join(aspects)) for segment in segments]
         
         if self.chat_model_name == "vllm":
-            logits_processor = JSONLogitsProcessor(schema=relevance_schema, llm=self.chat_model.llm_engine)
-            sampling_params = SamplingParams(max_tokens=300, logits_processors=[logits_processor], temperature=0.01)
+            guided_decoding_params = GuidedDecodingParams(json=relevance_schema.model_json_schema())
+            sampling_params = SamplingParams(max_tokens=300, guided_decoding_params=guided_decoding_params, temperature=0.01)
             outputs = self.chat_model.generate(prompts, sampling_params=sampling_params)
             responses = [json.loads(output.outputs[0].text)['is_segment_relevant_to_claim'] for output in outputs]
         
