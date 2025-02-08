@@ -19,7 +19,7 @@ if __name__ == "__main__":
     parser.add_argument("--top_k", type=float, default=5)
     parser.add_argument("--beta", type=float, default=1)
     parser.add_argument("--gamma", type=float, default=2)
-    parser.add_argument("--max_depth", type=int, default=2)
+    parser.add_argument("--max_depth", type=int, default=3)
     parser.add_argument("--max_aspect_children_num", type=int, default=5)
     parser.add_argument("--max_subaspect_children_num", type=int, default=5)
     args = parser.parse_args()
@@ -43,11 +43,13 @@ if __name__ == "__main__":
     with open(f"{args.data_dir}/{args.topic}/claims.json", "r") as f:
         claims = json.load(f)
 
-    for c in claims[:1]:
+    for c in claims:
         args.claim_id = c["id"]
         args.claim = c["body"]
         dir = f'{args.data_dir}/{args.topic}/{args.claim_id}/'
-
         assert os.path.exists(dir)
+
+        args.output_dir = f'{args.data_dir}/{args.topic}/{args.claim_id}/{args.max_aspect_children_num}_{args.max_subaspect_children_num}_{args.max_depth}/'
+        os.makedirs(args.output_dir, exist_ok=True)
 
         main(args)

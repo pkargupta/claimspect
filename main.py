@@ -204,11 +204,11 @@ def main(args):
     perspective_discovery(args, id2node)
     
     print("######## OUTPUT ASPECT HIERARCHY ########")
-    with open(f'{args.data_dir}/{args.topic}/{args.claim_id}/aspect_hierarchy.txt', 'w') as f:
+    with open(os.path.join(args.output_dir, 'aspect_hierarchy.txt'), 'w') as f:
         with redirect_stdout(f):
             hierarchy_dict = root_node.display(indent_multiplier=5, visited=None, corpus_len=len(corpus))
 
-    with open(f'{args.data_dir}/{args.topic}/{args.claim_id}/hierarchy.json', 'w', encoding='utf-8') as f:
+    with open(os.path.join(args.output_dir, 'aspect_hierarchy.json'), 'w', encoding='utf-8') as f:
         json.dump(hierarchy_dict, f, ensure_ascii=False, indent=4)
 
 
