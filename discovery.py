@@ -9,12 +9,13 @@ from prompts import subaspect_list_schema, subaspect_prompt, perspective_prompt,
 from prompts import stance_schema, stance_prompt, perspective_desc_schema, perspective_desc_prompt
 
 def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temperature=0.7, top_p=0.99):
+    parent_path = " -> ".join(parent_aspect.get_ancestors(as_str=True))
 
     if args.chat_model_name == "vllm":
         subset = [segments[rank2id[i]] for i in np.arange(top_k)]
         guided_decoding_params = GuidedDecodingParams(json=subaspect_list_schema.model_json_schema())
         sampling_params = SamplingParams(max_tokens=2000, guided_decoding=guided_decoding_params, temperature=temperature, top_p=top_p)
-        output = args.chat_model.generate(subaspect_prompt(parent_aspect.name, parent_aspect.description, args.claim, subset, k=args.max_subaspect_children_num), sampling_params=sampling_params)[0].outputs[0].text
+        output = args.chat_model.generate(subaspect_prompt(parent_aspect.name, parent_aspect.description, parent_path, args.claim, subset, k=args.max_subaspect_children_num), sampling_params=sampling_params)[0].outputs[0].text
         subaspects = json.loads(output)['subaspect_list']
     
     elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
@@ -34,10 +35,11 @@ def perspective_discovery(args, id2node, temperature=0.1, top_p=0.99, top_k=20):
         # STAGE 1: for each node, get all segments
         segments = node.get_all_segments()
         node.mapped_segs = segments
+        node_path = " -> ".join(node.get_ancestors(as_str=True))
 
         # STAGE 2: classify the stance of each segment
         if len(segments):
-            stance_prompts = [stance_prompt(args.claim, node.name, node.description, seg) for seg in segments]
+            stance_prompts = [stance_prompt(args.claim, node.name, node.description, node_path, seg) for seg in segments]
             if args.chat_model_name == "vllm":
                 # stance detection
                 guided_decoding_params = GuidedDecodingParams(json=stance_schema.model_json_schema())
@@ -70,9 +72,9 @@ def perspective_discovery(args, id2node, temperature=0.1, top_p=0.99, top_k=20):
                     stance_clusters["irrelevant_to_claim"].append((seg_id, segments[seg_id], segment_stance["explanation"]))
 
             # STAGE 3: for each stance cluster, determine a description
-            perspective_prompts = [perspective_desc_prompt(args.claim, node.name, node.description, "supportive", stance_clusters["supports_claim"]),
-                                   perspective_desc_prompt(args.claim, node.name, node.description, "neutral", stance_clusters["neutral_to_claim"]),
-                                   perspective_desc_prompt(args.claim, node.name, node.description, "in opposition", stance_clusters["opposes_claim"])]
+            perspective_prompts = [perspective_desc_prompt(args.claim, node.name, node.description, node_path, "supportive", stance_clusters["supports_claim"]),
+                                   perspective_desc_prompt(args.claim, node.name, node.description, node_path, "neutral", stance_clusters["neutral_to_claim"]),
+                                   perspective_desc_prompt(args.claim, node.name, node.description, node_path, "in opposition", stance_clusters["opposes_claim"])]
             if args.chat_model_name == "vllm":
                 # generate perspectives & classify
                 guided_decoding_params = GuidedDecodingParams(json=perspective_desc_schema.model_json_schema())

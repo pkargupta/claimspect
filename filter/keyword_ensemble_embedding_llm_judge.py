@@ -72,7 +72,7 @@ Please help me determine whether this segment is related to the claim so that I 
         
         if self.chat_model_name == "vllm":
             guided_decoding_params = GuidedDecodingParams(json=relevance_schema.model_json_schema())
-            sampling_params = SamplingParams(max_tokens=300, guided_decoding_params=guided_decoding_params, temperature=0.01)
+            sampling_params = SamplingParams(max_tokens=300, guided_decoding=guided_decoding_params, temperature=0.01)
             outputs = self.chat_model.generate(prompts, sampling_params=sampling_params)
             responses = [json.loads(output.outputs[0].text)['is_segment_relevant_to_claim'] for output in outputs]
         

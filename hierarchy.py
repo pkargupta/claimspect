@@ -69,7 +69,7 @@ class AspectNode:
         if self.parent is None:
             return []
         
-        ancestors = self.parent.get_ancestors()
+        ancestors = self.parent.get_ancestors(as_str=as_str)
         if len(ancestors) > 0:
             if as_str:
                 return [self.parent.name] + ancestors

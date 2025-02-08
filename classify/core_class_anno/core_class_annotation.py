@@ -301,7 +301,7 @@ def run_annotation(args, claim, llm_enrichment_path, corpus_path, label_path, la
             label_keyterm_dict[node] = keyword_list
     
     """ prompt init """
-    gpt_template = f'You will be provided with a corpus segment. This segment is about a claim: {claim}' +'Please select the suitable aspect it talks about from the following aspects: {}. Separate by comma if there are multiple. Just give the aspect names as shown in the provided list starting with aspect:.'
+    gpt_template = f'You will be provided with a corpus segment. This segment is about a claim: {claim}.\n' +'Please select the suitable aspect it talks about from the following aspects: {}. Separate by comma if there are multiple. Just give the aspect names as shown in the provided list starting with aspect:.'
 
     """ model init """
     model_name = 'all-mpnet-base-v2'
