@@ -154,7 +154,7 @@ def main(args):
                 id2node.append(subaspect_node)
                 
                 queue.append(subaspect_node)
-                
+
     """ Filtering: filter out segments that are not relevant to the claim """
     print("######## FILTERING SEGMENTS ########")
     # filter_segments(args, tree)  # 7000 -> 192
