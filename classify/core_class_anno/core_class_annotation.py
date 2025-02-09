@@ -11,12 +11,27 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity as cos
 
 from vllm import SamplingParams
-from outlines.serve.vllm import JSONLogitsProcessor
+from vllm.sampling_params import GuidedDecodingParams
 import json
 from pydantic import BaseModel, conlist
 
 class cls_schema(BaseModel):
     aspect_label: conlist(str, max_length=5)
+
+def cls_prompt(instruction, doc, class_names):
+    prompt = "You are a multi-label text classifier." + instruction + f"""
+Your corpus_segment is below:
+corpus_segment: {doc}
+
+Your aspect_options are the following:
+aspect_options: {str(class_names)}
+
+Output your answer in the following JSON format:
+{{
+    aspect_label: <list of strings, where the string values are the names of the aspects from aspect_options that the corpus_segment discusses (with reasonable confidence); if no options are applicable, leave the list empty>
+}}
+"""
+    return prompt
 
 def api_call(args, doc, class_names, instruction, demos=[]):
     '''
@@ -29,9 +44,8 @@ def api_call(args, doc, class_names, instruction, demos=[]):
     class_names = [item.lower() for item in class_names]
     
     if args.chat_model_name == "vllm":
-        
-        logits_processor = JSONLogitsProcessor(schema=cls_schema, llm=args.chat_model.llm_engine)
-        sampling_params = SamplingParams(max_tokens=500, logits_processors=[logits_processor], temperature=0.1, top_p=0.99)
+        guided_decoding_params = GuidedDecodingParams(json=cls_schema.model_json_schema())
+        sampling_params = SamplingParams(max_tokens=500, guided_decoding=guided_decoding_params, temperature=0.1, top_p=0.99)
 
         prompt = "You are a multi-label text classifier." + instruction + f"""
 Your corpus_segment is below:
@@ -182,6 +196,64 @@ def bfs(root, doc_emb, key_term_emb_dict):
     # return a list of class names that are selected
     return similarity_score_dic
 
+def process_document_batch(args, root_node, id2label, label2id, documents, gpt_template, total_doc_embedding, key_term_emb_dict):
+    # make a tree copy
+    root = copy.deepcopy(root_node)
+    # set root path score to 1
+    root.path_score = 1
+    root.similarity_score = 1
+    # process all level, calculate path score
+
+    prompts = []
+    for index, doc in enumerate(documents):
+        doc_emb=total_doc_embedding[index]
+        sim_dic = bfs(root, doc_emb, key_term_emb_dict)
+        class_names = [id2label[cid].replace('_', ' ') for cid in sim_dic]
+        instruction = gpt_template.format(', '.join(class_names))
+        prompts.append(cls_prompt(instruction, doc, class_names))
+    
+    if args.chat_model_name == "vllm":
+        guided_decoding_params = GuidedDecodingParams(json=cls_schema.model_json_schema())
+        sampling_params = SamplingParams(max_tokens=500, guided_decoding=guided_decoding_params, temperature=0.1, top_p=0.99)
+
+        outputs = args.chat_model.generate(prompts, sampling_params=sampling_params)
+        
+        doc_aspects = [json.loads(output.outputs[0].text)['aspect_label'] for output in outputs]
+    elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
+        outputs = args.chat_model(prompts, temperature=0.1, top_p=0.99)
+        outputs = [json.loads(o.split("```json")[1].split("```")[0].strip())['aspect_list']
+                   if "```json" in o 
+                   else json.loads(o.strip())['aspect_list']
+                   for o in outputs]
+    else:
+        raise ValueError(f'Invalid chat model name: {args.chat_model_name} not implemented yet.')
+    
+    
+    all_outputs = []
+    for aspects in doc_aspects:
+        class_names = [cn.replace(' ', '_') for cn in aspects]
+        classes = [label2id[cn] for cn in class_names if cn in label2id]
+
+        q = queue.Queue()
+        class_set = set(classes)
+        for c in classes:
+            q.put(root.findChild(c))
+            # print(c)
+        while not q.empty():
+            c = q.get()
+            for p in c.parents:
+                pid = p.node_id
+                if pid == -1: continue
+                q.put(p)
+                class_set.add(pid)
+        
+        doc_output = {'response':str(aspects), 
+                      'core classes':classes,
+                      'with ancestors': list(class_set)}
+        all_outputs.append(doc_output)
+    
+    return all_outputs
+
 def process_document(args, root_node, id2label, label2id, document_text, gpt_template, doc_emb, key_term_emb_dict):
     
     # make a tree copy
@@ -229,7 +301,7 @@ def run_annotation(args, claim, llm_enrichment_path, corpus_path, label_path, la
             label_keyterm_dict[node] = keyword_list
     
     """ prompt init """
-    gpt_template = f'You will be provided with a corpus segment. This segment is about a claim: {claim}' +'Please select the suitable aspect it talks about from the following aspects: {}. Separate by comma if there are multiple. Just give the aspect names as shown in the provided list starting with aspect:.'
+    gpt_template = f'You will be provided with a corpus segment. This segment is about a claim: {claim}.\n' +'Please select the suitable aspect it talks about from the following aspects: {}. Separate by comma if there are multiple. Just give the aspect names as shown in the provided list starting with aspect:.'
 
     """ model init """
     model_name = 'all-mpnet-base-v2'
@@ -265,13 +337,12 @@ def run_annotation(args, claim, llm_enrichment_path, corpus_path, label_path, la
         current_key = [i.replace('_', ' ') for i in current_key]
         current_embed = model.encode(current_key, batch_size=128, convert_to_numpy=True)
         key_term_emb_dict[current_label] = current_embed
-    
-    """ process all documents """
-    for index,(doc_id,doc) in tqdm(enumerate(zip(all_docs_id,all_docs))):
-        print(index)
-        doc_emb=total_doc_embedding[index]
-        writing_result[doc_id] = process_document(args, root, id2label, label2id, doc, gpt_template, doc_emb, key_term_emb_dict)
-        print(writing_result[doc_id])
+
+    """ BATCH processing of all documents """
+    results = process_document_batch(args, root, id2label, label2id, all_docs, gpt_template, total_doc_embedding, key_term_emb_dict)
+
+    for doc_id, result in zip(all_docs_id, results):
+        writing_result[doc_id] = result
     
     json.dump(writing_result, open(output_path, 'w'), indent=1)
 

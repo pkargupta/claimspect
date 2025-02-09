@@ -45,7 +45,7 @@ class subaspect_list_schema(BaseModel):
 
 subaspect_instruction = lambda aspect, topic, k, n: f"You are an analyst that identifies different subaspects of parent aspect, {aspect}, to consider when evaluating the claim: {topic}. You will identify a minimum of 2 and a maximum of {k} subaspects under aspect {aspect} that the provided set of scientific research paper excerpts are considering when determining the answer to the following topic: {aspect} for \"{topic}\". For each subaspect, provide a description and {n} additional keywords that would typically be used to describe that subaspect, using the research excerpts we provide you as reference. We define subaspect as a more specific point underneath the parent aspect that would considered when specifically addressing the claim.\n\n"
 
-def subaspect_prompt(aspect, aspect_description, topic, segments, k=5, n=10): 
+def subaspect_prompt(aspect, aspect_description, aspect_path, topic, segments, k=5, n=10): 
     prompt = subaspect_instruction(aspect, topic, k, n)
 
     for idx, segment in enumerate(segments):
@@ -55,6 +55,7 @@ def subaspect_prompt(aspect, aspect_description, topic, segments, k=5, n=10):
 
 claim: {topic}
 parent_aspect: {aspect}; {aspect_description}
+path_to_parent_aspect: {aspect_path}
 
 Provide your output in the following JSON format:
 ---
@@ -62,7 +63,7 @@ Provide your output in the following JSON format:
     "subaspect_list":
         [
             {{
-                "subaspect_label": <should be a brief, 5-10 word string where the value is an all-lowercase label of the subaspect (phrase-length) that falls under parent aspect {aspect} and is specifically relevant to the claim>,
+                "subaspect_label": <should be a brief, 5-10 word string where the value is an all-lowercase label of the subaspect (phrase-length) that falls under parent aspect {aspect}, is a natural next node in the path_to_parent_aspect, and is specifically relevant to the claim>,
                 "subaspect_description": <a string where the value is a brief, sentence-long description of the subaspect and why it is significant for addressing specifically both the claim and the parent aspect>,
                 "subaspect_keywords": <list of {n} unique, all-lowercase, and comma-separated string keywords (always a space after the comma) used to describe the subaspect_label (e.g., ["keyword_1", "keyword_2", ..., "keyword_{n}"]) based on the input excerpts>
             }}
@@ -111,6 +112,78 @@ Your output should be in the following JSON format:
 """
 
 ############ PERSPECTIVE DISCOVERY ############
+class stance_schema(BaseModel):
+    explanation: Annotated[str, StringConstraints(strip_whitespace=True)]
+    supports_claim: bool
+    neutral_to_claim: bool
+    opposes_claim: bool
+    irrelevant_to_claim: bool
+
+def stance_prompt(claim, aspect_name, aspect_description, aspect_path, segment):
+    
+    prompt = f"""You are a stance detector, which determines the stance that a segment from a scientific paper has towards an aspect of a specific claim. Oftentimes, scientific papers do not provide explicit, outright stances, so your job is to figure out what stance the data or statement that they are presenting implies.
+ 
+Segment: {segment.content}
+
+What is the segment's stance specifically with respect to {aspect_name} for if {claim}? {aspect_name} can be described as {aspect_description}.
+
+Claim: {claim}
+Aspect to consider: {aspect_name}: {aspect_description}
+Path to aspect: {aspect_path}
+    
+Your stance options are the following:
+
+- supports_claim: The segment either implicitly or explicitly indicates that claim is true specific to the given aspect.
+- neutral_to_claim: The segment is relevant to the claim and aspect, but does not indicate whether the claim is true specific to the given aspect.
+- opposes_claim: The segment either implicitly or explicitly indicates that the claim is false specific to the given aspect.
+- irrelevant_to_claim: The segment does not contain relevant information on the claim and the given aspect.
+
+Your output should be in the following JSON format:
+---
+{{
+    "explanation": <a 1-2 sentence brief explanation of the segment's stance>
+    "supports_claim": <boolean value, True or False>,
+    "neutral_to_claim": <boolean value, True or False>,
+    "opposes_claim": <boolean value, True or False>,
+    "irrelevant_to_claim": <boolean value, True or False>,
+}}
+---
+"""
+    return prompt
+
+class perspective_desc_schema(BaseModel):
+    perspective_description: Annotated[str, StringConstraints(strip_whitespace=True)]
+
+def perspective_desc_prompt(claim, aspect_name, aspect_description, aspect_path, stance, segments):
+
+    formatted_segments = ""
+    for idx, seg in enumerate(segments):
+        formatted_segments += f"Segment #{idx}: {seg[1].content}\n\tSegment's explanation behind their stance: {seg[2]}\n"
+    if formatted_segments == "":
+        formatted_segments = "No segments."
+    
+    return f"""You are a dilligent, detailed assistant which summarizes the overall perspective of WHY the following research paper segments are {stance} towards the claim, {claim} with respect to {aspect_name}. {aspect_name} can be described as {aspect_description}.
+    
+Here is information on your input claim and aspect.
+Claim: {claim}
+Aspect to consider: {aspect_name}: {aspect_description}
+Specifically, identify the overall perspective towards: {aspect_path}
+
+Here are your segments; each one is also paired with an explanation behind their stance:
+{formatted_segments}
+
+Only if there are no segments, then output "No segments were identified that are {stance} towards the claim" as your description.
+
+Your output should be in the following JSON format:
+---
+{{
+    "perspective_description": <output a brief, 2-3 sentence-long string where the value is a summary of the segments' stances/perspectives towards {aspect_name} of the claim, {claim}>
+}}
+---
+"""
+
+
+
 class perspective_cluster(BaseModel):
     perspective_description: Annotated[str, StringConstraints(strip_whitespace=True)]
     perspective_segments: conlist(int)

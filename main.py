@@ -1,8 +1,10 @@
 import argparse
 from vllm import LLM
 from vllm import SamplingParams
-from outlines.serve.vllm import JSONLogitsProcessor
+from vllm.sampling_params import GuidedDecodingParams
 import json
+import os
+os.environ['HF_HOME'] = '/shared/data3/pk36/.cache'
 from tqdm import tqdm
 import numpy as np
 from collections import deque
@@ -24,7 +26,7 @@ from discovery import subaspect_discovery, perspective_discovery
 from unidecode import unidecode
 
 def load_data(args, chunk_size=3):
-    with open(f'{args.data_dir}/{args.topic}/{args.topic}_text.txt', 'r', encoding='utf-8', errors='ignore') as f:
+    with open(f'{args.data_dir}/{args.topic}/{args.claim_id}/text.txt', 'r', encoding='utf-8', errors='ignore') as f:
         corpus = []
         paper_id = 0
         global_id = 0
@@ -45,14 +47,45 @@ def load_data(args, chunk_size=3):
     
     return corpus
 
+def load_segment_data(args):
+    with open(f'{args.data_dir}/{args.topic}/{args.claim_id}/segments.json', 'r', encoding='utf-8', errors='ignore') as f:
+        segments = json.load(f)
+    
+    corpus = []
+    paperid2idx = {}
+    paperid2seg = {}
+    paper_idx = 0
+    global_id = 0
+    local_id = 0
+
+    for seg in segments:
+        paper_id = seg["paper_id"]
+        content = unidecode(seg["segment"])
+
+        if paper_id in paperid2seg:
+            paperid2seg[paper_id].append(Segment(global_id, local_id, paper_idx, content))
+        else:
+            local_id = 0
+            paper_idx += 1
+            paperid2idx[paper_id] = paper_idx
+            paperid2seg[paper_id] = [Segment(global_id, local_id, paper_idx, content)]
+
+        global_id += 1
+        local_id += 1
+    
+    for paper_id, paper_segments in paperid2seg.items():
+        corpus.append(Paper(paper_id=paperid2idx[paper_id], segments=paper_segments))
+    
+    return corpus
+
 def coarse_grained_aspect_discovery(args, claim, temperature=0.3, top_p=0.99):
     """Step 1: Generate coarse-grained aspects for the claim."""
     """Step 2: Generate specific keywords for each aspect."""
     
     if args.chat_model_name == "vllm":
         # OPTION 1: generation code for vllm
-        logits_processor = JSONLogitsProcessor(schema=aspect_list_schema, llm=args.chat_model.llm_engine)
-        sampling_params = SamplingParams(max_tokens=2000, logits_processors=[logits_processor], temperature=temperature, top_p=top_p)
+        guided_decoding_params = GuidedDecodingParams(json=aspect_list_schema.model_json_schema())
+        sampling_params = SamplingParams(max_tokens=2000, guided_decoding=guided_decoding_params, temperature=temperature, top_p=top_p)
         output = args.chat_model.generate(aspect_prompt(claim,k=args.max_aspect_children_num), sampling_params=sampling_params)[0].outputs[0].text
         aspects = json.loads(output)['aspect_list']
     
@@ -74,7 +107,7 @@ def main(args):
     print("######## LOADING DATA ########")
     claim = args.claim
     id2node = []
-    corpus = load_data(args)  # papers
+    corpus = load_segment_data(args)  # papers
 
     # Initialize tree
     print("######## INITIALIZE TREE ########")
@@ -157,7 +190,7 @@ def main(args):
 
     """ Filtering: filter out segments that are not relevant to the claim """
     print("######## FILTERING SEGMENTS ########")
-    # filter_segments(args, tree)  # 7000 -> 192
+    filter_segments(args, tree)  # 7000 -> 192
     # the modification is made at the relevant papers and relevant segments of the root node. 
     # now these two part only contain the relevant papers and segments after filtering
     
@@ -171,11 +204,11 @@ def main(args):
     perspective_discovery(args, id2node)
     
     print("######## OUTPUT ASPECT HIERARCHY ########")
-    with open(f'{args.data_dir}/{args.topic}/aspect_hierarchy.txt', 'w') as f:
+    with open(os.path.join(args.output_dir, 'aspect_hierarchy.txt'), 'w') as f:
         with redirect_stdout(f):
             hierarchy_dict = root_node.display(indent_multiplier=5, visited=None, corpus_len=len(corpus))
 
-    with open(f'{args.data_dir}/{args.topic}/hierarchy.json', 'w', encoding='utf-8') as f:
+    with open(os.path.join(args.output_dir, 'aspect_hierarchy.json'), 'w', encoding='utf-8') as f:
         json.dump(hierarchy_dict, f, ensure_ascii=False, indent=4)
 
 
@@ -202,11 +235,12 @@ if __name__ == "__main__":
         args.embed_func = lambda text, model: openai_embed(inputs=text, model_name=model)
 
     if args.chat_model_name == "vllm":
-        args.chat_model = LLM(model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True)
+        # args.chat_model = LLM(model="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True)
+        args.chat_model = LLM(model="meta-llama/Llama-3.1-8B-Instruct", tensor_parallel_size=4, max_num_seqs=100, enable_prefix_caching=True, gpu_memory_utilization=0.85)
     
     elif (args.chat_model_name == "gpt-4o") or (args.chat_model_name == "gpt-4o-mini"):
-        def openai_model_specific_chat(prompts: list[str]) -> list[str]:
-            return chat(prompts, model_name=args.chat_model_name, seed=42, temperature=0.3, top_p=0.99)
+        def openai_model_specific_chat(prompts: list[str], temperature=0.3, top_p=0.99) -> list[str]:
+            return chat(prompts, model_name=args.chat_model_name, seed=42, temperature=temperature, top_p=top_p)
         args.chat_model = openai_model_specific_chat
     
     main(args)
