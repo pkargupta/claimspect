@@ -5,7 +5,7 @@ from typing import Optional
 from joblib import Memory
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
-cachedir = "./cache"
+cachedir = ".cache"
 memory = Memory(cachedir, verbose=0)
 
 @memory.cache
