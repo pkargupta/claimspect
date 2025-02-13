@@ -8,7 +8,7 @@ from eval.node_judge.evaluation import (
     get_path_relevance,
     get_path_granularity,
     get_level_granularity,
-    get_taxonomy_wise_uniqueness,
+    retry_taxonomy_wise_uniqueness,
     get_node_wise_segment_quality,
 )
 
@@ -16,7 +16,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--eval_json_path", type=str, default="eval/example/hierarchy.json")
     parser.add_argument("--output_path", type=str, default="eval/example/node_llm_judge.json")
-    parser.add_argument("--model_judge_name", type=str, default="gpt-4o", help="Name of the LLM model")
+    parser.add_argument("--model_judge_name", type=str, default="gpt-4o-mini", help="Name of the LLM model")
     args = parser.parse_args()
 
     # Load JSON file
@@ -38,14 +38,14 @@ def main():
     valid_level_scores = [level['score'] for level in level_wise_granularity if level['score'] != -1]
     avg_level_granularity = (sum(valid_level_scores) / len(valid_level_scores)) if valid_level_scores else 0
     
-    # Evaluate taxonomy uniqueness
-    taxonomy_wise_uniqueness = get_taxonomy_wise_uniqueness(claim, taxonomy)
+    # Evaluate taxonomy uniqueness 
+    taxonomy_wise_uniqueness = retry_taxonomy_wise_uniqueness(claim, taxonomy, node_num=len(nodes))
     
     # Evaluate node segment quality
     node_wise_segment_quality = get_node_wise_segment_quality(claim, nodes)
     valid_segment_scores = [node['score'] for node in node_wise_segment_quality if node['score'] != -1]
     avg_segment_quality = (sum(valid_segment_scores) / len(valid_segment_scores)) if valid_segment_scores else 0
-        
+    
     final_results = {
         "avg_relevance_score": avg_relevance,
         "avg_granularity_score": avg_granularity,

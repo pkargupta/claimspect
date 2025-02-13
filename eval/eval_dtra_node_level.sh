@@ -10,7 +10,6 @@ python -m eval.eval \
     --hierarchy_prefix "$HIERARCHY_PREFIX" \
     --hierarchy_suffix "$HIERARCHY_SUFFIX" \
     --llm_judge "$LLM_JUDGE" \
-    --do_eval_taxonomy_level \
     --do_eval_node_level
 
 
