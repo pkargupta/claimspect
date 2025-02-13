@@ -2,57 +2,57 @@
     "aspect_name": "The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.",
     "children": [
         {
-            "aspect_name": "Efficacy",
+            "aspect_name": "Efficacy against COVID-19 variants",
             "children": [
                 {
-                    "aspect_name": "Effectiveness in preventing COVID-19"
+                    "aspect_name": "Effectiveness against Delta variant"
                 },
                 {
-                    "aspect_name": "Duration of protection"
+                    "aspect_name": "Effectiveness against Omicron variant"
                 }
             ]
         },
         {
-            "aspect_name": "Safety",
+            "aspect_name": "Side effect profile",
             "children": [
                 {
-                    "aspect_name": "Incidence of side effects"
+                    "aspect_name": "Common side effects"
                 },
                 {
-                    "aspect_name": "Severity of side effects"
+                    "aspect_name": "Severe side effects"
                 }
             ]
         },
         {
-            "aspect_name": "Availability",
+            "aspect_name": "Duration of protection",
             "children": [
                 {
-                    "aspect_name": "Distribution channels"
+                    "aspect_name": "Antibody persistence"
                 },
                 {
-                    "aspect_name": "Manufacturing capacity"
+                    "aspect_name": "Need for booster shots"
                 }
             ]
         },
         {
-            "aspect_name": "Cost",
+            "aspect_name": "Population-specific efficacy",
             "children": [
                 {
-                    "aspect_name": "Price per dose"
+                    "aspect_name": "Efficacy in elderly"
                 },
                 {
-                    "aspect_name": "Insurance coverage"
+                    "aspect_name": "Efficacy in immunocompromised individuals"
                 }
             ]
         },
         {
-            "aspect_name": "Public perception",
+            "aspect_name": "Ease of distribution",
             "children": [
                 {
-                    "aspect_name": "Trust in vaccine"
+                    "aspect_name": "Storage requirements"
                 },
                 {
-                    "aspect_name": "Vaccine hesitancy"
+                    "aspect_name": "Shipping logistics"
                 }
             ]
         }
