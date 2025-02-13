@@ -4,54 +4,45 @@ from typing import List
 from tqdm import tqdm
 from eval.utils import perform_evaluation
 
-def generate_paths(root_dir: str, numbers: List[int], suffix: str) -> List[str]:
+def generate_paths(root_dir: str, suffix: str) -> List[str]:
     """
     Generate a list of paths by combining root_dir, each number in numbers, and suffix.
     """
-    paths = []
-    for number in numbers:
-        path = os.path.join(root_dir, str(number), suffix)
-        paths.append(path)
+    # find all the directories in the root_dir
+    directories = [d for d in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, d))]
+    # give the full path to the directories
+    paths = [os.path.join(root_dir, d, suffix) for d in directories]
+    # check if they exist, get the existing paths, report the missing ones
+    paths = [(p, d) for p, d in zip(paths, directories) if os.path.exists(p)]
+    print(f"Found {len(paths)} existing paths.")
+    print(f"Missing {len(directories) - len(paths)} paths.")
     return paths
-
-def extract_completed_numbers(file_path: str) -> List[int]:
-    """
-    Extract completed numbers from a file. Each line starting with 'Completed:' is parsed to extract the number.
-    """
-    completed_numbers = []
-    with open(file_path, 'r') as file:
-        for line in file:
-            if line.startswith("Completed:"):
-                number = int(line.split(":")[1].strip())
-                completed_numbers.append(number)
-    return completed_numbers
 
 def main():
     
     """ Step I: Load the data """
     parser = argparse.ArgumentParser(description='Process directories.')
     parser.add_argument('--result_directory', type=str, required=True, help='Path to the result directory')
-    parser.add_argument('--index_path', type=str, required=True, help='Path to the index file')
     parser.add_argument('--output_directory', type=str, required=True, help='Path to the output directory')
     parser.add_argument('--hierarchy_prefix', type=str, required=True, help='Prefix for the hierarchy path')
     parser.add_argument('--hierarchy_suffix', type=str, required=True, help='Suffix for the hierarchy path')
     parser.add_argument('--llm_judge', type=str, required=True, help='Evaluation model')
+    parser.add_argument('--do_eval_node_level', action='store_true', help='Evaluate node level')
+    parser.add_argument('--do_eval_taxonomy_level', action='store_true', help='Evaluate taxononmy level')
     
     args = parser.parse_args()
-    
-    # Extract completed numbers from the index file
-    completed_numbers = extract_completed_numbers(args.index_path)
     # get the hierarchy paths
-    hierarchy_paths = generate_paths(args.hierarchy_prefix, completed_numbers, args.hierarchy_suffix)
+    hierarchy_paths = generate_paths(args.hierarchy_prefix,args.hierarchy_suffix)
     
     """ Step II: Process the data """
-    for hierarchy_path, idx in tqdm(zip(hierarchy_paths, completed_numbers), desc="Processing hierarchy paths", total=len(hierarchy_paths)):
+    for hierarchy_path, idx in tqdm(hierarchy_paths, desc="Processing hierarchy paths", total=len(hierarchy_paths)):
         
         local_output_path = os.path.join(args.output_directory, f"claim_{idx}")
-        if os.path.exists(local_output_path):
-            continue
-        perform_evaluation(hierarchy_path, local_output_path, args.llm_judge)
-    
+        perform_evaluation(hierarchy_path, 
+                           local_output_path, 
+                           args.llm_judge, 
+                           args.do_eval_node_level,
+                           args.do_eval_taxonomy_level)
 
 if __name__ == "__main__":
     main()

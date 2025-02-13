@@ -11,7 +11,7 @@ def get_path_relevance(claim: str, paths: list) -> list:
             f"Given the claim: '{claim}', decide whether this path from the aspect tree is relevant to the analysis of the claim: '{path}'\n\n"
             "Output options: '<relevant>' or '<irerelevant>'. Do some simple rationalization before giving the output if possible."
         )
-
+    
     input_strs = [get_prompt(claim, path) for path in paths]
     outputs = llm_chat(input_strs, model_name="gpt-4o")
     
@@ -88,25 +88,34 @@ def get_level_granularity(claim: str, levels: list) -> list:
     
     return results
 
-def get_taxonomy_wise_uniqueness(claim: str, taxonomy: str) -> dict:
+def retry_taxonomy_wise_uniqueness(claim: str, taxonomy: str, node_num: int, retry_times: int = 3) -> dict:
+    for _ in range(retry_times):
+        result = get_taxonomy_wise_uniqueness(claim, taxonomy, node_num)
+        if result['score'] is not None:
+            return result
+    return result
+
+def get_taxonomy_wise_uniqueness(claim: str, taxonomy: str, node_num: int) -> dict:
     def get_prompt(claim, taxonomy):
         return (
             "Claims made by individuals or entities are often nuanced and cannot always be strictly categorized as entirely 'true' or 'false'. "
             "Particularly in scientific and political contexts. Instead, a claim can be broken down "
             "into its core aspects and sub-aspects, which are easier to evaluate individually.\n\n"
-            f"Given the claim: '{claim}', decide whether this taxonomy: {taxonomy} has overlapping nodes. \n\n"
-            "Output options: '<overlapping>' or '<not overlapping>'. Do some simple rationalization before giving the output if possible."
+            "Normally, we want the aspects and sub-aspects to be unique in the taxonomy. "
+            f"Given the claim: '{claim}', count how many nodes in this taxonomy are largely overlapping or almost equivalent: {taxonomy}\n\n"
+            "Output options: '<overlap_num>0</overlap_num>', '<overlap_num>1</overlap_num>'... or other possible numbers. Do some simple rationalization before giving the output if possible."
         )
     prompt = get_prompt(claim, taxonomy)
     outputs = llm_chat([prompt], model_name="gpt-4o")[0]
     
+    # extract the number from the output
     result = {"taxonomy": taxonomy}
-    if "<overlapping>" in outputs.lower():
-        result['score'] = 0
-    elif "<not overlapping>" in outputs.lower():
-        result['score'] = 1
-    else:
-        result['score'] = -1
+    try:
+        output_int = outputs.split('<overlap_num>')[1].split('</overlap_num>')[0].strip()
+        result['score'] = 1 - int(output_int) / node_num
+    except Exception:
+        print(Exception)
+        result['score'] = None
     result['reasoning'] = outputs
     return result
 
