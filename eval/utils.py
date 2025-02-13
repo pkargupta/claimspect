@@ -6,9 +6,6 @@ def perform_evaluation(hierarchy_path: str, output_directory: str, eval_model: s
     Perform evaluation on the data in hierarchy_path and save the results in the output_directory.
     """
     
-    # taxonomy-level comparison baseline not implemented
-    print("Warning: Taxonomy-level comparison baseline not implemented.")
-    
     # Implementation of evaluation logic
     eval_json_path = hierarchy_path
     model_judge_name = eval_model
