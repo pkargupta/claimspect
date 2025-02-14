@@ -66,7 +66,7 @@ def build_prompt(claim, literature, max_aspects_per_node=5):
         "Claims made by individuals or entities are often nuanced and cannot always be strictly categorized "
         "as entirely 'true' or 'false'—particularly in scientific and political contexts. Instead, a claim can "
         "be broken down into its core aspects, which are easier to evaluate individually.\n\n"
-        f"Given the claim: '{claim}', generate a list of up to {max_aspects_per_node} aspects of the claim. "
+        f"Given the claim: '{claim}', generate a list of up to {max_aspects_per_node} aspects (short phrases) of the claim. "
         "They should be the node of the same level\n\n"
         f"Here are some literautre segments to help you generate the aspects: {literature}\n"
         "The aspects should be structured as a list, formatted as follows:\n"
@@ -248,11 +248,10 @@ def main():
       5. Clean and save the final taxonomy.
     """
     parser = argparse.ArgumentParser(description="Generate a taxonomy from a claim using GPT model.")
-    parser.add_argument("--model_name", type=str, default="llama-3.1-8b-instrcut", help="Name of the LLM model")
+    parser.add_argument("--model_name", type=str, default="llama-3.1-8b-instruct", help="Name of the LLM model")
     parser.add_argument("--height", type=int, default=3, help="Height of the taxonomy tree")
     parser.add_argument("--output_path", type=str, default="eval/example/rag_iterative_taxonomy.json", help="Output file path")
     parser.add_argument("--input_path", type=str, default="eval/example/hierarchy.json", help="Input JSON file with claim")
-    parser.add_argument("--segment_embed_cache_path", type=str, default=".cache/vaccine_seg_embed_cache.pickle", help="Cache directory for embedding")
     parser.add_argument("--data_dir", default="data")
     parser.add_argument("--topic", default="vaccine")
     parser.add_argument("--rag_segment_num", default=10)

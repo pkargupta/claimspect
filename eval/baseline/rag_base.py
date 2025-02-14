@@ -266,7 +266,7 @@ def main():
       6. Clean and save the resulting taxonomy.
     """
     parser = argparse.ArgumentParser(description="Generate a taxonomy from a claim using GPT model.")
-    parser.add_argument("--model_name", type=str, default="llama-3.1-8b-instrcut", help="Name of the LLM model")
+    parser.add_argument("--model_name", type=str, default="llama-3.1-8b-instruct", help="Name of the LLM model")
     parser.add_argument("--height", type=int, default=3, help="Height of the taxonomy tree")
     parser.add_argument("--output_path", type=str, default="eval/example/rag_base_taxonomy.json", help="Output file path")
     parser.add_argument("--input_path", type=str, default="eval/example/hierarchy.json", help="Input JSON file with claim")

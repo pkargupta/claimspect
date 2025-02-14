@@ -29,6 +29,11 @@ def main():
     parser.add_argument('--llm_judge', type=str, required=True, help='Evaluation model')
     parser.add_argument('--do_eval_node_level', action='store_true', help='Evaluate node level')
     parser.add_argument('--do_eval_taxonomy_level', action='store_true', help='Evaluate taxononmy level')
+    parser.add_argument('--baseline_model_name', type=str, required=True, help='Baseline model name')
+    parser.add_argument('--taxo_height', type=int, required=True, help='Taxonomy height')
+    parser.add_argument('--child_num_per_node', type=int, required=True, help='Child number per node')
+    parser.add_argument('--data_dir', type=str, required=True, help='Data directory')
+    parser.add_argument('--topic', type=str, required=True, help='Topic')
     
     args = parser.parse_args()
     # get the hierarchy paths
@@ -38,11 +43,18 @@ def main():
     for hierarchy_path, idx in tqdm(hierarchy_paths, desc="Processing hierarchy paths", total=len(hierarchy_paths)):
         
         local_output_path = os.path.join(args.output_directory, f"claim_{idx}")
+        print("Processing hierarchy path:", hierarchy_path)
         perform_evaluation(hierarchy_path, 
                            local_output_path, 
                            args.llm_judge, 
                            args.do_eval_node_level,
-                           args.do_eval_taxonomy_level)
+                           args.do_eval_taxonomy_level,
+                           args.baseline_model_name,
+                           args.taxo_height,
+                           args.child_num_per_node,
+                           args.data_dir,
+                           args.topic,
+                           int(idx))
 
 if __name__ == "__main__":
     main()

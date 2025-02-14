@@ -187,7 +187,7 @@ def generate_description(claim: str, taxonomy: dict, model_name: str):
 def main():
     """Main function to handle command-line execution."""
     parser = argparse.ArgumentParser(description="Generate a taxonomy from a claim using GPT model.")
-    parser.add_argument("--model_name", type=str, default="llama-3.1-8b-instrcut", help="Name of the LLM model")
+    parser.add_argument("--model_name", type=str, default="llama-3.1-8b-instruct", help="Name of the LLM model")
     parser.add_argument("--height", type=int, default=3, help="Height of the taxonomy tree")
     parser.add_argument("--output_path", type=str, default="eval/example/zeroshot_taxonomy.json", help="Output file path")
     parser.add_argument("--input_path", type=str, default="eval/example/hierarchy.json", help="Input JSON file with claim")
