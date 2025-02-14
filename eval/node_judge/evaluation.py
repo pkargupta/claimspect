@@ -2,7 +2,7 @@
 
 from eval.llm.io import llm_chat  # make sure this import path is correct in your project
 
-def get_path_relevance(claim: str, paths: list) -> list:
+def get_path_relevance(claim: str, paths: list, judge_name) -> list:
     def get_prompt(claim, path):
         return (
             "Claims made by individuals or entities are often nuanced and cannot always be strictly categorized as entirely 'true' or 'false'. "
@@ -13,7 +13,7 @@ def get_path_relevance(claim: str, paths: list) -> list:
         )
     
     input_strs = [get_prompt(claim, path) for path in paths]
-    outputs = llm_chat(input_strs, model_name="gpt-4o")
+    outputs = llm_chat(input_strs, model_name=judge_name)
     
     results = []
     for path, output in zip(paths, outputs):
@@ -29,7 +29,7 @@ def get_path_relevance(claim: str, paths: list) -> list:
     
     return results
 
-def get_path_granularity(claim: str, paths: list) -> list:
+def get_path_granularity(claim: str, paths: list, judge_name) -> list:
     def get_prompt(claim, path):
         return (
             "Claims made by individuals or entities are often nuanced and cannot always be strictly categorized as entirely 'true' or 'false'. "
@@ -39,7 +39,7 @@ def get_path_granularity(claim: str, paths: list) -> list:
             "Output options: '<good granularity>' or '<bad granularity>'. Do some simple rationalization before giving the output if possible."
         )
     input_strs = [get_prompt(claim, path) for path in paths]
-    outputs = llm_chat(input_strs, model_name="gpt-4o")
+    outputs = llm_chat(input_strs, model_name=judge_name)
     
     results = []
     for path, output in zip(paths, outputs):
@@ -55,7 +55,7 @@ def get_path_granularity(claim: str, paths: list) -> list:
     
     return results
 
-def get_level_granularity(claim: str, levels: list) -> list:
+def get_level_granularity(claim: str, levels: list, judge_name) -> list:
     def get_prompt(claim, level_instance):
         parent = level_instance['parent']
         siblings = level_instance['siblings']
@@ -68,7 +68,7 @@ def get_level_granularity(claim: str, levels: list) -> list:
             "'<majority granular>' or '<all granular>'. Do some simple rationalization before giving the output if possible."
         )
     input_strs = [get_prompt(claim, level) for level in levels]
-    outputs = llm_chat(input_strs, model_name="gpt-4o")
+    outputs = llm_chat(input_strs, model_name=judge_name)
     
     results = []
     for level_instance, output in zip(levels, outputs):
@@ -88,14 +88,14 @@ def get_level_granularity(claim: str, levels: list) -> list:
     
     return results
 
-def retry_taxonomy_wise_uniqueness(claim: str, taxonomy: str, node_num: int, retry_times: int = 3) -> dict:
+def retry_taxonomy_wise_uniqueness(claim: str, taxonomy: str, node_num: int, retry_times: int = 3, judge_name=None) -> dict:
     for _ in range(retry_times):
-        result = get_taxonomy_wise_uniqueness(claim, taxonomy, node_num)
+        result = get_taxonomy_wise_uniqueness(claim, taxonomy, node_num, judge_name)
         if result['score'] is not None:
             return result
     return result
 
-def get_taxonomy_wise_uniqueness(claim: str, taxonomy: str, node_num: int) -> dict:
+def get_taxonomy_wise_uniqueness(claim: str, taxonomy: str, node_num: int, judge_name) -> dict:
     def get_prompt(claim, taxonomy):
         return (
             "Claims made by individuals or entities are often nuanced and cannot always be strictly categorized as entirely 'true' or 'false'. "
@@ -106,7 +106,7 @@ def get_taxonomy_wise_uniqueness(claim: str, taxonomy: str, node_num: int) -> di
             "Output options: '<overlap_num>0</overlap_num>', '<overlap_num>1</overlap_num>'... or other possible numbers. Do some simple rationalization before giving the output if possible."
         )
     prompt = get_prompt(claim, taxonomy)
-    outputs = llm_chat([prompt], model_name="gpt-4o")[0]
+    outputs = llm_chat([prompt], model_name=judge_name)[0]
     
     # extract the number from the output
     result = {"taxonomy": taxonomy}
@@ -119,7 +119,7 @@ def get_taxonomy_wise_uniqueness(claim: str, taxonomy: str, node_num: int) -> di
     result['reasoning'] = outputs
     return result
 
-def get_node_wise_segment_quality(claim: str, nodes: list) -> list:
+def get_node_wise_segment_quality(claim: str, nodes: list, judge_name) -> list:
     def get_prompt(claim, node):
         aspect_name = node['aspect_name']
         segments = node['segments']
@@ -134,7 +134,7 @@ def get_node_wise_segment_quality(claim: str, nodes: list) -> list:
         )
     
     input_strs = [get_prompt(claim, node) for node in nodes]
-    outputs = llm_chat(input_strs, model_name="gpt-4o")
+    outputs = llm_chat(input_strs, model_name=judge_name)
     results = []
     for node, output in zip(nodes, outputs):
         if len(node['segments']) == 0:

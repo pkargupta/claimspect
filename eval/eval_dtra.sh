@@ -12,5 +12,3 @@ python -m eval.eval \
     --llm_judge "$LLM_JUDGE" \
     --do_eval_taxonomy_level \
     --do_eval_node_level
-
-

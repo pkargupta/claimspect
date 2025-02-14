@@ -24,25 +24,25 @@ def main():
     claim, taxonomy, paths, levels, nodes = analyze_json(eval_json)
     
     # Evaluate path relevance
-    path_wise_relevance = get_path_relevance(claim, paths)
+    path_wise_relevance = get_path_relevance(claim, paths, args.model_judge_name)
     valid_relevance_scores = [item['score'] for item in path_wise_relevance if item['score'] != -1]
     avg_relevance = (sum(valid_relevance_scores) / len(valid_relevance_scores)) if valid_relevance_scores else 0
     
     # Evaluate path granularity
-    path_wise_granularity = get_path_granularity(claim, paths)
+    path_wise_granularity = get_path_granularity(claim, paths, args.model_judge_name)
     valid_granularity_scores = [item['score'] for item in path_wise_granularity if item['score'] != -1]
     avg_granularity = (sum(valid_granularity_scores) / len(valid_granularity_scores)) if valid_granularity_scores else 0
         
     # Evaluate level granularity
-    level_wise_granularity = get_level_granularity(claim, levels)
+    level_wise_granularity = get_level_granularity(claim, levels, args.model_judge_name)
     valid_level_scores = [level['score'] for level in level_wise_granularity if level['score'] != -1]
     avg_level_granularity = (sum(valid_level_scores) / len(valid_level_scores)) if valid_level_scores else 0
     
     # Evaluate taxonomy uniqueness 
-    taxonomy_wise_uniqueness = retry_taxonomy_wise_uniqueness(claim, taxonomy, node_num=len(nodes))
+    taxonomy_wise_uniqueness = retry_taxonomy_wise_uniqueness(claim, taxonomy, node_num=len(nodes), judge_name=args.model_judge_name)
     
     # Evaluate node segment quality
-    node_wise_segment_quality = get_node_wise_segment_quality(claim, nodes)
+    node_wise_segment_quality = get_node_wise_segment_quality(claim, nodes, args.model_judge_name)
     valid_segment_scores = [node['score'] for node in node_wise_segment_quality if node['score'] != -1]
     avg_segment_quality = (sum(valid_segment_scores) / len(valid_segment_scores)) if valid_segment_scores else 0
     
