@@ -2,104 +2,341 @@
     "aspect_name": "The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.",
     "children": [
         {
-            "aspect_name": "Efficacy",
+            "aspect_name": "Effectiveness of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
             "children": [
                 {
-                    "aspect_name": "Efficacy percentage"
+                    "aspect_name": "Effectiveness of the Pfizer COVID-19 vaccine",
+                    "children": [
+                        {
+                            "aspect_name": "Comparative Effectiveness of the Pfizer and Moderna Vaccines",
+                            "aspect_description": "The Comparative Effectiveness of the Pfizer and Moderna Vaccines refers to the evaluation and analysis of the relative performance, safety, and efficacy of the Pfizer COVID-19 vaccine in comparison to the Moderna COVID-19 vaccine."
+                        },
+                        {
+                            "aspect_name": "Efficacy and Duration of Immunity",
+                            "aspect_description": "The 'Efficacy and Duration of Immunity' aspect refers to the vaccine's ability to prevent severe illness and death from COVID-19 and how long the immune system's protection against the virus lasts."
+                        },
+                        {
+                            "aspect_name": "Reliability of Vaccine Certification",
+                            "aspect_description": "The 'Reliability of Vaccine Certification' refers to the consistency and accuracy of the information provided by a vaccine, in this case, whether the certification or documentation of the Pfizer or Moderna vaccine accurately reflects the vaccine's actual identity, efficacy, and safety."
+                        }
+                    ],
+                    "top_10_segments": [
+                        "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                        "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                        "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                        "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                        "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                        "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                        "The consistency ratio (CI) has been checked and it is 0.018 which is acceptable. When combining the weight of these five factors, it accounts for 67.6% of the overall decision that should be considered by decision makers when issuing of COVID-19 vaccine passports.",
+                        "Currently, it is still unclear. Uncertainty makes passports impractical (Brown et al. 201). Vaccine passports should be flexible enough for updates and changes with options.",
+                        "Vaccine passport should not be a tool in creating societal division (Osama et al. 2021). It is likely that vaccine passport would be a significant benefit for holders compare to non- holders (Brown et al. 2021).",
+                        "Permanent requirement 1.5% This criterion is the reciprocal of above. 6. Conclusion and Discussion With the coming Omicron variant, many have started to believe that COVID-19 is fading away."
+                    ],
+                    "aspect_description": "The effectiveness of the Pfizer COVID-19 vaccine refers to its ability to prevent COVID-19 infection, severe illness, or both in individuals who have received the vaccine, typically measured by its percentage of protection against the virus."
                 },
                 {
-                    "aspect_name": "Age approval"
+                    "aspect_name": "Effectiveness of the Moderna COVID-19 vaccine",
+                    "children": [
+                        {
+                            "aspect_name": "Comparative Effectiveness of the Pfizer COVID-19 Vaccine vs. Moderna COVID-19 Vaccine",
+                            "aspect_description": "The Comparative Effectiveness of the Pfizer COVID-19 Vaccine vs. Moderna COVID-19 Vaccine refers to an evaluation of the relative benefits and outcomes of the two vaccines in preventing COVID-19 illness and its complications."
+                        },
+                        {
+                            "aspect_name": "Duration of Vaccine-Induced Immunity and Protection",
+                            "aspect_description": "The Duration of Vaccine-Induced Immunity and Protection refers to the length of time the Pfizer and Moderna COVID-19 vaccines provide immunity and protection against the COVID-19 virus after vaccination."
+                        },
+                        {
+                            "aspect_name": "Assessment of the Implications of Different Vaccines for COVID-19 Passports and Public Policy",
+                            "aspect_description": "An assessment of the implications of different vaccines for COVID-19 passports and public policy refers to an evaluation of how various COVID-19 vaccines, such as Pfizer and Moderna, may affect the implementation and effectiveness of vaccination passports and related public health policies."
+                        }
+                    ],
+                    "top_10_segments": [
+                        "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                        "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                        "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                        "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                        "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                        "Currently, it is still unclear. Uncertainty makes passports impractical (Brown et al. 201). Vaccine passports should be flexible enough for updates and changes with options.",
+                        "Vaccine passport should not be a tool in creating societal division (Osama et al. 2021). It is likely that vaccine passport would be a significant benefit for holders compare to non- holders (Brown et al. 2021).",
+                        "A systematic review of clinical and laboratory parameters associated with increased severity among COVID-19 patients. Diabetes & Metabolic Syndrome: Clinical Research & Reviews.",
+                        "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                        "During this COVID-19 pandemic, government bodies have tremendous influence in the tourism industry. The further concern will be posted on the so-called proof of COVID-19 vaccinationd which will be discussed in the next section."
+                    ],
+                    "aspect_description": "The effectiveness of the Moderna COVID-19 vaccine refers to its ability to prevent COVID-19 illness, including severe cases and hospitalizations, in individuals who have received the vaccine."
                 },
                 {
-                    "aspect_name": "Immune response"
-                },
-                {
-                    "aspect_name": "Adverse effects"
-                },
-                {
-                    "aspect_name": "Storage requirements"
+                    "aspect_name": "Duration of immunity for COVID-19 vaccine",
+                    "children": [
+                        {
+                            "aspect_name": "Duration of immunity provided by the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
+                            "aspect_description": "The duration of immunity provided by the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine refers to the length of time that each vaccine protects against COVID-19 infection or severe illness."
+                        },
+                        {
+                            "aspect_name": "Effectiveness of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
+                            "aspect_description": "The Effectiveness of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine refers to the relative ability of the Pfizer vaccine to prevent COVID-19 infection, hospitalization, or severe illness compared to the Moderna vaccine."
+                        },
+                        {
+                            "aspect_name": "Comparative protection against COVID-19 infection and transmission between the Pfizer and Moderna vaccines",
+                            "aspect_description": "Comparative protection against COVID-19 infection and transmission between the Pfizer and Moderna vaccines refers to a study or analysis evaluating and contrasting the effectiveness of the Pfizer and Moderna COVID-19 vaccines in preventing COVID-19 infections and transmissions."
+                        }
+                    ],
+                    "top_10_segments": [
+                        "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                        "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                        "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                        "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                        "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                        "A systematic review of clinical and laboratory parameters associated with increased severity among COVID-19 patients. Diabetes & Metabolic Syndrome: Clinical Research & Reviews.",
+                        "Vaccine passport should not be a tool in creating societal division (Osama et al. 2021). It is likely that vaccine passport would be a significant benefit for holders compare to non- holders (Brown et al. 2021).",
+                        "The use of vaccine passport should not violate the basic human rights or restrict freedom of people (Phelan 2020). Neither should it give privileges to vaccinated people.",
+                        "The issuance of vaccine passports should consider future risks. Vaccine passports holder could be exempt from restrictions (Phelan 2020) and may violate public health measures that could pose a risk of ongoing pandemic. The duration of protection conferred by vaccines should be tied to passport expiration dates.",
+                        "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4]."
+                    ],
+                    "aspect_description": "The duration of immunity for a COVID-19 vaccine refers to how long the vaccine's protection against the virus lasts, which can vary in terms of the length of time the body remains immune to future infections."
                 }
-            ]
+            ],
+            "top_10_segments": [
+                "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                "Issuing such a passport on the circumstance of unknown efficacy of vaccines leads to numerous challenges such as positioning and clarification of how the passport should be used. Certainly, there is a clear need to standardize data across vaccine passport options so that it can be universally accepted. 2.3 Challenges of implementing COVID-19 vaccination documentation As many mentioned the uncertainty about the vaccine, the vaccine efficacy is an important factor in determining the effectiveness of vaccine passports to prevent further spreading.",
+                "The consistency ratio (CI) has been checked and it is 0.018 which is acceptable. When combining the weight of these five factors, it accounts for 67.6% of the overall decision that should be considered by decision makers when issuing of COVID-19 vaccine passports.",
+                "Permanent requirement 1.5% This criterion is the reciprocal of above. 6. Conclusion and Discussion With the coming Omicron variant, many have started to believe that COVID-19 is fading away.",
+                "Currently, it is still unclear. Uncertainty makes passports impractical (Brown et al. 201). Vaccine passports should be flexible enough for updates and changes with options."
+            ],
+            "aspect_description": "The effectiveness of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine refers to the comparative measurement of the two vaccines' ability to prevent COVID-19 infection, severe illness, and hospitalization among vaccinated individuals."
         },
         {
-            "aspect_name": "Adverse Effects",
+            "aspect_name": "Safety of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
             "children": [
                 {
-                    "aspect_name": "incidence of adverse effects"
+                    "aspect_name": "Comparative safety of the Pfizer COVID-19 and Moderna COVID-19 vaccines",
+                    "children": [
+                        {
+                            "aspect_name": "The Pfizer COVID-19 vaccine is safer than the Moderna COVID-19 vaccine",
+                            "aspect_description": "This claim implies that the Pfizer COVID-19 vaccine has a lower incidence of adverse reactions and side effects compared to the Moderna COVID-19 vaccine."
+                        },
+                        {
+                            "aspect_name": "The Pfizer COVID-19 vaccine is more effective than the Moderna COVID-19 vaccine",
+                            "aspect_description": "This claim refers to the results of clinical trials indicating that Pfizer's COVID-19 vaccine produces higher antibody levels and offers greater protection against COVID-19 infection compared to Moderna's vaccine."
+                        },
+                        {
+                            "aspect_name": "The Pfizer COVID-19 vaccine has a longer duration of immunity than the Moderna COVID-19 vaccine",
+                            "aspect_description": "The Pfizer COVID-19 vaccine has a longer duration of immunity than the Moderna COVID-19 vaccine, indicating that it provides protection against COVID-19 for a more extended period of time compared to the Moderna vaccine."
+                        }
+                    ],
+                    "top_10_segments": [
+                        "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                        "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                        "Vaccine passports should be globally acceptable and comply with International Health Regulations or IHR (Petersen et al. 2021). Vaccine passports should have a standard set of information provided and standard form, whether ot be digital or physical.",
+                        "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                        "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                        "The use of vaccine passport should not violate the basic human rights or restrict freedom of people (Phelan 2020). Neither should it give privileges to vaccinated people.",
+                        "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                        "To make the COVID-19 vaccine passport benefit the tourism supply chain, it needs to gain credibility. This is going to require international attention and cooperation in creating an interoperability standard. Secure certification processes for an effective vaccination passport will help to create more confidence among tourists.",
+                        "The consistency ratio (CI) has been checked and it is 0.018 which is acceptable. When combining the weight of these five factors, it accounts for 67.6% of the overall decision that should be considered by decision makers when issuing of COVID-19 vaccine passports.",
+                        "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only."
+                    ],
+                    "aspect_description": "The Comparative safety of the Pfizer COVID-19 and Moderna COVID-19 vaccines refers to an evaluation or comparison of the potential risks and adverse effects associated with each vaccine."
                 },
                 {
-                    "aspect_name": "severity of adverse effects"
+                    "aspect_name": "Effectiveness of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
+                    "children": [
+                        {
+                            "aspect_name": "Effectiveness of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
+                            "aspect_description": "The effectiveness of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine refers to the relative ability of the two vaccines to prevent COVID-19 infection and associated symptoms in individuals."
+                        },
+                        {
+                            "aspect_name": "Efficacy of vaccines in preventing further spreading",
+                            "aspect_description": "The efficacy of vaccines in preventing further spreading refers to their ability to reduce the transmission of the COVID-19 virus from one person to another."
+                        },
+                        {
+                            "aspect_name": "Uncertainty and variability in vaccine efficacy",
+                            "aspect_description": "Uncertainty and variability in vaccine efficacy refers to the unpredictability and differences in the effectiveness of vaccines, such as the Pfizer and Moderna COVID-19 vaccines, in preventing infections or severe illness in various populations."
+                        }
+                    ],
+                    "top_10_segments": [
+                        "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                        "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                        "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                        "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                        "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                        "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                        "Issuing such a passport on the circumstance of unknown efficacy of vaccines leads to numerous challenges such as positioning and clarification of how the passport should be used. Certainly, there is a clear need to standardize data across vaccine passport options so that it can be universally accepted. 2.3 Challenges of implementing COVID-19 vaccination documentation As many mentioned the uncertainty about the vaccine, the vaccine efficacy is an important factor in determining the effectiveness of vaccine passports to prevent further spreading.",
+                        "The consistency ratio (CI) has been checked and it is 0.018 which is acceptable. When combining the weight of these five factors, it accounts for 67.6% of the overall decision that should be considered by decision makers when issuing of COVID-19 vaccine passports.",
+                        "Permanent requirement 1.5% This criterion is the reciprocal of above. 6. Conclusion and Discussion With the coming Omicron variant, many have started to believe that COVID-19 is fading away.",
+                        "Currently, it is still unclear. Uncertainty makes passports impractical (Brown et al. 201). Vaccine passports should be flexible enough for updates and changes with options."
+                    ],
+                    "aspect_description": "The effectiveness of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine refers to the relative ability of the Pfizer vaccine to prevent severe illness and hospitalization due to COVID-19 compared to the Moderna vaccine."
                 },
                 {
-                    "aspect_name": "specific adverse effects (e.g."
-                },
-                {
-                    "aspect_name": "demographic factors (age"
-                },
-                {
-                    "aspect_name": "comparison of adverse effects between different doses"
+                    "aspect_name": "Duration of protection offered by the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
+                    "children": [
+                        {
+                            "aspect_name": "Duration of protection offered by the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
+                            "aspect_description": "The duration of protection offered by the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine refers to how long immunity against COVID-19 is provided by each vaccine after completion of the recommended dosing regimen."
+                        },
+                        {
+                            "aspect_name": "Type of protection offered by the vaccines (infection vs severe disease)",
+                            "aspect_description": "The aspect of \"Type of protection offered by the vaccines (infection vs severe disease)\" refers to whether the Pfizer COVID-19 vaccine and the Moderna COVID-19 vaccine provide stronger protection against contracting the virus itself or preventing severe illness and hospitalization."
+                        },
+                        {
+                            "aspect_name": "Effectiveness and duration of immunity for COVID-19 vaccines",
+                            "aspect_description": "Effectiveness and duration of immunity for COVID-19 vaccines refers to how well a vaccine protects against the virus and how long it keeps individuals immune to COVID-19."
+                        }
+                    ],
+                    "top_10_segments": [
+                        "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                        "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                        "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                        "The issuance of vaccine passports should consider future risks. Vaccine passports holder could be exempt from restrictions (Phelan 2020) and may violate public health measures that could pose a risk of ongoing pandemic. The duration of protection conferred by vaccines should be tied to passport expiration dates.",
+                        "Furthermore, the difference in protection against infection versus severe disease as well as for how long the effect lasts may also vary depending on type of vaccine. This is something that an ecological study generally cannot address unless different vaccines have been used in separate but comparable geo- graphical areas.",
+                        "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                        "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                        "Vaccine passports should be globally acceptable and comply with International Health Regulations or IHR (Petersen et al. 2021). Vaccine passports should have a standard set of information provided and standard form, whether ot be digital or physical.",
+                        "Permanent requirement 1.5% This criterion is the reciprocal of above. 6. Conclusion and Discussion With the coming Omicron variant, many have started to believe that COVID-19 is fading away.",
+                        "Currently, it is still unclear. Uncertainty makes passports impractical (Brown et al. 201). Vaccine passports should be flexible enough for updates and changes with options."
+                    ],
+                    "aspect_description": "The duration of protection offered by the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine refers to how long each vaccine provides immunity against COVID-19, with one potentially offering longer-lasting protection than the other."
                 }
-            ]
+            ],
+            "top_10_segments": [
+                "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                "Vaccine passports should be globally acceptable and comply with International Health Regulations or IHR (Petersen et al. 2021). Vaccine passports should have a standard set of information provided and standard form, whether ot be digital or physical.",
+                "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                "The use of vaccine passport should not violate the basic human rights or restrict freedom of people (Phelan 2020). Neither should it give privileges to vaccinated people.",
+                "The consistency ratio (CI) has been checked and it is 0.018 which is acceptable. When combining the weight of these five factors, it accounts for 67.6% of the overall decision that should be considered by decision makers when issuing of COVID-19 vaccine passports.",
+                "To make the COVID-19 vaccine passport benefit the tourism supply chain, it needs to gain credibility. This is going to require international attention and cooperation in creating an interoperability standard. Secure certification processes for an effective vaccination passport will help to create more confidence among tourists."
+            ],
+            "aspect_description": "The 'Safety of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine' aspect refers to the evaluation and comparison of the risk of adverse effects, allergic reactions, and potential long-term health consequences associated with each vaccine."
         },
         {
-            "aspect_name": "Age Group Differences",
+            "aspect_name": "Efficacy of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
             "children": [
                 {
-                    "aspect_name": "Age Group Differences"
+                    "aspect_name": "The efficacy of the Pfizer COVID-19 vaccine",
+                    "children": [
+                        {
+                            "aspect_name": "The efficacy of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
+                            "aspect_description": "The efficacy of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine refers to how well each vaccine protects against the SARS-CoV-2 virus in a real-world setting."
+                        },
+                        {
+                            "aspect_name": "The importance of vaccine efficacy in determining the effectiveness of vaccine passports",
+                            "aspect_description": "The importance of vaccine efficacy in determining the effectiveness of vaccine passports refers to the crucial role that a vaccine's ability to prevent COVID-19 effectively plays in deciding whether it should be considered a valid requirement for entry into public spaces, travel, or other restricted areas."
+                        },
+                        {
+                            "aspect_name": "The potential implications of unknown or unclear vaccine efficacy on the implementation and standardization of vaccine passports",
+                            "aspect_description": "The potential implications of unknown or unclear vaccine efficacy on the implementation and standardization of vaccine passports refer to the consequences of uncertain or unpredictable vaccine effectiveness on the development and widespread adoption of digital or physical documents verifying an individual's vaccination status."
+                        }
+                    ],
+                    "top_10_segments": [
+                        "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                        "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                        "Issuing such a passport on the circumstance of unknown efficacy of vaccines leads to numerous challenges such as positioning and clarification of how the passport should be used. Certainly, there is a clear need to standardize data across vaccine passport options so that it can be universally accepted. 2.3 Challenges of implementing COVID-19 vaccination documentation As many mentioned the uncertainty about the vaccine, the vaccine efficacy is an important factor in determining the effectiveness of vaccine passports to prevent further spreading.",
+                        "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                        "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                        "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                        "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                        "The consistency ratio (CI) has been checked and it is 0.018 which is acceptable. When combining the weight of these five factors, it accounts for 67.6% of the overall decision that should be considered by decision makers when issuing of COVID-19 vaccine passports.",
+                        "Currently, it is still unclear. Uncertainty makes passports impractical (Brown et al. 201). Vaccine passports should be flexible enough for updates and changes with options.",
+                        "Permanent requirement 1.5% This criterion is the reciprocal of above. 6. Conclusion and Discussion With the coming Omicron variant, many have started to believe that COVID-19 is fading away."
+                    ],
+                    "aspect_description": "The efficacy of the Pfizer COVID-19 vaccine refers to its ability to prevent COVID-19 cases, hospitalizations, and severe disease in recipients, typically measured by a percentage of people who do not develop the disease after receiving the vaccine."
                 },
                 {
-                    "aspect_name": "Effectiveness Across Age Groups"
+                    "aspect_name": "The efficacy of the Moderna COVID-19 vaccine",
+                    "children": [
+                        {
+                            "aspect_name": "The efficacy of the Moderna COVID-19 vaccine",
+                            "aspect_description": "The efficacy of the Moderna COVID-19 vaccine refers to its ability to prevent severe illness and death from COVID-19, typically measured as a percentage, such as 94% or higher."
+                        },
+                        {
+                            "aspect_name": "The efficacy of the Pfizer COVID-19 vaccine",
+                            "aspect_description": "The efficacy of the Pfizer COVID-19 vaccine refers to its ability to prevent symptomatic COVID-19 disease in a vaccinated individual compared to those who have not received the vaccine."
+                        },
+                        {
+                            "aspect_name": "The comparison of the efficacy between the two vaccines",
+                            "aspect_description": "The comparison of the efficacy between the two vaccines refers to the evaluation and assessment of how well each vaccine prevents severe illness, hospitalization, or death from COVID-19."
+                        }
+                    ],
+                    "top_10_segments": [
+                        "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                        "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                        "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                        "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                        "Issuing such a passport on the circumstance of unknown efficacy of vaccines leads to numerous challenges such as positioning and clarification of how the passport should be used. Certainly, there is a clear need to standardize data across vaccine passport options so that it can be universally accepted. 2.3 Challenges of implementing COVID-19 vaccination documentation As many mentioned the uncertainty about the vaccine, the vaccine efficacy is an important factor in determining the effectiveness of vaccine passports to prevent further spreading.",
+                        "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                        "Currently, it is still unclear. Uncertainty makes passports impractical (Brown et al. 201). Vaccine passports should be flexible enough for updates and changes with options.",
+                        "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                        "Permanent requirement 1.5% This criterion is the reciprocal of above. 6. Conclusion and Discussion With the coming Omicron variant, many have started to believe that COVID-19 is fading away.",
+                        "The consistency ratio (CI) has been checked and it is 0.018 which is acceptable. When combining the weight of these five factors, it accounts for 67.6% of the overall decision that should be considered by decision makers when issuing of COVID-19 vaccine passports."
+                    ],
+                    "aspect_description": "The efficacy of the Moderna COVID-19 vaccine refers to its ability to prevent severe illness and infection from SARS-CoV-2 in a large enough group of people to be considered statistically significant, typically measured as a percentage."
                 },
                 {
-                    "aspect_name": "Selection Effects"
-                },
-                {
-                    "aspect_name": "Dose Differences and Immune Response"
-                },
-                {
-                    "aspect_name": "Side Effects and Safety Profiles"
+                    "aspect_name": "The comparative efficacy between the two vaccines",
+                    "children": [
+                        {
+                            "aspect_name": "The efficacy of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine",
+                            "aspect_description": "The efficacy of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine refers to the relative effectiveness of each vaccine in preventing COVID-19 infections or severe illness among those who receive them."
+                        },
+                        {
+                            "aspect_name": "The measure of 'better' or superiority",
+                            "aspect_description": "The measure of 'better' or superiority refers to efficacy, a term that compares the effectiveness of one vaccine over another in preventing severe illness, hospitalization, and death from COVID-19."
+                        },
+                        {
+                            "aspect_name": "The context in which the comparison is being made",
+                            "aspect_description": "The context in which the comparison is being made refers to the specific circumstances, such as population demographics, health conditions, or vaccine administration protocols, that are being considered when evaluating which vaccine is \"better\"."
+                        }
+                    ],
+                    "top_10_segments": [
+                        "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                        "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                        "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                        "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                        "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                        "The use of vaccine passport should not violate the basic human rights or restrict freedom of people (Phelan 2020). Neither should it give privileges to vaccinated people.",
+                        "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                        "Currently, it is still unclear. Uncertainty makes passports impractical (Brown et al. 201). Vaccine passports should be flexible enough for updates and changes with options.",
+                        "A systematic review of clinical and laboratory parameters associated with increased severity among COVID-19 patients. Diabetes & Metabolic Syndrome: Clinical Research & Reviews.",
+                        "Permanent requirement 1.5% This criterion is the reciprocal of above. 6. Conclusion and Discussion With the coming Omicron variant, many have started to believe that COVID-19 is fading away."
+                    ],
+                    "aspect_description": "The comparative efficacy between the two vaccines refers to a comparison of the effectiveness of the Pfizer COVID-19 vaccine and the Moderna COVID-19 vaccine in preventing severe illness and hospitalization due to COVID-19."
                 }
-            ]
-        },
-        {
-            "aspect_name": "Cost and Accessibility",
-            "children": [
-                {
-                    "aspect_name": "Cost comparison between Pfizer and Moderna vaccines"
-                },
-                {
-                    "aspect_name": "Accessibility in terms of age approval for Pfizer and Moderna vaccines"
-                },
-                {
-                    "aspect_name": "Global affordability considerations for Pfizer and Moderna vaccines"
-                },
-                {
-                    "aspect_name": "Transport and storage requirements for Pfizer and Moderna vaccines"
-                },
-                {
-                    "aspect_name": "Incidence of adverse effects in Pfizer versus Moderna vaccines"
-                }
-            ]
-        },
-        {
-            "aspect_name": "Storage and Transport Requirements",
-            "children": [
-                {
-                    "aspect_name": "temperature requirements"
-                },
-                {
-                    "aspect_name": "transportation logistics"
-                },
-                {
-                    "aspect_name": "shelf life"
-                },
-                {
-                    "aspect_name": "cost implications"
-                },
-                {
-                    "aspect_name": "energy requirements"
-                }
-            ]
+            ],
+            "top_10_segments": [
+                "For other vaccines, the validity of this certificate shall extend until the date indicated for the particular vaccination or prophylaxis. Since there is a lack of evidence to support the effectiveness and duration of immunity for COVID-19 vaccine, the duration of the certification validity box will be left blank or not included in other certifications.",
+                "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+                "Issuing such a passport on the circumstance of unknown efficacy of vaccines leads to numerous challenges such as positioning and clarification of how the passport should be used. Certainly, there is a clear need to standardize data across vaccine passport options so that it can be universally accepted. 2.3 Challenges of implementing COVID-19 vaccination documentation As many mentioned the uncertainty about the vaccine, the vaccine efficacy is an important factor in determining the effectiveness of vaccine passports to prevent further spreading.",
+                "In addition, a total of 5.51 billion people worldwide have had a dose of a COVID-19 vaccine (71.8% of the world population [3,4].",
+                "The unclear duration of use needs further discussion. Vaccine passports are likely to be widely implemented for a certain period of time, as a temporary recommendation (Pavli and Meltezou 2021) such as an EU Digital Green Certificate. The purpose of vaccine passport is to facilitate mobility during the time of COVID-19 only.",
+                "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+                "Permanent requirement 1.5% This criterion is the reciprocal of above. 6. Conclusion and Discussion With the coming Omicron variant, many have started to believe that COVID-19 is fading away.",
+                "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+                "The consistency ratio (CI) has been checked and it is 0.018 which is acceptable. When combining the weight of these five factors, it accounts for 67.6% of the overall decision that should be considered by decision makers when issuing of COVID-19 vaccine passports.",
+                "Currently, it is still unclear. Uncertainty makes passports impractical (Brown et al. 201). Vaccine passports should be flexible enough for updates and changes with options."
+            ],
+            "aspect_description": "The efficacy of the Pfizer COVID-19 vaccine compared to the Moderna COVID-19 vaccine refers to the relative effectiveness of each vaccine in preventing severe illness and hospitalization from COVID-19."
         }
-    ]
+    ],
+    "top_10_segments": [
+        "The vaccination passport for COVID-19 should only be used temporarily. The more important issue to focus upon is the development of and access to vaccines and making coronavirus an endemic disease so people can live normal lives and do not need special measures.",
+        "Virology Journal. 2016; 13:1-7 Shrotri M, Swinnen T, Kampmann B, Parker EP. An interactive website tracking COVID-19 vaccine development.",
+        "Vaccine passport should not be a tool in creating societal division (Osama et al. 2021). It is likely that vaccine passport would be a significant benefit for holders compare to non- holders (Brown et al. 2021).",
+        "A systematic review of clinical and laboratory parameters associated with increased severity among COVID-19 patients. Diabetes & Metabolic Syndrome: Clinical Research & Reviews.",
+        "COVID-19 the spread and response. Nature Medicine.",
+        "A COVID-19 passport should be scientifically valid. It should provide reliable evidence that holder has been fully vaccinated against COVID-19 and is at low risk of infection and spreading the disease to others (Dye and Mills 2021).",
+        "The use of vaccine passport should not violate the basic human rights or restrict freedom of people (Phelan 2020). Neither should it give privileges to vaccinated people.",
+        "It has been said that pandemics are not gender- neutral [21-23]. The demographics of those the infected with COVID-19 changed as pandemic progressed. There was a shift from the older age group to the younger ones.",
+        "Permanent requirement 1.5% This criterion is the reciprocal of above. 6. Conclusion and Discussion With the coming Omicron variant, many have started to believe that COVID-19 is fading away.",
+        "Cuadros DF, Branscum AJ, Mukandavire Z, Miller FD, MacKinnon N. Dynamics of the COVID-19 epidemic in urban and rural areas in the United States. Annals of Epidemiology."
+    ],
+    "aspect_description": "This claim refers to a comparison of the effectiveness, safety, or efficacy of the Pfizer-BioNTech COVID-19 vaccine versus the Moderna COVID-19 vaccine."
 }

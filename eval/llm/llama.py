@@ -12,15 +12,14 @@ client = OpenAI(
 def llama_chat(prompt_list: list[str]) -> list[str]:
     
     results = []
-    for prompt in tqdm(prompt_list):
+    for prompt in tqdm(prompt_list, leave=False):
         completion = client.chat.completions.create(
             model="meta-llama/Meta-Llama-3.1-8B-Instruct",
             messages=[
                 {"role": "developer", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt},
             ],
-        temperature=0.7,
-        seed=42)
+        temperature=0.7)
         completion_text = completion.choices[0].message.content
         results.append(completion_text)
     return results

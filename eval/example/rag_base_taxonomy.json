@@ -2,63 +2,44 @@
     "aspect_name": "The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.",
     "children": [
         {
-            "aspect_name": "Efficacy and Protection",
+            "aspect_name": "Effectiveness",
             "children": [
                 {
-                    "aspect_name": "Efficacy Rates"
+                    "aspect_name": "Efficacy against severe cases"
                 },
                 {
-                    "aspect_name": "Cellular and Antibody Responses"
+                    "aspect_name": "Efficacy against mild cases"
                 },
                 {
-                    "aspect_name": "Protection Against Severe Infection"
+                    "aspect_name": "Long-term protection"
                 }
             ]
         },
         {
-            "aspect_name": "Safety and Side Effects",
+            "aspect_name": "Safety",
             "children": [
                 {
-                    "aspect_name": "Adverse Effects Frequency"
+                    "aspect_name": "Common side effects"
                 },
                 {
-                    "aspect_name": "Allergic Reactions including Anaphylaxis"
+                    "aspect_name": "Serious side effects"
                 },
                 {
-                    "aspect_name": "Specific Concerns (e.g., Myocarditis)"
+                    "aspect_name": "Risk of allergic reactions"
                 }
             ]
         },
         {
-            "aspect_name": "Demographic Factors",
+            "aspect_name": "Comparison metrics",
             "children": [
                 {
-                    "aspect_name": "Age Considerations"
+                    "aspect_name": "Seropositivity rates"
                 },
                 {
-                    "aspect_name": "Health and Demographic Selection Effects"
-                }
-            ]
-        },
-        {
-            "aspect_name": "Cost and Accessibility",
-            "children": [
-                {
-                    "aspect_name": "Vaccine Pricing"
+                    "aspect_name": "Serum antibody levels"
                 },
                 {
-                    "aspect_name": "Distribution and Storage Requirements"
-                }
-            ]
-        },
-        {
-            "aspect_name": "Duration of Immunity",
-            "children": [
-                {
-                    "aspect_name": "Waning Effectiveness"
-                },
-                {
-                    "aspect_name": "Booster Dose Impact"
+                    "aspect_name": "Viral load reduction"
                 }
             ]
         }

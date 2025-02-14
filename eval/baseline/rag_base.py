@@ -3,6 +3,8 @@ import json
 import logging
 import os
 import pickle
+import re
+import json
 
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -50,56 +52,101 @@ def load_claim(json_path):
         return None
 
 
-def build_prompt(claim, height, literature: str, node_num_per_level):
-    """
-    Construct the LLM prompt based on the claim and taxonomy height.
-
-    Args:
-        claim (str): The main claim to be analyzed.
-        height (int): The height of the desired taxonomy tree.
-        literature (str): Relevant literature segments.
-
-    Returns:
-        str: The prompt to be passed to the language model.
-    """
+def build_prompt(claim, literature, height, node_num_per_level):
+    """Construct the LLM prompt based on the claim and taxonomy height."""
     return (
-        "Claims made by individuals or entities are often nuanced and cannot always be strictly categorized "
-        "as entirely 'true' or 'false'—particularly in scientific and political contexts. Instead, a claim "
-        "can be broken down into its core aspects and sub-aspects, which are easier to evaluate individually.\n\n"
+        "Claims made by individuals or entities are often nuanced and cannot always be strictly categorized as entirely 'true' or 'false'—"
+        "particularly in scientific and political contexts. Instead, a claim can be broken down "
+        "into its core aspects and sub-aspects, which are easier to evaluate individually.\n\n"
         f"Given the claim: '{claim}', generate a taxonomy of the claim with a specified height of {height}.\n\n"
-        f"Here are some literautre segments to help you generate the taxonomy: {literature}\n"
+	f"Here are some literautre segments to help you generate the taxonomy: {literature}\n"
         f'Generate up to {node_num_per_level} subnodes per node in the taxonomy.\n'
-        "The taxonomy should be structured as a dictionary, formatted as follows:\n"
-        "{"
-        '   "aspect_name": "the claim itself",  # the root aspect should be the claim itself (a sentence), '
-        'but other aspects should be the aspect name (words or phrases)\n'
-        '   "children": [\n'
-        '       { "aspect_name": "Sub-aspect 1", "children": [...] },\n'
-        '       { "aspect_name": "Sub-aspect 2", "children": [...] }, ...\n'
-        "   ]\n"
+        "The taxonomy should be structured as a dictionary, formatted as follows:\n\n"
+        "{\n"
+        '    "aspect_name": "{claim}",\n'
+        '    "children": [\n'
+        '        {\n'
+        '            "aspect_name": "Sub-aspect 1",\n'
+        '            "children": [\n'
+        '                { "aspect_name": "Sub-sub-aspect 1.1",\n'
+        '                  "children": [\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 1.1.1" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 1.1.2" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 1.1.3" }\n'
+        '                  ]\n'
+        '                },\n'
+        '                { "aspect_name": "Sub-sub-aspect 1.2",\n'
+        '                  "children": [\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 1.2.1" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 1.2.2" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 1.2.3" }\n'
+        '                  ]\n'
+        '                },\n'
+        '                { "aspect_name": "Sub-sub-aspect 1.3",\n'
+        '                  "children": [\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 1.3.1" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 1.3.2" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 1.3.3" }\n'
+        '                  ]\n'
+        '                }\n'
+        '            ]\n'
+        '        },\n'
+        '        {\n'
+        '            "aspect_name": "Sub-aspect 2",\n'
+        '            "children": [\n'
+        '                { "aspect_name": "Sub-sub-aspect 2.1",\n'
+        '                  "children": [\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 2.1.1" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 2.1.2" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 2.1.3" }\n'
+        '                  ]\n'
+        '                },\n'
+        '                { "aspect_name": "Sub-sub-aspect 2.2",\n'
+        '                  "children": [\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 2.2.1" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 2.2.2" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 2.2.3" }\n'
+        '                  ]\n'
+        '                },\n'
+        '                { "aspect_name": "Sub-sub-aspect 2.3",\n'
+        '                  "children": [\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 2.3.1" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 2.3.2" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 2.3.3" }\n'
+        '                  ]\n'
+        '                }\n'
+        '            ]\n'
+        '        },\n'
+        '        {\n'
+        '            "aspect_name": "Sub-aspect 3",\n'
+        '            "children": [\n'
+        '                { "aspect_name": "Sub-sub-aspect 3.1",\n'
+        '                  "children": [\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 3.1.1" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 3.1.2" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 3.1.3" }\n'
+        '                  ]\n'
+        '                },\n'
+        '                { "aspect_name": "Sub-sub-aspect 3.2",\n'
+        '                  "children": [\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 3.2.1" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 3.2.2" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 3.2.3" }\n'
+        '                  ]\n'
+        '                },\n'
+        '                { "aspect_name": "Sub-sub-aspect 3.3",\n'
+        '                  "children": [\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 3.3.1" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 3.3.2" },\n'
+        '                      { "aspect_name": "Sub-sub-sub-aspect 3.3.3" }\n'
+        '                  ]\n'
+        '                }\n'
+        '            ]\n'
+        '        }\n'
+        '    ]\n'
         "}\n\n"
-        "Ensure that the output is a valid JSON object, directly serializable using json.loads(). "
-        "Do not include any extra formatting such as ```json."
+        'directly output the dict and do not include any additional text in the response.'
     )
-
-
-def generate_taxonomy(prompt, model_name):
-    """
-    Send the prompt to the LLM and return the parsed taxonomy response.
-
-    Args:
-        prompt (str): Prompt to be sent to the language model.
-        model_name (str): Name of the LLM model.
-
-    Returns:
-        dict or None: Parsed JSON if successful, otherwise None.
-    """
-    response = llm_chat([prompt], model_name)
-    try:
-        return json.loads(response[0])
-    except json.JSONDecodeError as e:
-        logging.error(f"Error parsing JSON response: {e}")
-        return None
 
 
 def clean_taxonomy(node):
@@ -135,29 +182,78 @@ def save_taxonomy(output, output_path):
     except IOError as e:
         logging.error(f"Error saving taxonomy to {output_path}: {e}")
 
-
-def load_segments(args, chunk_size=3):
+def load_segments(data_dir, topic, claim_id):
     """
     Load text segments from a topic-specific text file, chunked by a specified size.
-
-    Args:
-        args: Parsed command-line arguments.
-        chunk_size (int): Number of sentences to group into one segment.
-
-    Returns:
-        list: List of segmented and cleaned text chunks.
     """
-    corpus = []
-    file_path = f"{args.data_dir}/{args.topic}/{args.topic}_text.txt"
+    json_path = os.path.join(data_dir, topic, f"segments.json")
+    with open(json_path, 'r') as f:
+        data = json.load(f)
+    segment_list = data[str(claim_id)]
+    segment_str_list = [seg['segment'] for seg in segment_list]
+    return segment_str_list
 
-    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-        for line in f:
-            sents = line.strip().lower().split('. ')
-            for i in np.arange(0, len(sents), chunk_size):
-                seg_content = unidecode(". ".join(sents[i:i + chunk_size]))
-                corpus.append(seg_content)
-    return corpus
+def generate_taxonomy(prompt, model_name):
+    """Send the prompt to LLM and get taxonomy response."""
+    response = llm_chat([prompt], model_name)
+    cleaned_response = response[0]
+    
+    # Remove possible ```json or other code block markers
+    cleaned_response = re.sub(r'^```json\n?|```$', '', cleaned_response, flags=re.MULTILINE)
+    result = json.loads(cleaned_response)
+    assert 'aspect_name' in result, "Aspect name not found in the response."
+    return result
 
+
+def retry_generate_taxonomy(prompt, model_name, max_retries=16):
+    """Retry generating taxonomy if the response is empty."""
+    for i in range(max_retries):
+        try: 
+            return generate_taxonomy(prompt, model_name)
+        except Exception as e:
+            logging.warning(f"Failed to generate taxonomy. Retrying attempt {i+1}...")
+    return None
+
+def generate_description(claim: str, taxonomy: dict, model_name: str):
+    """
+    Generate descriptions for the taxonomy nodes using the LLM model in batched mode.
+    """
+    
+    def collect_node_names(node: dict, collected_nodes: list):
+        """
+        Recursively collect all node names from the taxonomy.
+        """
+        collected_nodes.append(node["aspect_name"])
+        if "children" in node:
+            for child in node["children"]:
+                collect_node_names(child, collected_nodes)
+    
+    # Collect all node names
+    node_names = []
+    collect_node_names(taxonomy, node_names)
+    
+    # Generate batched descriptions
+    prompts = [
+        f"Based on the claim: '{claim}', provide one-sentence for what does this aspect name mean: '{node_name}'. Do not include any additional comments."
+        for node_name in node_names
+    ]
+    
+    responses = llm_chat(prompts, model_name)  # Call LLM once with batched prompts
+    
+    def assign_descriptions(node: dict, response_iterator):
+        """
+        Recursively assign descriptions to the taxonomy nodes.
+        """
+        node["aspect_description"] = next(response_iterator)
+        if "children" in node:
+            for child in node["children"]:
+                assign_descriptions(child, response_iterator)
+    
+    # Assign descriptions using an iterator over the responses
+    response_iterator = iter(responses)
+    assign_descriptions(taxonomy, response_iterator)
+    
+    return taxonomy
 
 def main():
     """
@@ -170,15 +266,15 @@ def main():
       6. Clean and save the resulting taxonomy.
     """
     parser = argparse.ArgumentParser(description="Generate a taxonomy from a claim using GPT model.")
-    parser.add_argument("--model_name", type=str, default="gpt-4o", help="Name of the LLM model")
-    parser.add_argument("--height", type=int, default=2, help="Height of the taxonomy tree")
+    parser.add_argument("--model_name", type=str, default="llama-3.1-8b-instrcut", help="Name of the LLM model")
+    parser.add_argument("--height", type=int, default=3, help="Height of the taxonomy tree")
     parser.add_argument("--output_path", type=str, default="eval/example/rag_base_taxonomy.json", help="Output file path")
     parser.add_argument("--input_path", type=str, default="eval/example/hierarchy.json", help="Input JSON file with claim")
-    parser.add_argument("--segment_embed_cache_path", type=str, default=".cache/vaccine_seg_embed_cache.pickle", help="Cache directory for embedding")
     parser.add_argument("--data_dir", default="data")
     parser.add_argument("--topic", default="vaccine")
-    parser.add_argument("--rag_segment_num", default=20)
-    parser.add_argument("--node_num_per_level", default=5)
+    parser.add_argument("--rag_segment_num", default=10)
+    parser.add_argument("--node_num_per_level", default=3)
+    parser.add_argument("--claim_id", default=1)
     args = parser.parse_args()
 
     # Load the claim
@@ -188,19 +284,13 @@ def main():
         return
 
     # Load text segments
-    segments = load_segments(args)
+    segments = load_segments(data_dir=args.data_dir, topic=args.topic, claim_id=args.claim_id)
 
     # Define an embedding function
     embedding_func = get_embedding_model()
 
     # Load or compute segment embeddings
-    if os.path.exists(args.segment_embed_cache_path):
-        with open(args.segment_embed_cache_path, 'rb') as f:
-            segment_embeddings = pickle.load(f)
-    else:
-        segment_embeddings = embedding_func(segments)
-        with open(args.segment_embed_cache_path, 'wb') as f:
-            pickle.dump(segment_embeddings, f)
+    segment_embeddings = embedding_func(segments)
 
     # Embed the main claim
     claim_embedding = embedding_func([claim])[claim]
@@ -217,15 +307,12 @@ def main():
 
     # Build the prompt and generate the taxonomy
     prompt = build_prompt(claim, args.height, literature, args.node_num_per_level)
-    taxonomy = generate_taxonomy(prompt, args.model_name)
-    if not taxonomy:
-        logging.error("Failed to generate a valid taxonomy. Exiting.")
-        return
+    taxonomy = retry_generate_taxonomy(prompt, args.model_name)
 
-    # Clean and save the taxonomy
-    cleaned_taxonomy = clean_taxonomy(taxonomy)
-    save_taxonomy(cleaned_taxonomy, args.output_path)
+    # generate the description for the keywords
+    enriched_taxonomy = generate_description(claim, taxonomy, args.model_name)
 
+    save_taxonomy(enriched_taxonomy, args.output_path)
 
 if __name__ == "__main__":
     main()

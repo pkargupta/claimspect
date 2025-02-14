@@ -50,7 +50,7 @@ def load_claim(json_path):
         return None
 
 
-def build_prompt(claim, literature, max_aspects_per_node=5):
+def build_prompt(claim, max_aspects_per_node=5):
     """
     Construct the LLM prompt based on the claim and taxonomy height.
     
@@ -68,7 +68,6 @@ def build_prompt(claim, literature, max_aspects_per_node=5):
         "be broken down into its core aspects, which are easier to evaluate individually.\n\n"
         f"Given the claim: '{claim}', generate a list of up to {max_aspects_per_node} aspects of the claim. "
         "They should be the node of the same level\n\n"
-        f"Here are some literautre segments to help you generate the aspects: {literature}\n"
         "The aspects should be structured as a list, formatted as follows:\n"
         '["aspect 1", "aspect 2", "aspect 3"]\n'
         "directly output the list and do not include any additional text in the response."
@@ -121,7 +120,7 @@ def load_segments(data_dir, topic, claim_id):
     return segment_str_list
 
 
-def iterative_rag(args, current_claim, original_claim, segment_embeddings, embedding_func, current_height=0):
+def iterative_zeroshot(args, current_claim, original_claim, current_height=0):
     """
     Recursively build a taxonomy for a claim by splitting it into aspects at each level,
     guided by the most relevant literature segments.
@@ -149,29 +148,11 @@ def iterative_rag(args, current_claim, original_claim, segment_embeddings, embed
     # Base case: if we have reached the maximum height
     if current_height == args.height:
         return {"aspect_name": aspect_name}
-
-    # Embed the current claim
-    claim_embedding = embedding_func([current_claim])[current_claim]
-
-    # Find the most similar segments to the claim
-    segment_similarities = []
-    for segment, segment_embedding in segment_embeddings.items():
-        similarity = cosine_similarity(
-            claim_embedding.reshape(1, -1),
-            segment_embedding.reshape(1, -1)
-        )
-        segment_similarities.append((segment, similarity))
-
-    # Sort by descending similarity and select top segments
-    segment_similarities = sorted(segment_similarities, key=lambda x: x[1], reverse=True)
-    top_segments = [seg for seg, _ in segment_similarities[:args.rag_segment_num]]
-    literature = '\n'.join(top_segments)
-
-    top_10_segments = [seg for seg, _ in segment_similarities[:10]]
     
     # Build the prompt and call the LLM
-    input_prompt = build_prompt(current_claim, literature, args.max_aspects_per_node)
+    input_prompt = build_prompt(current_claim, args.max_aspects_per_node)
     response = llm_chat([input_prompt], model_name=args.model_name)[0]
+    breakpoint()
 
     # Attempt to parse the LLM response as JSON
     try:
@@ -184,18 +165,16 @@ def iterative_rag(args, current_claim, original_claim, segment_embeddings, embed
 
     # Recursively process each aspect
     children = [
-        iterative_rag(
+        iterative_zeroshot(
             args,
             f"With regard to {aspect}, {original_claim}",
             original_claim,
-            segment_embeddings,
-            embedding_func,
             current_height + 1
         )
         for aspect in aspects
     ]
 
-    return {"aspect_name": aspect_name, "children": children, "top_10_segments": top_10_segments}
+    return {"aspect_name": aspect_name, "children": children}
 
 def generate_description(claim: str, taxonomy: dict, model_name: str):
     """
@@ -250,12 +229,11 @@ def main():
     parser = argparse.ArgumentParser(description="Generate a taxonomy from a claim using GPT model.")
     parser.add_argument("--model_name", type=str, default="llama-3.1-8b-instrcut", help="Name of the LLM model")
     parser.add_argument("--height", type=int, default=3, help="Height of the taxonomy tree")
-    parser.add_argument("--output_path", type=str, default="eval/example/rag_iterative_taxonomy.json", help="Output file path")
+    parser.add_argument("--output_path", type=str, default="eval/example/zeroshot_iterative_taxonomy.json", help="Output file path")
     parser.add_argument("--input_path", type=str, default="eval/example/hierarchy.json", help="Input JSON file with claim")
     parser.add_argument("--segment_embed_cache_path", type=str, default=".cache/vaccine_seg_embed_cache.pickle", help="Cache directory for embedding")
     parser.add_argument("--data_dir", default="data")
     parser.add_argument("--topic", default="vaccine")
-    parser.add_argument("--rag_segment_num", default=10)
     parser.add_argument("--max_aspects_per_node", default=3)
     parser.add_argument("--claim_id", default=1)
     args = parser.parse_args()
@@ -265,18 +243,9 @@ def main():
     if not claim:
         logging.error("No valid claim found. Exiting.")
         return
-
-    # Load text segments
-    segments = load_segments(data_dir=args.data_dir, topic=args.topic, claim_id=args.claim_id)
-
-    # Define an embedding function
-    embedding_func = get_embedding_model()
-
-    # Load or compute segment embeddings
-    segment_embeddings = embedding_func(segments)
     
     # Generate the taxonomy
-    taxonomy = iterative_rag(args, claim, claim, segment_embeddings, embedding_func)
+    taxonomy = iterative_zeroshot(args, claim, claim)
 
     # Clean and save the taxonomy
     cleaned_taxonomy = clean_taxonomy(taxonomy)

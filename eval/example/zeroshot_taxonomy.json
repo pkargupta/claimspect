@@ -1,60 +1,60 @@
 {
-    "aspect_name": "The Pfizer COVID-19 vaccine is better than the Moderna COVID-19 vaccine.",
+    "aspect_name": "Comparing Pfizer COVID-19 vaccine and Moderna COVID-19 vaccine",
     "children": [
         {
-            "aspect_name": "Efficacy against COVID-19 variants",
+            "aspect_name": "Efficacy against COVID-19",
             "children": [
                 {
-                    "aspect_name": "Effectiveness against Delta variant"
+                    "aspect_name": "Efficacy in preventing severe cases of COVID-19",
+                    "aspect_description": "Efficacy in preventing severe cases of COVID-19 refers to the vaccine's ability to effectively prevent severe symptoms and hospitalizations due to COVID-19 infection."
                 },
                 {
-                    "aspect_name": "Effectiveness against Omicron variant"
+                    "aspect_name": "Efficacy in preventing hospitalizations due to COVID-19",
+                    "aspect_description": "Efficacy in preventing hospitalizations due to COVID-19 refers to the percentage of people who received a vaccine and avoided being hospitalized due to COVID-19, compared to those who did not receive the vaccine."
+                },
+                {
+                    "aspect_name": "Efficacy in preventing deaths due to COVID-19",
+                    "aspect_description": "The efficacy in preventing deaths due to COVID-19 refers to the effectiveness of a vaccine in reducing the number of fatalities caused by the virus."
                 }
-            ]
+            ],
+            "aspect_description": "Efficacy against COVID-19 refers to the percentage of people who do not develop COVID-19 symptoms after receiving a vaccine."
         },
         {
-            "aspect_name": "Side effect profile",
+            "aspect_name": "Side effects and safety profile",
             "children": [
                 {
-                    "aspect_name": "Common side effects"
+                    "aspect_name": "Common side effects experienced by patients",
+                    "aspect_description": "Common side effects experienced by patients refer to the typical and generally harmless reactions that occur in a large number of individuals after receiving a specific vaccine, such as pain, redness, or fatigue."
                 },
                 {
-                    "aspect_name": "Severe side effects"
+                    "aspect_name": "Serious side effects experienced by patients",
+                    "aspect_description": "The aspect 'Serious side effects experienced by patients' refers to any severe, life-threatening, or irreversible reactions that occur in a limited number of individuals as a result of receiving the vaccine."
+                },
+                {
+                    "aspect_name": "Long-term safety and potential for adverse reactions",
+                    "aspect_description": "Long-term safety and potential for adverse reactions refers to the potential risks and side effects associated with receiving the vaccine, such as allergic reactions, blood clots, or long-term health consequences, which can vary between the two vaccines."
                 }
-            ]
+            ],
+            "aspect_description": "The 'side effects and safety profile' refers to the potential adverse reactions and risks associated with taking a vaccine, as well as its overall safety record and the likelihood of serious complications or long-term health effects."
         },
         {
-            "aspect_name": "Duration of protection",
+            "aspect_name": "Immune response and duration of protection",
             "children": [
                 {
-                    "aspect_name": "Antibody persistence"
+                    "aspect_name": "Immune response in terms of antibody production",
+                    "aspect_description": "The immune response in terms of antibody production refers to the body's ability to produce specific proteins called antibodies to recognize and neutralize the SARS-CoV-2 virus after receiving a COVID-19 vaccine."
                 },
                 {
-                    "aspect_name": "Need for booster shots"
-                }
-            ]
-        },
-        {
-            "aspect_name": "Population-specific efficacy",
-            "children": [
-                {
-                    "aspect_name": "Efficacy in elderly"
+                    "aspect_name": "Duration of protection against COVID-19",
+                    "aspect_description": "The duration of protection against COVID-19 refers to how long the immune system retains its ability to prevent or reduce the severity of COVID-19 after receiving a vaccine."
                 },
                 {
-                    "aspect_name": "Efficacy in immunocompromised individuals"
+                    "aspect_name": "Comparison of immune response between Pfizer COVID-19 vaccine and Moderna COVID-19 vaccine",
+                    "aspect_description": "A comparison of immune response between Pfizer COVID-19 vaccine and Moderna COVID-19 vaccine refers to an analysis of how well each vaccine stimulates the body's immune system to produce antibodies and immune cells that can fight the SARS-CoV-2 virus."
                 }
-            ]
-        },
-        {
-            "aspect_name": "Ease of distribution",
-            "children": [
-                {
-                    "aspect_name": "Storage requirements"
-                },
-                {
-                    "aspect_name": "Shipping logistics"
-                }
-            ]
+            ],
+            "aspect_description": "The immune response and duration of protection refer to how well the vaccine stimulates the body's immune system to produce antibodies and protective immune cells, and how long these immune responses last to provide defense against the virus."
         }
-    ]
+    ],
+    "aspect_description": "Comparing Pfizer COVID-19 vaccine and Moderna COVID-19 vaccine refers to the process of evaluating and analyzing the efficacy, safety, and differences between the two vaccines to determine which one is more effective or suitable for individuals."
 }
