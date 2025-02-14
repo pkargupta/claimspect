@@ -59,16 +59,14 @@ def present_taxonomy(taxonomy_json, level=0):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--baseline_json_path_list", type=list, default=[
-        "eval/example/zeroshot_taxonomy.json",
-        "eval/example/rag_base_taxonomy.json",
-        "eval/example/rag_iterative_taxonomy.json"
-    ])
+    parser.add_argument("--baseline_json_path_list", type=str, default='["eval/example/zeroshot_taxonomy.json","eval/example/rag_base_taxonomy.json","eval/example/rag_iterative_taxonomy.json"])')
     parser.add_argument("--method_json_path", type=str, default="eval/example/hierarchy.json")
     parser.add_argument("--output_path", type=str, default="eval/example/taxonomy_llm_judge.json")
-    parser.add_argument("--model_name", type=str, default="gpt-4o", help="Name of the LLM model")
+    parser.add_argument("--model_name", type=str, default="gpt-4o-mini", help="Name of the LLM model")
     args = parser.parse_args()
-
+    
+    args.baseline_json_path_list = json.loads(args.baseline_json_path_list)
+    
     # Load JSON files
     baseline_json_list, method_json = get_json_files(args)
     claim = method_json['aspect_name']
@@ -86,7 +84,6 @@ def main():
 
         # Get LLM results
         results = llm_chat([baseline_first_prompt, method_first_prompt], args.model_name)
-        breakpoint()
 
         # Parse results using `in`
         baseline_first_result = (

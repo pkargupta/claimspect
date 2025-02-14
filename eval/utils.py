@@ -36,9 +36,41 @@ def run_baseline_evaluation(hierarchy_path, output_directory, baseline_model_nam
 
         # Evaluate the baseline results
         run_node_level_evaluation(output_path, output_directory, eval_model, f"{baseline}_baseline_node_level_eval.json")
-        
     
-
+    # Compare the preference of our method with the baselines
+    output_path = os.path.join(output_directory, eval_model, f"preference_comparison_our_method.json")
+    if os.path.exists(output_path):
+        print(f"Skipping preference comparison for {hierarchy_path} with existing output at {output_path}")
+    else:
+        baseline_json_path_list = [
+            os.path.join(output_directory, f"{baseline_model_name}_{baseline}_hierarchy.json")
+            for baseline in baselines
+        ]
+        command = [
+            "python", "-m", "eval.taxo_judge.judge",
+            f"--baseline_json_path_list={str(baseline_json_path_list).replace('\'', '\"')}",
+            f"--method_json_path={hierarchy_path}",
+            f'--output_path={output_path}',
+            f'--model_name={eval_model}'
+        ]    
+        run_command(command)
+     
+    # compare the preference of rag_baseline and zeroshot_baseline
+    output_path = os.path.join(output_directory, eval_model, f"preference_comparison_rag.json")
+    if os.path.exists(output_path):
+        print(f"Skipping preference comparison for {hierarchy_path} with existing output at {output_path}")
+    else:
+        baseline_json_path_list = [os.path.join(output_directory, f"{baseline_model_name}_zeroshot_hierarchy.json")]
+        command = [
+            "python", "-m", "eval.taxo_judge.judge",
+            f"--baseline_json_path_list={str(baseline_json_path_list).replace('\'', '\"')}",
+            f"--method_json_path={os.path.join(output_directory, f'{baseline_model_name}_rag_hierarchy.json')}",
+            f'--output_path={output_path}',
+            f'--model_name={eval_model}'
+        ]
+        run_command(command)
+    
+    
 def run_node_level_evaluation(eval_json_path, output_directory, model_judge_name, output_filename):
     """Runs node-level evaluation for a given evaluation JSON path."""
     output_path = os.path.join(output_directory, model_judge_name, output_filename)
@@ -75,7 +107,7 @@ def perform_evaluation(hierarchy_path: str,
     # Part I: Taxonomy-level comparison
     if do_eval_taxonomy_level:
         run_baseline_evaluation(hierarchy_path, output_directory, baseline_model_name, taxo_height, child_num_per_node, data_dir, topic, claim_id, eval_model)
-    
+        
     # Part II: Node-level evaluation
     if do_eval_node_level:
         run_node_level_evaluation(hierarchy_path, output_directory, eval_model, "node_level_eval.json")

@@ -2,9 +2,7 @@ import argparse
 import json
 import logging
 import os
-import pickle
 
-import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from unidecode import unidecode
 
@@ -56,7 +54,6 @@ def build_prompt(claim, max_aspects_per_node=5):
     
     Args:
         claim (str): The current claim.
-        literature (str): The top relevant literature segments.
         max_aspects_per_node (int): The maximum number of aspects to generate.
 
     Returns:
@@ -123,13 +120,11 @@ def load_segments(data_dir, topic, claim_id):
 def iterative_zeroshot(args, current_claim, original_claim, current_height=0):
     """
     Recursively build a taxonomy for a claim by splitting it into aspects at each level,
-    guided by the most relevant literature segments.
 
     Args:
         args: Parsed command-line arguments.
         current_claim (str): The current claim or sub-claim being processed.
         original_claim (str): The main/initial claim.
-        segment_embeddings (dict): Precomputed embeddings for literature segments.
         embedding_func (callable): Function to produce embeddings for a given text.
         current_height (int): Current depth in the taxonomy tree.
 
@@ -221,7 +216,6 @@ def main():
     Main function to handle command-line execution:
       1. Parse arguments.
       2. Load the claim.
-      3. Load or create and cache embeddings for literature segments.
       4. Generate a taxonomy from the claim using a recursive approach.
       5. Clean and save the final taxonomy.
     """
