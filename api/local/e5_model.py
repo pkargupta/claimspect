@@ -19,7 +19,7 @@ class E5:
     def __init__(self):
         
         # Select the most available GPU
-        available_gpus = GPUtil.getAvailable(order="memory", limit=1, maxMemory=0.8)
+        available_gpus = GPUtil.getAvailable(order="memory", limit=1, maxMemory=0.9)
         if available_gpus:
             self.device = torch.device(f"cuda:{available_gpus[0]}")
             print(f"E5Embedder using GPU: cuda:{available_gpus[0]}")
