@@ -21,7 +21,6 @@ def user_interface(processed_data: dict, user_num: int, results_path: str) -> di
         print(f"Evaluating topic: {topic}")
         results[topic] = []
         for idx, node in enumerate(nodes):
-            # Allow split evaluation among multiple users
             if idx % user_num != int(user_id):
                 continue
             
@@ -42,10 +41,26 @@ def user_interface(processed_data: dict, user_num: int, results_path: str) -> di
                 print("Please evaluate the following segment:")
                 print("############################################")
                 print(seg["segment"])
-                feedback = robust_input("Input your feedback (0=support, 1=neutral, 2=oppose):", ["0", "1", "2"])
-                seg["human_label"] = "support" if feedback == "0" else "neutral" if feedback == "1" else "oppose"
+                
+                user_feedback = input("Input your feedback (0=support, 1=neutral, 2=oppose, or type 'quit' to skip this aspect):\n").strip().lower()
+                if user_feedback == "quit":
+                    print("User opted to quit this aspect. Skipping remaining segments and moving to next aspect.")
+                    break
+                
+                while user_feedback not in ["0", "1", "2"]:
+                    print("Invalid response. Please input 0, 1, 2 or 'quit' to skip.")
+                    user_feedback = input("Input your feedback (0=support, 1=neutral, 2=oppose, or type 'quit' to skip this aspect):\n").strip().lower()
+                    if user_feedback == "quit":
+                        print("User opted to quit this aspect. Skipping remaining segments and moving to next aspect.")
+                        break
+                
+                if user_feedback == "quit":
+                    break
+
+                seg["human_label"] = "support" if user_feedback == "0" else "neutral" if user_feedback == "1" else "oppose"
                 aspect_results.append(seg)
                 print("############################################")
+            
             with open(aspect_save_path, "w") as f:
                 json.dump(aspect_results, f, indent=4)
             print(f"Aspect {idx} saved to {aspect_save_path}")
