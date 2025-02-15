@@ -9,7 +9,7 @@ def main():
     parser.add_argument('--data_path', type=str, default='res', help='Path to the data directory')
     parser.add_argument('--results_path', type=str, default='eval/human_judge/res', help='Path to save evaluation results')
     parser.add_argument('--json_prefix', type=str, default='3_3_3/aspect_hierarchy.json', help='Prefix for JSON files')
-    parser.add_argument('--segment_per_perspective', type=int, default=2, help='Segments per perspective')
+    parser.add_argument('--segment_per_perspective', type=int, default=50, help='Segments per perspective')
     parser.add_argument('--sample_per_split', type=int, default=2, help='Number of node samples per topic')
     parser.add_argument('--user_num', type=int, default=2, help='Total number of evaluators')
 
