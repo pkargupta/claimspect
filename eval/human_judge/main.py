@@ -27,7 +27,9 @@ def main():
     )
 
     # Run the user interface for human evaluation
-    user_interface(processed_data, args.user_num, args.results_path)
+    for topic in ['dtra', 'vaccine']:
+        print(f"Processing topic: {topic}")
+        user_interface(processed_data, args.user_num, args.results_path, topic)
     
     # Process and display the results
     result_processor(args.results_path)

@@ -37,8 +37,4 @@ def result_processor(results_path: str) -> dict:
         accuracy_results[topic] = accuracy
         print(f"{topic}: {accuracy:.2%} accuracy")
     
-    print("LLM Label Accuracy by Topic:")
-    for topic, acc in accuracy_results.items():
-        print(f"{topic}: {acc:.2%}")
-    
     return accuracy_results
