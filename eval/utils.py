@@ -71,7 +71,7 @@ def run_baseline_evaluation(hierarchy_path, output_directory, baseline_model_nam
         run_command(command)
     
     
-def run_node_level_evaluation(eval_json_path, output_directory, model_judge_name, output_filename):
+def run_node_level_evaluation(eval_json_path, output_directory, model_judge_name, output_filename, max_paths=None):
     """Runs node-level evaluation for a given evaluation JSON path."""
     output_path = os.path.join(output_directory, model_judge_name, output_filename)
     
@@ -85,6 +85,8 @@ def run_node_level_evaluation(eval_json_path, output_directory, model_judge_name
             f"--model_judge_name={model_judge_name}",
             f"--output_path={output_path}"
         ]
+        if max_paths is not None:
+            command.append(f"--max_paths={max_paths}")
         run_command(command)
 
 def perform_evaluation(hierarchy_path: str, 
@@ -99,7 +101,8 @@ def perform_evaluation(hierarchy_path: str,
                        data_dir: str,
                        topic: str,
                        claim_id: int,
-                       args):
+                       args,
+                       max_paths: int = None):
     """
     Perform evaluation on the data in hierarchy_path and save the results in the output_directory.
     """
@@ -111,7 +114,7 @@ def perform_evaluation(hierarchy_path: str,
         
     # Part II: Node-level evaluation
     if do_eval_node_level:
-        run_node_level_evaluation(hierarchy_path, output_directory, eval_model, "node_level_eval.json")
+        run_node_level_evaluation(hierarchy_path, output_directory, eval_model, "node_level_eval.json", max_paths=max_paths)
     
     # Part III: Ablation study
     if do_eval_ablation:
@@ -123,7 +126,7 @@ def perform_evaluation(hierarchy_path: str,
             
             # first do score analysis
             print(f"Performing ablation study for {hierarchy_path}")
-            run_node_level_evaluation(ablation_hierarchy_path, output_directory, eval_model, "node_level_eval_nodisc.json")
+            run_node_level_evaluation(ablation_hierarchy_path, output_directory, eval_model, "node_level_eval_nodisc.json", max_paths=max_paths)
             
             # then do the preference comparison
             output_path = os.path.join(output_directory, eval_model, f"{baseline_model_name}_preference_comparison_ablation.json")

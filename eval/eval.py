@@ -4,7 +4,7 @@ from typing import List
 from tqdm import tqdm
 from eval.utils import perform_evaluation
 
-def generate_paths(root_dir: str, suffix: str) -> List[str]:
+def generate_paths(root_dir: str, suffix: str, max_paths: int = None) -> List[str]:
     """
     Generate a list of paths by combining root_dir, each number in numbers, and suffix.
     """
@@ -14,6 +14,11 @@ def generate_paths(root_dir: str, suffix: str) -> List[str]:
     paths = [os.path.join(root_dir, d, suffix) for d in directories]
     # check if they exist, get the existing paths, report the missing ones
     paths = [(p, d) for p, d in zip(paths, directories) if os.path.exists(p)]
+    
+    # Apply max_paths limit if specified
+    if max_paths is not None:
+        paths = paths[:max_paths]
+        
     print(f"Found {len(paths)} existing paths.")
     print(f"Missing {len(directories) - len(paths)} paths.")
     return paths
@@ -36,10 +41,10 @@ def main():
     parser.add_argument('--data_dir', type=str, required=True, help='Data directory')
     parser.add_argument('--topic', type=str, required=True, help='Topic')
     parser.add_argument('--ablation_directory', type=str, default=None, help='Path to the ablation directory')
-    
+    parser.add_argument('--max_paths', type=int, default=None, help='Maximum number of paths to evaluate')
     args = parser.parse_args()
     # get the hierarchy paths
-    hierarchy_paths = generate_paths(args.hierarchy_prefix,args.hierarchy_suffix)
+    hierarchy_paths = generate_paths(args.hierarchy_prefix, args.hierarchy_suffix, max_paths=args.max_paths)
     
     """ Step II: Process the data """
     for hierarchy_path, idx in tqdm(hierarchy_paths, desc="Processing hierarchy paths", total=len(hierarchy_paths)):
@@ -58,7 +63,8 @@ def main():
                            args.data_dir,
                            args.topic,
                            int(idx),
-                           args)
+                           args,
+                           max_paths=args.max_paths)
 
 if __name__ == "__main__":
     main()

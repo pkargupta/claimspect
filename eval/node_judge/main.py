@@ -18,8 +18,6 @@ def main():
     parser.add_argument("--output_path", type=str, default="eval/example/node_llm_judge.json")
     parser.add_argument("--model_judge_name", type=str, default="gpt-4o-mini", help="Name of the LLM model")
     parser.add_argument("--max_paths", type=int, default=None, help="Maximum number of paths to evaluate")
-    parser.add_argument("--max_levels", type=int, default=None, help="Maximum number of levels to evaluate")
-    parser.add_argument("--max_nodes", type=int, default=None, help="Maximum number of nodes to evaluate")
     args = parser.parse_args()
 
     # Load JSON file
@@ -37,7 +35,7 @@ def main():
     avg_granularity = (sum(valid_granularity_scores) / len(valid_granularity_scores)) if valid_granularity_scores else 0
         
     # Evaluate level granularity
-    level_wise_granularity = get_level_granularity(claim, levels, args.model_judge_name, max_levels=args.max_levels)
+    level_wise_granularity = get_level_granularity(claim, levels, args.model_judge_name)
     valid_level_scores = [level['score'] for level in level_wise_granularity if level['score'] != -1]
     avg_level_granularity = (sum(valid_level_scores) / len(valid_level_scores)) if valid_level_scores else 0
     
@@ -45,7 +43,7 @@ def main():
     taxonomy_wise_uniqueness = retry_taxonomy_wise_uniqueness(claim, taxonomy, node_num=len(nodes), judge_name=args.model_judge_name)
     
     # Evaluate node segment quality
-    node_wise_segment_quality = get_node_wise_segment_quality(claim, nodes, args.model_judge_name, max_nodes=args.max_nodes)
+    node_wise_segment_quality = get_node_wise_segment_quality(claim, nodes, args.model_judge_name)
     valid_segment_scores = [node['score'] for node in node_wise_segment_quality if node['score'] != -1]
     avg_segment_quality = (sum(valid_segment_scores) / len(valid_segment_scores)) if valid_segment_scores else 0
     

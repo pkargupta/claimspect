@@ -1,13 +1,13 @@
-ANALYSIS_RESULTS_DIR="res/vaccine"
-OUTPUT_DIR="eval/metrics/vaccine"
-HIERARCHY_PREFIX="res/vaccine"
+ANALYSIS_RESULTS_DIR="res/dtra"
+OUTPUT_DIR="eval/metrics/dtra"
+HIERARCHY_PREFIX="res/dtra"
 HIERARCHY_SUFFIX="3_3_3/aspect_hierarchy.json"
 LLM_JUDGE='human'
 BASELINE_MODEL_NAME="llama-3.1-8b-instruct"
 TAXO_HEIGHT=3
 CHILD_NUM_PER_NODE=3
 DATA_DIR="data"
-TOPIC="vaccine"
+TOPIC="dtra"
 MAX_PATHS=5
 
 python -m eval.eval \
@@ -22,4 +22,4 @@ python -m eval.eval \
     --data_dir "$DATA_DIR" \
     --topic "$TOPIC" \
     --do_eval_node_level \
-    --max_paths "$MAX_PATHS"
+    --max_paths "$MAX_PATHS" 
