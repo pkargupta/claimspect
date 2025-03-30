@@ -77,7 +77,7 @@ def sample_nodes(node_objects, segment_per_perspective, sample_per_split):
     results = {}
     for topic, nodes in node_objects.items():
         qualified_nodes = [node for node in nodes if check_qualification(node, segment_per_perspective)]
-        sampled_nodes = random.sample(qualified_nodes, sample_per_split)
+        sampled_nodes = random.sample(qualified_nodes, min(sample_per_split, len(qualified_nodes)))
         results[topic] = sampled_nodes
         print(f"Sampled {len(sampled_nodes)} nodes from {topic}")
     return results
@@ -206,12 +206,14 @@ def result_processor(results_path):
 
 def main():
     
+    TOP_K = 15
+    
     parser = argparse.ArgumentParser(description="Human Evaluation Script")
     parser.add_argument('--data_path', type=str, default='res', help='Path to the data file')
-    parser.add_argument('--results_path', type=str, default='eval/human_judge/res', help='Path to save the results')
+    parser.add_argument('--results_path', type=str, default=f'eval/human_judge/res/top_{TOP_K}', help='Path to save the results')
     parser.add_argument('--json_prefix', type=str, default='3_3_3/aspect_hierarchy.json', help='Prefix for JSON files')
-    parser.add_argument('--segment_per_perspective', type=int, default=10, help='Number of segments per perspective')
-    parser.add_argument('--sample_per_split', type=int, default=50, help='Number of samples per split')
+    parser.add_argument('--segment_per_perspective', type=int, default=TOP_K, help='Number of segments per perspective')
+    parser.add_argument('--sample_per_split', type=int, default=20, help='Number of samples per split')
     parser.add_argument('--user_num', type=int, default=2, help='Number of users')
 
     args = parser.parse_args()

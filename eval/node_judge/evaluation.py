@@ -2,7 +2,17 @@
 
 from eval.llm.io import llm_chat  # make sure this import path is correct in your project
 
-def get_path_relevance(claim: str, paths: list, judge_name) -> list:
+def human_chat(input_str_list: list[str]) -> list[str]:
+    results = []
+    for prompt in input_str_list:
+        print("\n" + "="*80)
+        print(prompt)
+        print("="*80 + "\n")
+        response = input("Please enter your response: ")
+        results.append(response)
+    return results
+
+def get_path_relevance(claim: str, paths: list, judge_name, max_paths: int = None) -> list:
     def get_prompt(claim, path):
         return (
             "Claims made by individuals or entities are often nuanced and cannot always be strictly categorized as entirely 'true' or 'false'. "
@@ -12,15 +22,19 @@ def get_path_relevance(claim: str, paths: list, judge_name) -> list:
             "Output options: '<relevant>' or '<irerelevant>'. Do some simple rationalization before giving the output if possible."
         )
     
+    # Limit paths if max_paths is specified
+    if max_paths is not None:
+        paths = paths[:max_paths]
+    
     input_strs = [get_prompt(claim, path) for path in paths]
-    outputs = llm_chat(input_strs, model_name=judge_name)
+    outputs = human_chat(input_strs) if judge_name == "human" else llm_chat(input_strs, model_name=judge_name)
     
     results = []
     for path, output in zip(paths, outputs):
         result = {"path": path}
         if "<relevant>" in output.lower():
             result['score'] = 1
-        elif "<irrelevant>" in output.lower():
+        elif "<irelevant>" in output.lower():
             result['score'] = 0
         else:
             result['score'] = -1
@@ -29,7 +43,7 @@ def get_path_relevance(claim: str, paths: list, judge_name) -> list:
     
     return results
 
-def get_path_granularity(claim: str, paths: list, judge_name) -> list:
+def get_path_granularity(claim: str, paths: list, judge_name, max_paths: int = None) -> list:
     def get_prompt(claim, path):
         return (
             "Claims made by individuals or entities are often nuanced and cannot always be strictly categorized as entirely 'true' or 'false'. "
@@ -38,8 +52,13 @@ def get_path_granularity(claim: str, paths: list, judge_name) -> list:
             f"Given the claim: '{claim}', decide whether this path from the aspect tree has good granularity: '{path}' Check whether the child node is a more specific subaspect of the parent node. \n\n"
             "Output options: '<good granularity>' or '<bad granularity>'. Do some simple rationalization before giving the output if possible."
         )
+    
+    # Limit paths if max_paths is specified
+    if max_paths is not None:
+        paths = paths[:max_paths]
+        
     input_strs = [get_prompt(claim, path) for path in paths]
-    outputs = llm_chat(input_strs, model_name=judge_name)
+    outputs = human_chat(input_strs) if judge_name == "human" else llm_chat(input_strs, model_name=judge_name)
     
     results = []
     for path, output in zip(paths, outputs):
@@ -55,7 +74,7 @@ def get_path_granularity(claim: str, paths: list, judge_name) -> list:
     
     return results
 
-def get_level_granularity(claim: str, levels: list, judge_name) -> list:
+def get_level_granularity(claim: str, levels: list, judge_name, max_levels: int = None) -> list:
     def get_prompt(claim, level_instance):
         parent = level_instance['parent']
         siblings = level_instance['siblings']
@@ -67,8 +86,13 @@ def get_level_granularity(claim: str, levels: list, judge_name) -> list:
             "Output options: '<all not granular>' or '<majority not granular>' or "
             "'<majority granular>' or '<all granular>'. Do some simple rationalization before giving the output if possible."
         )
+    
+    # Limit levels if max_levels is specified
+    if max_levels is not None:
+        levels = levels[:max_levels]
+        
     input_strs = [get_prompt(claim, level) for level in levels]
-    outputs = llm_chat(input_strs, model_name=judge_name)
+    outputs = human_chat(input_strs) if judge_name == "human" else llm_chat(input_strs, model_name=judge_name)
     
     results = []
     for level_instance, output in zip(levels, outputs):
@@ -106,7 +130,7 @@ def get_taxonomy_wise_uniqueness(claim: str, taxonomy: str, node_num: int, judge
             "Output options: '<overlap_num>0</overlap_num>', '<overlap_num>1</overlap_num>'... or other possible numbers. Do some simple rationalization before giving the output if possible."
         )
     prompt = get_prompt(claim, taxonomy)
-    outputs = llm_chat([prompt], model_name=judge_name)[0]
+    outputs = human_chat([prompt])[0] if judge_name == "human" else llm_chat([prompt], model_name=judge_name)[0]
     
     # extract the number from the output
     result = {"taxonomy": taxonomy}
@@ -119,7 +143,7 @@ def get_taxonomy_wise_uniqueness(claim: str, taxonomy: str, node_num: int, judge
     result['reasoning'] = outputs
     return result
 
-def get_node_wise_segment_quality(claim: str, nodes: list, judge_name) -> list:
+def get_node_wise_segment_quality(claim: str, nodes: list, judge_name, max_nodes: int = None) -> list:
     def get_prompt(claim, node):
         aspect_name = node['aspect_name']
         segments = node['segments']
@@ -133,8 +157,12 @@ def get_node_wise_segment_quality(claim: str, nodes: list, judge_name) -> list:
             "Output options: '<rel_seg_num> ... (int) </rel_seg_num>'. Do some rationalization before outputting the number of relevant segments."
         )
     
+    # Limit nodes if max_nodes is specified
+    if max_nodes is not None:
+        nodes = nodes[:max_nodes]
+        
     input_strs = [get_prompt(claim, node) for node in nodes]
-    outputs = llm_chat(input_strs, model_name=judge_name)
+    outputs = human_chat(input_strs) if judge_name == "human" else llm_chat(input_strs, model_name=judge_name)
     results = []
     for node, output in zip(nodes, outputs):
         if len(node['segments']) == 0:

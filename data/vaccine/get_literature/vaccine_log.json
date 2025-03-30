@@ -1,0 +1,142 @@
+[
+  {
+    "claim": "Pfizer's mRNA vaccine may trigger stronger T-cell responses than Moderna's, suggesting a potential variation in long-term immunity not captured in initial efficacy trials.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "Emergency use authorization of the BNT162b2 vaccine during the pandemic is a precedent that could influence future vaccine approval processes, particularly in balancing rapid approval and comprehensive safety evaluations.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": false
+  },
+  {
+    "claim": "Current COVID-19 vaccines may exacerbate pre-existing health conditions, leading to an increased incidence of thrombotic events.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "Moderna's higher reactogenicity compared to Pfizer may indicate a fundamentally flawed approach to mRNA vaccine design.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "The findings presuming statistical insignificance of differences between Pfizer and Moderna booster doses might undervalue subtle, long-term immunological benefits.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "The robustness of immune protection over time differs markedly between mRNA vaccines due to inherent structural and dosing variations.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "The emphasis on mRNA vaccine technology by Pfizer and Moderna may shift future vaccine research priorities away from traditional vaccine platforms.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": false
+  },
+  {
+    "claim": "Keeping manufacturing costs secret is essential for protecting proprietary processes and innovations in the pharmaceutical industry.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": false,
+    "has_10_papers": false
+  },
+  {
+    "claim": "Tiered pricing strategies for vaccines based on country income levels create more harm than good by encouraging black market sales.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": false,
+    "has_10_papers": false
+  },
+  {
+    "claim": "Healthcare professionals' varying interpretations of allergy history as a contraindication for COVID-19 vaccination reflect insufficient guidance on balancing vaccine benefits and allergy risks.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "The focus on mechanical stability overlooks potential adaptive strategies by healthcare providers to mitigate mishandling effects.",
+    "nuance": 1,
+    "relevancy": 0,
+    "has_5_papers": false,
+    "has_10_papers": false
+  },
+  {
+    "claim": "The shift to advanced hybrid materials like cyclic olefin polymers with nanolayer glass for vials could revolutionize vaccine storage and significantly reduce the carbon footprint.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "The supposed waning efficacy of two-dose mRNA vaccines lacks a comprehensive exploration of how evolving virus variants and prior infection status impact these findings.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "Current methodologies in determining COVID-19 vaccine efficacy may not account accurately for virus variants and changing transmission dynamics.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "The focus on mRNA and DNA vaccines overlooks the potential of viral vectored vaccines as a robust alternative for COVID-19 prevention.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "Collaborative efforts with private facilities could alleviate Nigeria's vaccine distribution challenges, but this may inadvertently create inequalities in access.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": false
+  },
+  {
+    "claim": "Failing to adopt standardized formats for secondary and tertiary vaccine packaging could lead to inefficiencies and increased costs in the global supply chain.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": false,
+    "has_10_papers": false
+  },
+  {
+    "claim": "VAERS data are unreliable and cannot serve as a valid basis for assessing vaccine safety risks compared to randomized controlled trials.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "Historical vaccine safety incidents indicate the quality control measures already in place are sufficient, rendering vial-specific analysis unnecessary.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  },
+  {
+    "claim": "The lower reported efficacy of the Johnson & Johnson vaccine hints at potentially misleading efficacy claims for mRNA vaccines due to inconsistent comparative benchmarks.",
+    "nuance": 1,
+    "relevancy": 1,
+    "has_5_papers": true,
+    "has_10_papers": true
+  }
+]
