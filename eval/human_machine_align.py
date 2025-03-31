@@ -507,7 +507,7 @@ def main(k: int = 5, seed: int = 42, output_dir: Path = Path("eval/human_align")
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--k", type=int, default=1, help="Number of instances to sample for each type")
+    parser.add_argument("--k", type=int, default=10, help="Number of instances to sample for each type")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for sampling")
     parser.add_argument("--output_dir", type=Path, default=Path("eval/human_align"), help="Output directory for results")
     args = parser.parse_args()
