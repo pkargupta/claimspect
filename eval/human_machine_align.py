@@ -31,8 +31,6 @@ class NodeRelevanceInput:
         )
     
     def is_aligned(self) -> bool:
-        if not self.human_result or not self.llm_result:
-            return False
         return self.human_result == self.llm_result
 
 @dataclass
@@ -53,8 +51,6 @@ class PathGranularityInput:
         )
     
     def is_aligned(self) -> bool:
-        if not self.human_result or not self.llm_result:
-            return False
         return self.human_result == self.llm_result
 
 @dataclass
@@ -77,8 +73,6 @@ class LevelGranularityInput:
         )
     
     def is_aligned(self) -> bool:
-        if not self.human_result or not self.llm_result:
-            return False
         return self.human_result == self.llm_result
 
 @dataclass
@@ -100,9 +94,6 @@ class UniquenessInput:
         )
     
     def is_aligned(self) -> bool:
-        if not self.human_result or not self.llm_result:
-            return False
-        # For uniqueness, we consider it aligned if both human and llm gave valid scores
         return self.human_result != -1 and self.llm_result != -1
 
 @dataclass
@@ -125,9 +116,6 @@ class SegmentQualityInput:
         )
     
     def is_aligned(self) -> bool:
-        if not self.human_result or not self.llm_result:
-            return False
-        # For segment quality, we consider it aligned if both human and llm gave valid scores
         return self.human_result != -1 and self.llm_result != -1
 
 def get_topic_from_claim(claim_name: str, dataset_name: str) -> str:
