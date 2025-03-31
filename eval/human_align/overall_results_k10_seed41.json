@@ -1,0 +1,27 @@
+{
+  "node_relevance": {
+    "avg_score_llm": 1.0,
+    "avg_score_human": 1.0,
+    "alignment_rate": 1.0
+  },
+  "path_granularity": {
+    "avg_score_llm": 0.7,
+    "avg_score_human": 0.6,
+    "alignment_rate": 0.9
+  },
+  "level_granularity": {
+    "avg_score_llm": 2.8,
+    "avg_score_human": 3.4,
+    "alignment_rate": null
+  },
+  "uniqueness": {
+    "avg_score_llm": 0.8746951566951567,
+    "avg_score_human": 0.8725,
+    "alignment_rate": null
+  },
+  "segment_quality": {
+    "avg_score_llm": 0.36,
+    "avg_score_human": 0.22000000000000003,
+    "alignment_rate": null
+  }
+}

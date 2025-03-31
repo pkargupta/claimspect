@@ -359,7 +359,7 @@ def parse_human_result(output: str, eval_type: str) -> float:
     elif eval_type == "uniqueness":
         try:
             output_int = output.split('<overlap_num>')[1].split('</overlap_num>')[0].strip()
-            return float(output_int)
+            return 1 - float(output_int/40)
         except:
             return -1.0
             
@@ -383,7 +383,7 @@ def calculate_metrics(instances: List[Any], eval_type: str) -> Dict[str, float]:
         }
     
     # For uniqueness and segment quality, alignment rate is based on valid scores
-    if eval_type in ["uniqueness", "segment_quality"]:
+    if eval_type in ["level_granularity", "uniqueness", "segment_quality"]:
         alignment_rate = None
     else:
         aligned = sum(1 for instance in instances if instance.is_aligned())
