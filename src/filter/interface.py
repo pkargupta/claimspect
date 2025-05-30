@@ -1,4 +1,4 @@
-from filter.keyword_ensemble_embedding_llm_judge import KeywordEnsembleEmbeddingLLMFilter
+from src.filter.keyword_ensemble_embedding_llm_judge import KeywordEnsembleEmbeddingLLMFilter
 
 def filter_segments(args, tree):
     

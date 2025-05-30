@@ -1,6 +1,6 @@
 import random
 import json
-from api.openai.embed import embed as openai_embed
+from src.api.openai.embed import embed as openai_embed
 # import cosine similarity function
 from sklearn.metrics.pairwise import cosine_similarity
 

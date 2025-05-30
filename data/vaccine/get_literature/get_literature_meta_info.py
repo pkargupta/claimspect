@@ -3,8 +3,8 @@ import json
 import random
 from tqdm import tqdm
 from itertools import combinations
-from api.openai.chat import chat
-from api.scholar.search_by_plain_str import search_literature_by_plain_text
+from src.api.openai.chat import chat
+from src.api.scholar.search_by_plain_str import search_literature_by_plain_text
 from tenacity import RetryError
 
 DECOMPOSITION_PROMPT = """

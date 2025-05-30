@@ -1,4 +1,4 @@
-from api.openai.chat import chat
+from src.api.openai.chat import chat
 
 def gpt4o_chat(prompt_list: list[str]) -> list[str]:
     return chat(prompt_list, model_name='gpt-4o', seed=42)

@@ -3,7 +3,7 @@ import json
 import time
 from copy import deepcopy
 
-from classify.core_class_anno.core_class_annotation import run_annotation
+from src.classify.core_class_anno.core_class_annotation import run_annotation
 
 def find_node_by_name(tree, node_name):
     """

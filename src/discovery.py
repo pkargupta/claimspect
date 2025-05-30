@@ -5,8 +5,8 @@ import json
 import numpy as np
 from tqdm import tqdm
 
-from prompts import subaspect_list_schema, subaspect_prompt, perspective_prompt, perspective_schema
-from prompts import stance_schema, stance_prompt, perspective_desc_schema, perspective_desc_prompt
+from src.prompts import subaspect_list_schema, subaspect_prompt, perspective_prompt, perspective_schema
+from src.prompts import stance_schema, stance_prompt, perspective_desc_schema, perspective_desc_prompt
 
 def subaspect_discovery(args, segments, rank2id, parent_aspect, top_k=10, temperature=0.7, top_p=0.99):
     parent_path = " -> ".join(parent_aspect.get_ancestors(as_str=True))

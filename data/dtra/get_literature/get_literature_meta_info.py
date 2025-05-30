@@ -2,8 +2,8 @@ import os
 import json
 from tqdm import tqdm
 from itertools import combinations
-from api.openai.chat import chat
-from api.scholar.search_by_plain_str import search_literature_by_plain_text
+from src.api.openai.chat import chat
+from src.api.scholar.search_by_plain_str import search_literature_by_plain_text
 
 DECOMPOSITION_PROMPT = """
 Task: You are an expert in analyzing and deconstructing claims into their core themes and underlying components. Given a specific claim, your goal is to:

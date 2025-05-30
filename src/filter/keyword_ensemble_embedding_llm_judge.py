@@ -1,10 +1,10 @@
-from filter.abstract import AbstractFilter
-from api.local.e5_model import E5
+from src.filter.abstract import AbstractFilter
+from src.api.local.e5_model import E5
 import re
 import numpy as np
-from api.local.e5_model import e5_embed
-from api.openai.chat import chat
-from api.openai.embed import embed as openai_embed
+from src.api.local.e5_model import e5_embed
+from src.api.openai.chat import chat
+from src.api.openai.embed import embed as openai_embed
 from sklearn.metrics.pairwise import cosine_similarity
 
 import json

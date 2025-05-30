@@ -1,9 +1,9 @@
 from main import main
 import argparse
-from api.local.e5_model import E5
-from api.local.e5_model import e5_embed
-from api.openai.embed import embed as openai_embed
-from api.openai.chat import chat
+from src.api.local.e5_model import E5
+from src.api.local.e5_model import e5_embed
+from src.api.openai.embed import embed as openai_embed
+from src.api.openai.chat import chat
 from vllm import LLM
 import os
 import json

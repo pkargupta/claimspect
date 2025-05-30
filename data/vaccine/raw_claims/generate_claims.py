@@ -1,6 +1,6 @@
 import os
 import json
-from api.openai.chat import chat
+from src.api.openai.chat import chat
 
 POS_CLAIM_GENERATION_PROMPT = """
 Scientific or political claims are often nuanced and multifaceted, rarely lending themselves to simple “yes” or “no” answers. To answer such questions effectively, claims must be broken into specific aspects for in-depth analysis, with evidence drawn from relevant scientific literature. We are currently studying such claims using this corpus: 

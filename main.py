@@ -10,19 +10,19 @@ import numpy as np
 from collections import deque
 from contextlib import redirect_stdout
 
-from api.local.e5_model import E5
-from api.local.e5_model import e5_embed
-from api.openai.embed import embed as openai_embed
-from api.openai.chat import chat
+from src.api.local.e5_model import E5
+from src.api.local.e5_model import e5_embed
+from src.api.openai.embed import embed as openai_embed
+from src.api.openai.chat import chat
 
-from hierarchy import Paper, AspectNode, Tree, Segment
-from filter.interface import filter_segments
-from classify.interface import hierarchical_segment_classification
+from src.hierarchy import Paper, AspectNode, Tree, Segment
+from src.filter.interface import filter_segments
+from src.classify.interface import hierarchical_segment_classification
 
-from keyword_generation.keyword_extractor import extract_keywords, stage1_retrieve_top_k_corpus_segments
-from prompts import aspect_list_schema, aspect_prompt
+from src.keyword_generation.keyword_extractor import extract_keywords, stage1_retrieve_top_k_corpus_segments
+from src.prompts import aspect_list_schema, aspect_prompt
 from segment_ranking import aspect_segment_ranking
-from discovery import subaspect_discovery, perspective_discovery
+from src.discovery import subaspect_discovery, perspective_discovery
 from unidecode import unidecode
 
 def load_data(args, chunk_size=3):

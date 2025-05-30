@@ -6,7 +6,7 @@ import os
 from sklearn.metrics.pairwise import cosine_similarity
 from unidecode import unidecode
 
-from api.local.e5_model import E5
+from src.api.local.e5_model import E5
 from eval.llm.io import llm_chat
 
 # Configure logging

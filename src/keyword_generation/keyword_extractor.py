@@ -1,9 +1,9 @@
 from sklearn.metrics.pairwise import cosine_similarity
-from api.openai.embed import embed as openai_embed
-from api.openai.chat import chat
-from api.local.e5_model import e5_embed
-from hierarchy import Segment
-from prompts import keyword_extraction_prompt, keyword_filter_prompt
+from src.api.openai.embed import embed as openai_embed
+from src.api.openai.chat import chat
+from src.api.local.e5_model import e5_embed
+from src.hierarchy import Segment
+from src.prompts import keyword_extraction_prompt, keyword_filter_prompt
 
 from vllm import SamplingParams
 from vllm.sampling_params import GuidedDecodingParams

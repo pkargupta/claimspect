@@ -1,5 +1,5 @@
-from prompts import aspect_candidate_init_prompt, aspect_candidate_prompt
-from model_definitions import llama_8b_model
+from src.prompts import aspect_candidate_init_prompt, aspect_candidate_prompt
+from src.model_definitions import llama_8b_model
 import re
 
 
