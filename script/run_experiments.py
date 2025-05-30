@@ -1,4 +1,4 @@
-from main import main
+from src.main import main
 import argparse
 from src.api.local.e5_model import E5
 from src.api.local.e5_model import e5_embed

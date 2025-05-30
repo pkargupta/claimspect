@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=0,1,2,3 python -m run_experiments \
+CUDA_VISIBLE_DEVICES=0,1,2,3 python -m script.run_experiments \
     --data_dir "data" \
     --topic "dtra" \
     --chat_model_name "vllm" \

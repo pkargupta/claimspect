@@ -4,7 +4,7 @@ from vllm import SamplingParams
 from vllm.sampling_params import GuidedDecodingParams
 import json
 import os
-os.environ['HF_HOME'] = '/shared/data3/pk36/.cache'
+
 from tqdm import tqdm
 import numpy as np
 from collections import deque
@@ -21,7 +21,7 @@ from src.classify.interface import hierarchical_segment_classification
 
 from src.keyword_generation.keyword_extractor import extract_keywords, stage1_retrieve_top_k_corpus_segments
 from src.prompts import aspect_list_schema, aspect_prompt
-from segment_ranking import aspect_segment_ranking
+from src.segment_ranking import aspect_segment_ranking
 from src.discovery import subaspect_discovery, perspective_discovery
 from unidecode import unidecode
 

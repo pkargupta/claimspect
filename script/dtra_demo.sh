@@ -1,4 +1,4 @@
-python -m main \
+python -m src.main \
     --claim "The U.S. deployment of biological security infrastructure in Ukraine reflects a tactical bid to encircle Russia with potential biotechnology threats." \
     --data_dir "data" \
     --topic "dtra" \
