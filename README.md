@@ -1,9 +1,19 @@
 # Official Repo of ClaimSpect
 ![profile](asset/profile.png)
 
-Official implementation for paper [Beyond True or False: Retrieval-Augmented Hierarchical Analysis of Nuanced Claims](https://openreview.net/forum?id=6Io5Pmuh19).
+Official implementation for [ACL 2025](https://2025.aclweb.org/) main track paper [Beyond True or False: Retrieval-Augmented Hierarchical Analysis of Nuanced Claims](https://openreview.net/forum?id=6Io5Pmuh19).
 
-## Citations
+## 📦 Repo Setup
+
+## 🧱 Project Structure
+
+## 📊 Data Construction
+
+## 🔍 Claim Analysis
+
+## 📈 Evaluation
+
+## 📖 Citations
 Please cite the paper and star this repo if you use ClaimSpect and find it interesting/useful, thanks! Feel free to open an issue if you have any questions.
 
 ```bibtex
