@@ -21,7 +21,6 @@ pip install -r requirements.txt
 The data construction process is implemented in the `data/dtra` and `data/vaccine` directory. This process involves:
 
 
-
 ## 🔍 Claim Analysis
 
 To run the claim analysis experiments:
