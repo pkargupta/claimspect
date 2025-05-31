@@ -19,9 +19,6 @@ pip install -r requirements.txt
 ## 📊 Data Construction
 
 The data construction process is implemented in the `data/dtra` and `data/vaccine` directory. This process involves:
-- 
-- 
-- 
 
 
 
