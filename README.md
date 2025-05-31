@@ -20,6 +20,13 @@ pip install -r requirements.txt
 
 The data construction process is implemented in the `data/dtra` and `data/vaccine` directory. This process involves:
 
+1. **Claim Construction**: Generate initial claims using `data/dtra/raw_claims/generate_claims.py`
+2. **Literature Searching**: Search for relevant papers using `data/dtra/get_literature/get_literature_meta_info.py`
+3. **Literature Download**: Download paper content using `data/dtra/get_literature/get_literature_body_from_url.py`
+4. **Literature Chunking**: Split papers into manageable chunks using `data/dtra/chunking/run_chunking.sh`
+
+Each step builds upon the previous one to create a comprehensive dataset for claim analysis.
+
 
 ## 🔍 Claim Analysis
 
