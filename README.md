@@ -5,13 +5,62 @@ Official implementation for [ACL 2025](https://2025.aclweb.org/) main track pape
 
 ## 📦 Repo Setup
 
-## 🧱 Project Structure
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/ClaimSpect.git
+cd ClaimSpect
+```
+
+2. Install the required dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 ## 📊 Data Construction
 
+The data construction process is implemented in the `data/dtra` and `data/vaccine` directory. This process involves:
+- 
+- 
+- 
+
+
+
 ## 🔍 Claim Analysis
 
+To run the claim analysis experiments:
+
+```bash
+bash script/run_experiments.sh
+```
+
+This script will execute the main claim analysis pipeline.
+
 ## 📈 Evaluation
+
+We provide multiple evaluation scripts for different aspects of the system:
+
+### Baseline Evaluation
+Run the baseline evaluation scripts in `eval/baseline/` directory.
+
+### LLM-as-Judge Evaluation
+```bash
+bash eval/eval_dtra.sh
+```
+
+### Retrieval Corpus Relevance Check
+```bash
+python eval/claim_examine/main.py
+```
+
+### Human Judge Evaluation
+```bash
+python eval/human_judge/main.py
+```
+
+### Human-Machine Alignment Evaluation
+```bash
+python eval/human_machine_align.py
+```
 
 ## 📖 Citations
 Please cite the paper and star this repo if you use ClaimSpect and find it interesting/useful, thanks! Feel free to open an issue if you have any questions.
