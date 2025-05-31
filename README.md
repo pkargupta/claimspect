@@ -7,7 +7,7 @@ Official implementation for [ACL 2025](https://2025.aclweb.org/) main track pape
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/ClaimSpect.git
+git clone https://github.com/pkargupta/claimspect.git
 cd ClaimSpect
 ```
 
