@@ -29,7 +29,9 @@ The data construction process is implemented in the `data/dtra` and `data/vaccin
 3. **Literature Download**: Download paper content using `data/dtra/get_literature/get_literature_body_from_url.py`
 4. **Literature Chunking**: Split papers into manageable chunks using `data/dtra/chunking/run_chunking.sh`
 
-Each step builds upon the previous one to create a comprehensive dataset for claim analysis.
+Each step builds upon the previous one to create a comprehensive dataset for claim analysis."
+
+But you can get access to the constructed data here: [first split](https://drive.google.com/file/d/1mVADElgxi3izOforYapP-UMeMloe3IGE/view?usp=sharing), [second split](https://drive.google.com/file/d/1Ngd4r9WprlZpdGCK5J2HzVd7_QFYP79I/view?usp=sharing).
 
 
 ## 🔍 Claim Analysis
