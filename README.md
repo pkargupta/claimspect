@@ -75,13 +75,10 @@ python eval/human_machine_align.py
 Please cite the paper and star this repo if you use ClaimSpect and find it interesting/useful, thanks! Feel free to open an issue if you have any questions.
 
 ```bibtex
-@inproceedings{
-    anonymous2025beyond,
-    title={Beyond True or False: Retrieval-Augmented Hierarchical Analysis of Nuanced Claims},
-    author={Anonymous},
-    booktitle={Submitted to ACL Rolling Review - February 2025},
-    year={2025},
-    url={https://openreview.net/forum?id=6Io5Pmuh19},
-    note={under review}
+@article{kargupta2025beyond,
+  title={Beyond True or False: Retrieval-Augmented Hierarchical Analysis of Nuanced Claims},
+  author={Kargupta, Priyanka and Tian, Runchu and Han, Jiawei},
+  journal={arXiv preprint arXiv:2506.10728},
+  year={2025}
 }
 ```
